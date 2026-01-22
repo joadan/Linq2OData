@@ -10,7 +10,11 @@ public class <#= clientName #>
 {
     public <#= clientName #>(HttpClient httpClient) 
     {
-        //This constructor is intentionally left blank
+         var odataClient = new Linq2OData.Client.ODataClient(httpClient); 
+          <# foreach (var metadata in metadataList) { #>
+    <#= metadata.EndpointName #> = new <#= metadata.NamespaceEndpointName #>(odataClient);
+<# } #>
+       
     }
 
     <# foreach (var metadata in metadataList) { #>

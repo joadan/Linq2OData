@@ -27,8 +27,8 @@ public class ODataEntitySet
     public required string EntityType { get; set; }
 
 
-    public string CSharpReturnType => $"List<{EntityType}>?";
-    public string CSharpMethodName => $"Get{EntityType}";
+    public string CSharpReturnType => $"ODataQuery<List<{EntityType}>>";
+    public string CSharpMethodName => $"Get{Name}";
 
 }
 public class ODataEntityType

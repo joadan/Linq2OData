@@ -28,7 +28,7 @@ namespace Linq2OData.Generator.Templates.Client
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("\r\n\r\nnamespace ");
+            this.Write("using Linq2OData.Client;\r\n\r\nnamespace ");
             
             #line 8 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(endpointNamespace));
@@ -42,7 +42,7 @@ namespace Linq2OData.Generator.Templates.Client
             
             #line default
             #line hidden
-            this.Write("(HttpClient httpClient) \r\n{\r\n\r\n");
+            this.Write("(ODataClient odataClient) \r\n{\r\n\r\n");
             
             #line 14 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
  foreach (var entitySet in metadata.EntitySets) { 
@@ -63,7 +63,21 @@ namespace Linq2OData.Generator.Templates.Client
             
             #line default
             #line hidden
-            this.Write("()\r\n    { \r\n    return null;\r\n    }\r\n");
+            this.Write("()\r\n    { \r\n    return  new ");
+            
+            #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entitySet.CSharpReturnType));
+            
+            #line default
+            #line hidden
+            this.Write("(odataClient, \"");
+            
+            #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entitySet.Name));
+            
+            #line default
+            #line hidden
+            this.Write("\");\r\n    }\r\n");
             
             #line 20 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
  } 

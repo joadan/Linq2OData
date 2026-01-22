@@ -3,19 +3,19 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
-
+using Linq2OData.Client;
 
 namespace <#= endpointNamespace #>;
 
 
-public class <#= metadata.EndpointName #>(HttpClient httpClient) 
+public class <#= metadata.EndpointName #>(ODataClient odataClient) 
 {
 
 <# foreach (var entitySet in metadata.EntitySets) { #>
     
     public <#= entitySet.CSharpReturnType #> <#= entitySet.CSharpMethodName #>()
     { 
-    return null;
+    return  new <#= entitySet.CSharpReturnType #>(odataClient, "<#= entitySet.Name #>");
     }
 <# } #>
 

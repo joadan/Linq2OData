@@ -5,7 +5,7 @@
 
 using Linq2OData.Client;
 
-namespace DemoClient.ODataDemo;
+namespace GeneratedClient.ODataDemo;
 
 public partial class Supplier
 {

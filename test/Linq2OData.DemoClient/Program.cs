@@ -1,4 +1,6 @@
-﻿namespace Linq2OData.DemoClient;
+﻿
+
+namespace Linq2OData.DemoClient;
 
 internal class Program
 {
@@ -7,6 +9,28 @@ internal class Program
         Console.WriteLine("Hello, World!");
 
         await GenerateClientAsync();
+   
+        await TestClientAsync();
+
+    }
+
+    private static async Task TestClientAsync()
+    {
+        var httpClient = new HttpClient();
+        httpClient.BaseAddress = new Uri("https://services.odata.org/V2/OData/OData.svc/");
+
+        var odataDemoClient = new GeneratedClient.ODataDemoClient(httpClient);
+
+        var result = await odataDemoClient
+             .ODataDemoEndpoint
+             .GetSuppliers()
+             .Top(5)
+             .Select()
+             .ExecuteBaseAsync();
+
+
+        var cc = result?.Count() ?? 0;
+
     }
 
 
@@ -19,7 +43,7 @@ internal class Program
             new Linq2OData.Generator.Models.ClientRequest
             {
                 Name = "ODataDemoClient",
-                Namespace = "DemoClient",
+                Namespace = "GeneratedClient",
                 MetadataList = [metadata]
             });
 

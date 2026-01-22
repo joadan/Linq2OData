@@ -1,25 +1,25 @@
+using Linq2OData.Client;
+
+namespace GeneratedClient.ODataDemo;
 
 
-namespace DemoClient.ODataDemo;
-
-
-public class ODataDemoEndpoint(HttpClient httpClient) 
+public class ODataDemoEndpoint(ODataClient odataClient) 
 {
 
     
-    public List<Product>? GetProduct()
+    public ODataQuery<List<Product>> GetProducts()
     { 
-    return null;
+    return  new ODataQuery<List<Product>>(odataClient, "Products");
     }
     
-    public List<Category>? GetCategory()
+    public ODataQuery<List<Category>> GetCategories()
     { 
-    return null;
+    return  new ODataQuery<List<Category>>(odataClient, "Categories");
     }
     
-    public List<Supplier>? GetSupplier()
+    public ODataQuery<List<Supplier>> GetSuppliers()
     { 
-    return null;
+    return  new ODataQuery<List<Supplier>>(odataClient, "Suppliers");
     }
 
 }
