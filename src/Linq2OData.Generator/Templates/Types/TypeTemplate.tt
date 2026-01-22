@@ -1,0 +1,23 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+using Linq2OData.Client;
+
+namespace <#= namespaceName #>;
+
+public partial class <#= entityType.Name #>
+{
+<# foreach (var property in entityType.Properties) { #>
+    [ODataMember("<#= property.Name #>")]
+    public <#= property.CSharpType #> <#= property.Name #> { get; set; }
+<# } #>
+
+
+<# foreach (var navigation in entityType.Navigations) { #>
+    [ODataMember("<#= navigation.Name #>")]
+    public <#= navigation.CSharpProperty #> <#= navigation.Name #> { get; set; }
+<# } #>
+}
+

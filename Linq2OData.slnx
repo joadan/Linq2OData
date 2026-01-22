@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Tests/">
+    <Project Path="test/Linq2OData.DemoClient/Linq2OData.DemoClient.csproj" Id="ba6dc6ea-ab25-4674-8dc5-c5323088b462" />
+    <Project Path="test/Linq2OData.Tests/Linq2OData.Tests.csproj" />
+  </Folder>
+  <Project Path="src/Linq2OData.Client/Linq2OData.Client.csproj" Id="71438afd-d2cb-4178-a8a5-caf9a13e7355" />
+  <Project Path="src/Linq2OData.Generator/Linq2OData.Generator.csproj" />
+</Solution>
