@@ -1,10 +1,5 @@
 ﻿using Linq2OData.Generator.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Text;
+
 using System.Xml.Linq;
 
 
@@ -37,8 +32,6 @@ internal static class MetadataParserVersion2
         var currentEdmNamespace = schema.Name.Namespace;
         metadata.Namespace = schema.Attribute("Namespace")?.Value ?? string.Empty;
 
-    
-
         // Parse EntityTypes
         metadata.EntityTypes = ParseEntityTypes(schema, currentEdmNamespace, sap);
 
@@ -51,7 +44,7 @@ internal static class MetadataParserVersion2
         var entityContainer = schema.Descendants(currentEdmNamespace + "EntityContainer").FirstOrDefault();
         if (entityContainer != null)
         {
-            metadata.EntitySets = ParseEntitySets(entityContainer, currentEdmNamespace, metadata.Namespace);
+            metadata.EntitySets = ParseEntitySets(entityContainer, currentEdmNamespace, metadata.Namespace, metadata.EntityTypes);
             metadata.Functions = ParseFunctionImports(entityContainer, currentEdmNamespace, m, metadata.Namespace);
         }
 
@@ -192,7 +185,7 @@ internal static class MetadataParserVersion2
         return property;
     }
 
-    private static List<ODataEntitySet> ParseEntitySets(XElement entityContainer, XNamespace edmNamespace, string schemaNamespace)
+    private static List<ODataEntitySet> ParseEntitySets(XElement entityContainer, XNamespace edmNamespace, string schemaNamespace, List<ODataEntityType> entityTypes)
     {
         var entitySets = new List<ODataEntitySet>();
 
@@ -211,7 +204,8 @@ internal static class MetadataParserVersion2
                 entitySets.Add(new ODataEntitySet
                 {
                     Name = name,
-                    EntityType = entityTypeName
+                    EntityTypeName = entityTypeName,
+                    EntityType = entityTypes.FirstOrDefault(et => et.Name == entityTypeName)!
                 });
             }
         }

@@ -6,9 +6,10 @@ using System.Text;
 
 namespace Linq2OData.Client
 {
-    public class ODataQuery<T>(ODataClient odataClient, string entitySetName)
+    public class ODataQuery<T>(ODataClient odataClient, string entitySetName, string? keyString = null)
     {
         private string? topExpression;
+    
 
         public string? TopExpression => topExpression;
         public ODataClient ODataClient => odataClient;
@@ -38,7 +39,17 @@ namespace Linq2OData.Client
         internal string? GenerateRequestUrl()
         {
             var urlBuilder = new StringBuilder();
-            urlBuilder.Append(EntitySetName);
+
+            if (string.IsNullOrWhiteSpace(keyString))
+            {
+                urlBuilder.Append(EntitySetName);
+            }
+            else
+            {
+                urlBuilder.Append($"{EntitySetName}({keyString})");
+            }
+
+        
             var queryParameters = new List<string>();
             if (!string.IsNullOrEmpty(TopExpression))
             {

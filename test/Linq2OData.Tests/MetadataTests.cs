@@ -89,17 +89,17 @@ namespace Linq2OData.Tests
             // Verify A_SalesQuotation entity set
             var salesQuotationSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "A_SalesQuotation");
             Assert.NotNull(salesQuotationSet);
-            Assert.Equal("A_SalesQuotationType", salesQuotationSet.EntityType);
+            Assert.Equal("A_SalesQuotationType", salesQuotationSet.EntityTypeName);
             
             // Verify A_SalesQuotationItem entity set
             var salesQuotationItemSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "A_SalesQuotationItem");
             Assert.NotNull(salesQuotationItemSet);
-            Assert.Equal("A_SalesQuotationItemType", salesQuotationItemSet.EntityType);
+            Assert.Equal("A_SalesQuotationItemType", salesQuotationItemSet.EntityTypeName);
             
             // Verify A_SalesQuotationPartner entity set
             var partnerSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "A_SalesQuotationPartner");
             Assert.NotNull(partnerSet);
-            Assert.Equal("A_SalesQuotationPartnerType", partnerSet.EntityType);
+            Assert.Equal("A_SalesQuotationPartnerType", partnerSet.EntityTypeName);
             
             // Verify count (should have 14 entity sets based on the XML)
             Assert.Equal(14, metadata.EntitySets.Count);
@@ -264,15 +264,15 @@ namespace Linq2OData.Tests
             
             var productsSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Products");
             Assert.NotNull(productsSet);
-            Assert.Equal("Product", productsSet.EntityType);
+            Assert.Equal("Product", productsSet.EntityTypeName);
             
             var categoriesSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Categories");
             Assert.NotNull(categoriesSet);
-            Assert.Equal("Category", categoriesSet.EntityType);
+            Assert.Equal("Category", categoriesSet.EntityTypeName);
             
             var suppliersSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Suppliers");
             Assert.NotNull(suppliersSet);
-            Assert.Equal("Supplier", suppliersSet.EntityType);
+            Assert.Equal("Supplier", suppliersSet.EntityTypeName);
         }
 
         [Fact]

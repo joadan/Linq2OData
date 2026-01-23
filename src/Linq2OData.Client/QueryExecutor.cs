@@ -6,13 +6,15 @@ using System.Text.Json;
 
 namespace Linq2OData.Client
 {
-    internal class QueryExecutor()
+    internal class QueryExecutor<T>(ODataQuery<T> oDataQuery)
     {
         private const string DataPropertyName = "d";
         private const string ResultsPropertyName = "results";
-        internal async Task<T?> ExecuteRequestAsync<T>(ODataQuery<T> oDataQuery, CancellationToken token = default)
+        internal async Task<T?> ExecuteRequestAsync(CancellationToken token = default)
         {
-            using var response = await oDataQuery.ODataClient.HttpClient.GetAsync(oDataQuery.GenerateRequestUrl(), token);
+            var url = oDataQuery.GenerateRequestUrl();
+
+            using var response = await oDataQuery.ODataClient.HttpClient.GetAsync(url, token);
             
             if (!response.IsSuccessStatusCode)
             {
@@ -23,12 +25,12 @@ namespace Linq2OData.Client
 
             var rawResponse = await response.Content.ReadAsStringAsync(token);
          
-            return ProcessResponse<T>(rawResponse);
+            return ProcessResponse(rawResponse);
         }
 
 
 
-        public T? ProcessResponse<T>(string con)
+        public T? ProcessResponse(string con)
         {
             //var document = JsonDocument.Parse(con);
 
@@ -39,85 +41,128 @@ namespace Linq2OData.Client
 
             if (dataElement.ValueKind == JsonValueKind.Array)
             {
-                return DeserializeArray<T>(root);
+                return DeserializeArray(dataElement);
             }
 
             throw new InvalidOperationException("Unexpected OData payload");
         }
 
 
-        private T DeserializeArray<T>(JsonElement array)
+        private T DeserializeArray(JsonElement array)
         {
-            var cleanedJson = RemoveODataMetadata(array);
-            return JsonSerializer.Deserialize<T>(cleanedJson)!;
+            var cleanedJson = ODataJsonCleanupHelper.Clean(array.GetRawText());
+            return JsonSerializer.Deserialize<T>(cleanedJson, oDataQuery.ODataClient.JsonOptions)!;
         }
 
 
-        private static string RemoveODataMetadata(JsonElement element)
+
+
+
+    }
+
+
+
+public static class ODataJsonCleanupHelper
+    {
+        /// <summary>
+        /// Removes OData system properties (e.g. __metadata, __deferred)
+        /// and completely drops objects that only contain metadata.
+        /// </summary>
+        public static string Clean(string json)
         {
+            using var document = JsonDocument.Parse(json);
             using var stream = new MemoryStream();
             using var writer = new Utf8JsonWriter(stream);
 
-            WriteWithoutMetadata(writer, element);
+            WriteCleanElement(writer, document.RootElement);
 
             writer.Flush();
-            return System.Text.Encoding.UTF8.GetString(stream.ToArray());
+            return Encoding.UTF8.GetString(stream.ToArray());
         }
 
-        private static void WriteWithoutMetadata(Utf8JsonWriter writer, JsonElement element)
+        private static void WriteCleanElement(
+            Utf8JsonWriter writer,
+            JsonElement element)
         {
             switch (element.ValueKind)
             {
                 case JsonValueKind.Object:
                     writer.WriteStartObject();
+
                     foreach (var prop in element.EnumerateObject())
                     {
-                        if (prop.Name.StartsWith("__")) continue;
+                        // Remove OData system properties
+                        if (prop.Name.StartsWith("__"))
+                            continue;
+
+                        // Drop metadata-only objects completely
+                        if (IsMetadataOnlyObject(prop.Value))
+                            continue;
 
                         writer.WritePropertyName(prop.Name);
-                        WriteWithoutMetadata(writer, prop.Value);
+                        WriteCleanElement(writer, prop.Value);
                     }
+
                     writer.WriteEndObject();
                     break;
 
                 case JsonValueKind.Array:
                     writer.WriteStartArray();
+
                     foreach (var item in element.EnumerateArray())
-                    {
-                        WriteWithoutMetadata(writer, item);
-                    }
+                        WriteCleanElement(writer, item);
+
                     writer.WriteEndArray();
                     break;
 
                 default:
-                    propWriteValue(writer, element);
+                    WritePrimitive(writer, element);
                     break;
             }
         }
 
-        private static void propWriteValue(Utf8JsonWriter writer, JsonElement element)
+        private static bool IsMetadataOnlyObject(JsonElement element)
+        {
+            if (element.ValueKind != JsonValueKind.Object)
+                return false;
+
+            foreach (var prop in element.EnumerateObject())
+            {
+                if (!prop.Name.StartsWith("__"))
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static void WritePrimitive(
+            Utf8JsonWriter writer,
+            JsonElement element)
         {
             switch (element.ValueKind)
             {
                 case JsonValueKind.String:
                     writer.WriteStringValue(element.GetString());
                     break;
+
                 case JsonValueKind.Number:
                     if (element.TryGetInt64(out var l))
                         writer.WriteNumberValue(l);
                     else
                         writer.WriteNumberValue(element.GetDouble());
                     break;
+
                 case JsonValueKind.True:
                 case JsonValueKind.False:
                     writer.WriteBooleanValue(element.GetBoolean());
                     break;
+
                 case JsonValueKind.Null:
                     writer.WriteNullValue();
                     break;
             }
         }
-
-
     }
+
+
 }

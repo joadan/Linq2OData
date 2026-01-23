@@ -8,7 +8,7 @@ internal class Program
     {
         Console.WriteLine("Hello, World!");
 
-        await GenerateClientAsync();
+        //await GenerateClientAsync();
    
         await TestClientAsync();
 
@@ -16,20 +16,21 @@ internal class Program
 
     private static async Task TestClientAsync()
     {
-        var httpClient = new HttpClient();
-        httpClient.BaseAddress = new Uri("https://services.odata.org/V2/OData/OData.svc/");
+        var httpClient = new HttpClient
+        {
+            BaseAddress = new Uri("https://services.odata.org/V2/OData/OData.svc/")
+        };
 
-        var odataDemoClient = new GeneratedClient.ODataDemoClient(httpClient);
+        var client = new GeneratedClient.ODataDemoClient(httpClient);
 
-        var result = await odataDemoClient
-             .ODataDemoEndpoint
-             .GetSuppliers()
-             .Top(5)
+        var result = await client
+             .ODataDemo
+            .ProductsByKey(1)
              .Select()
              .ExecuteBaseAsync();
 
 
-        var cc = result?.Count() ?? 0;
+        var cc = result;
 
     }
 

@@ -19,4 +19,12 @@ public class <#= metadata.EndpointName #>(ODataClient odataClient)
     }
 <# } #>
 
+<# foreach (var entitySet in metadata.EntitySets) { #>
+    
+    public <#= entitySet.CSharpKeyReturnType #> <#= entitySet.CSharpKeyMethodName #>(<#= entitySet.EntityType.KeyArgumentString #>)
+    { 
+    return  new <#= entitySet.CSharpKeyReturnType #>(odataClient, "<#= entitySet.Name #>", $"<#= entitySet.EntityType.KeyArgumentResultString #>");
+    }
+<# } #>
+
 }

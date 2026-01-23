@@ -60,7 +60,7 @@ namespace Linq2OData.Generator.Templates.Client
             this.Write("    ");
             
             #line 15 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(metadata.EndpointName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(metadata.Namespace));
             
             #line default
             #line hidden
@@ -95,7 +95,7 @@ namespace Linq2OData.Generator.Templates.Client
             this.Write(" ");
             
             #line 21 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(metadata.EndpointName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(metadata.Namespace));
             
             #line default
             #line hidden

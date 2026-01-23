@@ -10,13 +10,13 @@ namespace Linq2OData.Client;
 public class ODataQueryExecute<T, TResult>(ODataQuery<T> oDataQuery, Expression<Func<T, TResult>>? selector)
 {
 
-    public T BaseResult { get; set; }
+    public T? BaseResult { get; set; }
 
-    public async Task<T> ExecuteBaseAsync(CancellationToken cancellationToken = default)
+    public async Task<T?> ExecuteBaseAsync(CancellationToken cancellationToken = default)
     {
-        var exexutor = new QueryExecutor();
+        var exexutor = new QueryExecutor<T>(oDataQuery);
 
-        BaseResult = await exexutor.ExecuteRequestAsync<T>(oDataQuery, cancellationToken);
+        BaseResult = await exexutor.ExecuteRequestAsync(cancellationToken);
 
 
         return BaseResult;

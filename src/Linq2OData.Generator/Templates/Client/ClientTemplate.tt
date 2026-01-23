@@ -12,12 +12,12 @@ public class <#= clientName #>
     {
          var odataClient = new Linq2OData.Client.ODataClient(httpClient); 
           <# foreach (var metadata in metadataList) { #>
-    <#= metadata.EndpointName #> = new <#= metadata.NamespaceEndpointName #>(odataClient);
+    <#= metadata.Namespace #> = new <#= metadata.NamespaceEndpointName #>(odataClient);
 <# } #>
        
     }
 
     <# foreach (var metadata in metadataList) { #>
-    public <#= metadata.NamespaceEndpointName #> <#= metadata.EndpointName #> { get; set; }
+    public <#= metadata.NamespaceEndpointName #> <#= metadata.Namespace #> { get; set; }
 <# } #>
 }

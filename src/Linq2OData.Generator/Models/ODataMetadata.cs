@@ -13,6 +13,9 @@ public class ODataMetadata
 
     public string EndpointName => $"{Namespace}Endpoint";
     public string NamespaceEndpointName => $"{Namespace}.{EndpointName}";
+
+
+
 }
 public enum ODataVersion
 {
@@ -24,11 +27,17 @@ public class ODataEntitySet
 {
 
     public required string Name { get; set; }
-    public required string EntityType { get; set; }
+    public required string EntityTypeName { get; set; }
+    public required ODataEntityType EntityType { get; set; }
+
+    private bool EntityTypeHasKeys => EntityType?.Keys.Count > 0;
 
 
-    public string CSharpReturnType => $"ODataQuery<List<{EntityType}>>";
-    public string CSharpMethodName => $"Get{Name}";
+    public string CSharpReturnType => $"ODataQuery<List<{EntityTypeName}>>";
+    public string CSharpMethodName => $"{Name}";
+
+    public string CSharpKeyReturnType => $"ODataQuery<{EntityTypeName}>";
+    public string CSharpKeyMethodName => $"{Name}ByKey";
 
 }
 public class ODataEntityType
@@ -41,112 +50,185 @@ public class ODataEntityType
     public List<ODataProperty> Properties { get; set; } = [];
     public List<ODataNavigation> Navigations { get; set; } = [];
 
+    public List<ODataProperty> KeyProperties =>  Properties.Where(p => Keys.Contains(p.Name)).ToList();
+
+    public string KeyArgumentString
+    {
+        get
+        {
+            if (KeyProperties.Count == 0) {  return string.Empty; }
+
+            var keyArg = KeyProperties.Select(p =>
+            {
+                return $"{p.CSharpType} {ToCamelCaseVariable(p.Name)}";
+            });
+            return string.Join(", ", keyArg);
+
+        }
+    }
+
+    public string KeyArgumentResultString
+    {
+        get
+        {
+            if (KeyProperties.Count == 0) { return string.Empty; }
+
+            var keyArg = KeyProperties.Select(p =>
+            {
+                return $"{p.Name}={{{ToCamelCaseVariable(p.Name)}}}";
+            });
+            
+            return string.Join(",", keyArg);
+
+            
+
+        }
+    }
+
+
+    public static string ToCamelCaseVariable(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        int len = input.Length;
+        int i = 0;
+
+        // Find consecutive uppercase letters at the start
+        while (i < len && char.IsUpper(input[i]))
+            i++;
+
+        // If first char is the only uppercase, just lowercase it
+        if (i == 1)
+            return char.ToLower(input[0]) + input.Substring(1);
+
+        // If the whole string is uppercase (like "ID"), lowercase everything
+        if (i == len)
+            return input.ToLower();
+
+        // Lowercase all leading uppercase letters except the last if next char is lowercase
+        // Handles cases like "XMLHttpRequest" -> "xmlHttpRequest"
+        int endOfAcronym = i;
+        if (i > 1 && i < len && char.IsLower(input[i]))
+            endOfAcronym = i - 1;
+
+        return input.Substring(0, endOfAcronym).ToLower() + input.Substring(endOfAcronym);
+    }
+
+
 }
+
+
+
+
+
 
 public class ODataProperty
-{
-    public required string Name { get; set; }
-    public bool Nullable { get; set; } = true;
-
-    public required string DataType { get; set; }
-
-    public string? Description { get; set; }
-    public string? Label { get; set; }
-
-    public int? MaxLength { get; set; }
-
-    public int? Precision { get; set; }
-    public int? Scale { get; set; }
-
-    public bool Creatable { get; set; }
-    public bool Updateble { get; set; }
-
-    public bool Sortable { get; set; }
-    public bool Filterable { get; set; }
-
-
-    public string CSharpType
     {
-        get
+        public required string Name { get; set; }
+        public bool Nullable { get; set; } = true;
+
+        public required string DataType { get; set; }
+
+        public string? Description { get; set; }
+        public string? Label { get; set; }
+
+        public int? MaxLength { get; set; }
+
+        public int? Precision { get; set; }
+        public int? Scale { get; set; }
+
+        public bool Creatable { get; set; }
+        public bool Updateble { get; set; }
+
+        public bool Sortable { get; set; }
+        public bool Filterable { get; set; }
+
+
+        public string CSharpType
         {
-            if (!DataType.StartsWith("Edm.")) {
-                return DataType;
-            }
-
-
-            var csharpType = DataType switch
+            get
             {
-                "Edm.String" => "string",
-                "Edm.Int32" => "int",
-                "Edm.Int64" => "long",
-                "Edm.Boolean" => "bool",
-                "Edm.DateTime" => "DateTime",
-                "Edm.DateTimeOffset" => "DateTimeOffset",
-                "Edm.Decimal" => "decimal",
-                "Edm.Double" => "double",
-                "Edm.Guid" => "Guid",
-                "Edm.Time" => "TimeSpan",
-                _ => "object"
-            };
+                if (!DataType.StartsWith("Edm."))
+                {
+                    return DataType;
+                }
 
 
-            if (Nullable && csharpType != "string")
-            {
-                return csharpType + "?";
+                var csharpType = DataType switch
+                {
+                    "Edm.String" => "string",
+                    "Edm.Int32" => "int",
+                    "Edm.Int64" => "long",
+                    "Edm.Boolean" => "bool",
+                    "Edm.DateTime" => "DateTime",
+                    "Edm.DateTimeOffset" => "DateTimeOffset",
+                    "Edm.Decimal" => "decimal",
+                    "Edm.Double" => "double",
+                    "Edm.Guid" => "Guid",
+                    "Edm.Time" => "TimeSpan",
+                    _ => "object"
+                };
+
+
+                if (Nullable && csharpType != "string")
+                {
+                    return csharpType + "?";
+                }
+
+                return csharpType;
+
             }
-
-            return csharpType;
-
         }
+
     }
 
-}
-
-public class ODataNavigation
-{
-    public required string Name { get; set; }
-
-    public required string ToEntity { get; set; }
-
-    public ODataNavigationType NavigationType { get; set; }
-
-    public string CSharpProperty
+    public class ODataNavigation
     {
-        get
-        {
+        public required string Name { get; set; }
 
-            if(NavigationType == ODataNavigationType.Many)
+        public required string ToEntity { get; set; }
+
+        public ODataNavigationType NavigationType { get; set; }
+
+        public string CSharpProperty
+        {
+            get
             {
-                return $"List<{ToEntity}>?";
-            }
-          
+
+                if (NavigationType == ODataNavigationType.Many)
+                {
+                    return $"List<{ToEntity}>?";
+                }
+
                 return ToEntity + "?";
-          
 
+
+            }
         }
+
     }
 
-}
+    public class ODataFunction
+    {
+        public required string Name { get; set; }
+        public string? ReturnType { get; set; }
+        public string? HttpMethod { get; set; }
+        public List<ODataFunctionParameter> Parameters { get; set; } = [];
+    }
 
-public class ODataFunction
-{
-    public required string Name { get; set; }
-    public string? ReturnType { get; set; }
-    public string? HttpMethod { get; set; }
-    public List<ODataFunctionParameter> Parameters { get; set; } = [];
-}
+    public class ODataFunctionParameter
+    {
+        public required string Name { get; set; }
+        public required string DataType { get; set; }
+        public int? MaxLength { get; set; }
+        public string? Mode { get; set; }
+    }
 
-public class ODataFunctionParameter
-{
-    public required string Name { get; set; }
-    public required string DataType { get; set; }
-    public int? MaxLength { get; set; }
-    public string? Mode { get; set; }
-}
+    public enum ODataNavigationType
+    {
+        ZeroOrOne,
+        One,
+        Many
+    }
 
-public enum ODataNavigationType
-{
-    ZeroOrOne,
-    One,
-    Many
-}
