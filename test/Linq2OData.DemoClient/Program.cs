@@ -26,8 +26,8 @@ internal class Program
         var result = await client
              .ODataDemo
             .ProductsByKey(1)
-             .Select()
-             .ExecuteBaseAsync();
+             .Select(e => new { e.ID, e.Price})
+             .ExecuteAsync();
 
 
         var cc = result;

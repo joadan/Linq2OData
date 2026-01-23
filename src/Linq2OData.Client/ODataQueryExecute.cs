@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
+﻿using System.Linq.Expressions;
+
 
 namespace Linq2OData.Client;
 
@@ -15,19 +13,23 @@ public class ODataQueryExecute<T, TResult>(ODataQuery<T> oDataQuery, Expression<
     public async Task<T?> ExecuteBaseAsync(CancellationToken cancellationToken = default)
     {
         var exexutor = new QueryExecutor<T>(oDataQuery);
-
         BaseResult = await exexutor.ExecuteRequestAsync(cancellationToken);
-
-
         return BaseResult;
     }
 
-    //public async Task<TResult> ExecuteAsync(CancellationToken cancellationToken = default)
-    //{
-        
-    //    return await ExecuteBaseAsync(cancellationToken)
+    public async Task<TResult?> ExecuteAsync(CancellationToken cancellationToken = default)
+    {
+        await ExecuteBaseAsync(cancellationToken);
 
-    //    return default;
-    //    // return ConvertResult(await ExecuteBaseAsync(cancellationToken));
-    //}
+        if (BaseResult == null)
+        {
+            return default;
+        }
+
+        if (selector == null) {  return  (TResult?)(object)BaseResult; }
+
+       return selector.Compile().Invoke(BaseResult);
+     
+    }
+
 }

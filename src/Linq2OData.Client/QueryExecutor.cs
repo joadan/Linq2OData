@@ -39,7 +39,7 @@ namespace Linq2OData.Client
             root.TryGetProperty(DataPropertyName, out var dataElement);
 
 
-            if (dataElement.ValueKind == JsonValueKind.Array)
+            if (dataElement.ValueKind == JsonValueKind.Array || dataElement.ValueKind == JsonValueKind.Object)
             {
                 return DeserializeArray(dataElement);
             }
