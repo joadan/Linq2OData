@@ -1,0 +1,19 @@
+
+using Linq2OData.Client;
+
+namespace GeneratedClient.ODataDemo;
+
+public partial class CategoryInput : ODataInputBase
+{
+    public int? ID 
+	{
+		get => GetValue<int?>("ID");
+		set => SetValue("ID", value);
+	}
+    public string? Name 
+	{
+		get => GetValue<string?>("Name");
+		set => SetValue("Name", value);
+	}
+
+}

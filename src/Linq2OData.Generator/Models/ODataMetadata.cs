@@ -39,6 +39,8 @@ public class ODataEntitySet
     public string CSharpKeyReturnType => $"ODataQuery<{EntityTypeName}>";
     public string CSharpKeyMethodName => $"{Name}ByKey";
 
+    public string CSharpDeleteMethodName => $"{Name}DeleteAsync";
+  
 }
 public class ODataEntityType
 {
@@ -50,13 +52,15 @@ public class ODataEntityType
     public List<ODataProperty> Properties { get; set; } = [];
     public List<ODataNavigation> Navigations { get; set; } = [];
 
-    public List<ODataProperty> KeyProperties =>  Properties.Where(p => Keys.Contains(p.Name)).ToList();
+    public List<ODataProperty> KeyProperties => Properties.Where(p => Keys.Contains(p.Name)).ToList();
+
+    public string InputName => $"{Name}Input";
 
     public string KeyArgumentString
     {
         get
         {
-            if (KeyProperties.Count == 0) {  return string.Empty; }
+            if (KeyProperties.Count == 0) { return string.Empty; }
 
             var keyArg = KeyProperties.Select(p =>
             {
@@ -77,11 +81,8 @@ public class ODataEntityType
             {
                 return $"{p.Name}={{{ToCamelCaseVariable(p.Name)}}}";
             });
-            
+
             return string.Join(",", keyArg);
-
-            
-
         }
     }
 
@@ -124,111 +125,121 @@ public class ODataEntityType
 
 
 public class ODataProperty
+{
+    public required string Name { get; set; }
+    public bool Nullable { get; set; } = true;
+
+    public required string DataType { get; set; }
+
+    public string? Description { get; set; }
+    public string? Label { get; set; }
+
+    public int? MaxLength { get; set; }
+
+    public int? Precision { get; set; }
+    public int? Scale { get; set; }
+
+    public bool Creatable { get; set; }
+    public bool Updateble { get; set; }
+
+    public bool Sortable { get; set; }
+    public bool Filterable { get; set; }
+
+    public string CSharpTypeRaw
     {
-        public required string Name { get; set; }
-        public bool Nullable { get; set; } = true;
-
-        public required string DataType { get; set; }
-
-        public string? Description { get; set; }
-        public string? Label { get; set; }
-
-        public int? MaxLength { get; set; }
-
-        public int? Precision { get; set; }
-        public int? Scale { get; set; }
-
-        public bool Creatable { get; set; }
-        public bool Updateble { get; set; }
-
-        public bool Sortable { get; set; }
-        public bool Filterable { get; set; }
-
-
-        public string CSharpType
+        get
         {
-            get
+            if (!DataType.StartsWith("Edm."))
             {
-                if (!DataType.StartsWith("Edm."))
-                {
-                    return DataType;
-                }
-
-
-                var csharpType = DataType switch
-                {
-                    "Edm.String" => "string",
-                    "Edm.Int32" => "int",
-                    "Edm.Int64" => "long",
-                    "Edm.Boolean" => "bool",
-                    "Edm.DateTime" => "DateTime",
-                    "Edm.DateTimeOffset" => "DateTimeOffset",
-                    "Edm.Decimal" => "decimal",
-                    "Edm.Double" => "double",
-                    "Edm.Guid" => "Guid",
-                    "Edm.Time" => "TimeSpan",
-                    _ => "object"
-                };
-
-
-                if (Nullable && csharpType != "string")
-                {
-                    return csharpType + "?";
-                }
-
-                return csharpType;
-
+                return DataType;
             }
+
+
+            var csharpType = DataType switch
+            {
+                "Edm.String" => "string",
+                "Edm.Int32" => "int",
+                "Edm.Int64" => "long",
+                "Edm.Boolean" => "bool",
+                "Edm.DateTime" => "DateTime",
+                "Edm.DateTimeOffset" => "DateTimeOffset",
+                "Edm.Decimal" => "decimal",
+                "Edm.Double" => "double",
+                "Edm.Guid" => "Guid",
+                "Edm.Time" => "TimeSpan",
+                _ => "object"
+            };
+
+            return csharpType;
         }
 
     }
 
-    public class ODataNavigation
+    public string CSharpType
     {
-        public required string Name { get; set; }
-
-        public required string ToEntity { get; set; }
-
-        public ODataNavigationType NavigationType { get; set; }
-
-        public string CSharpProperty
+        get
         {
-            get
+         
+            var csharpType = CSharpTypeRaw;
+
+            if (Nullable && csharpType != "string")
             {
-
-                if (NavigationType == ODataNavigationType.Many)
-                {
-                    return $"List<{ToEntity}>?";
-                }
-
-                return ToEntity + "?";
-
-
+                return csharpType + "?";
             }
+
+            return csharpType;
+
         }
-
     }
 
-    public class ODataFunction
+}
+
+public class ODataNavigation
+{
+    public required string Name { get; set; }
+
+    public required string ToEntity { get; set; }
+
+    public ODataNavigationType NavigationType { get; set; }
+
+    public string CSharpProperty
     {
-        public required string Name { get; set; }
-        public string? ReturnType { get; set; }
-        public string? HttpMethod { get; set; }
-        public List<ODataFunctionParameter> Parameters { get; set; } = [];
+        get
+        {
+
+            if (NavigationType == ODataNavigationType.Many)
+            {
+                return $"List<{ToEntity}>?";
+            }
+
+            return ToEntity + "?";
+
+
+        }
     }
 
-    public class ODataFunctionParameter
-    {
-        public required string Name { get; set; }
-        public required string DataType { get; set; }
-        public int? MaxLength { get; set; }
-        public string? Mode { get; set; }
-    }
+}
 
-    public enum ODataNavigationType
-    {
-        ZeroOrOne,
-        One,
-        Many
-    }
+public class ODataFunction
+{
+    public required string Name { get; set; }
+    public string? ReturnType { get; set; }
+    public string? HttpMethod { get; set; }
+    public List<ODataFunctionParameter> Parameters { get; set; } = [];
+}
+
+public class ODataFunctionParameter
+{
+    public required string Name { get; set; }
+    public required string DataType { get; set; }
+    public int? MaxLength { get; set; }
+    public string? Mode { get; set; }
+}
+
+public enum ODataNavigationType
+{
+    ZeroOrOne,
+    One,
+    Many
+}
 

@@ -15,7 +15,7 @@ public class <#= metadata.EndpointName #>(ODataClient odataClient)
     
     public <#= entitySet.CSharpReturnType #> <#= entitySet.CSharpMethodName #>()
     { 
-    return  new <#= entitySet.CSharpReturnType #>(odataClient, "<#= entitySet.Name #>");
+        return  new <#= entitySet.CSharpReturnType #>(odataClient, "<#= entitySet.Name #>");
     }
 <# } #>
 
@@ -23,8 +23,17 @@ public class <#= metadata.EndpointName #>(ODataClient odataClient)
     
     public <#= entitySet.CSharpKeyReturnType #> <#= entitySet.CSharpKeyMethodName #>(<#= entitySet.EntityType.KeyArgumentString #>)
     { 
-    return  new <#= entitySet.CSharpKeyReturnType #>(odataClient, "<#= entitySet.Name #>", $"<#= entitySet.EntityType.KeyArgumentResultString #>");
+        return  new <#= entitySet.CSharpKeyReturnType #>(odataClient, "<#= entitySet.Name #>", $"<#= entitySet.EntityType.KeyArgumentResultString #>");
     }
 <# } #>
+
+<# foreach (var entitySet in metadata.EntitySets) { #>
+    
+    public async Task<bool> <#= entitySet.CSharpDeleteMethodName #>(<#= entitySet.EntityType.KeyArgumentString #>)
+    { 
+        return await odataClient.DeleteEntityAsync("<#= entitySet.Name #>", $"<#= entitySet.EntityType.KeyArgumentResultString #>");     
+    }
+<# } #>
+ 
 
 }

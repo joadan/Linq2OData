@@ -1,5 +1,6 @@
 ﻿using Linq2OData.Generator.Models;
 using Linq2OData.Generator.Templates.Client;
+using Linq2OData.Generator.Templates.Input;
 using Linq2OData.Generator.Templates.Types;
 
 
@@ -23,9 +24,8 @@ public class ClientGenerator(ClientRequest request)
         }
 
         GenerateTypesCode();
-
         GenerateClientCode();
-
+        GenerateInputTypesCode();
 
 
         return files;
@@ -79,8 +79,20 @@ public class ClientGenerator(ClientRequest request)
                 AddFile("Types", entityType.Name + ".cs", classText);
             }
         }
-    
+    }
 
+    private void GenerateInputTypesCode()
+    {
+        foreach (var metadata in metadataCollection)
+        {
+            var fullNamspace = request.Namespace + "." + metadata.Namespace;
+
+            foreach (var entityType in metadata.EntityTypes)
+            {
+                var classText = new InputTemplate(entityType, fullNamspace).TransformText();
+                AddFile("Inputs", entityType.InputName + ".cs", classText);
+            }
+        }
     }
 
 

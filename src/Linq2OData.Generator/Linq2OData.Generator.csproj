@@ -25,6 +25,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ClientTemplate.tt</DependentUpon>
     </Compile>
+    <Compile Update="Templates\Input\InputTemplate.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>InputTemplate.tt</DependentUpon>
+    </Compile>
     <Compile Update="Templates\Types\TypeTemplate.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -40,6 +45,10 @@
     <None Update="Templates\Client\ClientTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>ClientTemplate.cs</LastGenOutput>
+    </None>
+    <None Update="Templates\Input\InputTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>InputTemplate.cs</LastGenOutput>
     </None>
     <None Update="Templates\Types\TypeTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>

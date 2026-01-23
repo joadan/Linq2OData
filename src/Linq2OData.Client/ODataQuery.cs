@@ -9,9 +9,10 @@ namespace Linq2OData.Client
     public class ODataQuery<T>(ODataClient odataClient, string entitySetName, string? keyString = null)
     {
         private string? topExpression;
-    
+        private string? expandExpression;
+        private string? filterExpression;
 
-        public string? TopExpression => topExpression;
+
         public ODataClient ODataClient => odataClient;
         public string EntitySetName => entitySetName;
 
@@ -22,6 +23,23 @@ namespace Linq2OData.Client
             topExpression = $"$top={count}";
             return this;
         }
+
+        public ODataQuery<T> Expand(string? expand = null)
+        {
+            if (string.IsNullOrWhiteSpace(expand)) { expandExpression = null; }
+
+            expandExpression = $"$expand={expand}";
+            return this;
+        }
+
+        public ODataQuery<T> Filter(string? filter = null)
+        {
+            if (string.IsNullOrWhiteSpace(filter)) { filterExpression = null; }
+
+            filterExpression = $"$filter={filter}";
+            return this;
+        }
+
 
         public ODataQueryExecute<T, T> Select()
         {
@@ -49,12 +67,23 @@ namespace Linq2OData.Client
                 urlBuilder.Append($"{EntitySetName}({keyString})");
             }
 
-        
+
             var queryParameters = new List<string>();
-            if (!string.IsNullOrEmpty(TopExpression))
+            if (!string.IsNullOrWhiteSpace(topExpression))
             {
-                queryParameters.Add(TopExpression);
+                queryParameters.Add(topExpression);
             }
+
+            if (!string.IsNullOrWhiteSpace(expandExpression))
+            {
+                queryParameters.Add(expandExpression);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filterExpression))
+            {
+                queryParameters.Add(filterExpression);
+            }
+
             if (queryParameters.Count > 0)
             {
                 urlBuilder.Append("?");

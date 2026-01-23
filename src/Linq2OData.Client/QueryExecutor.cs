@@ -6,6 +6,7 @@ using System.Text.Json;
 
 namespace Linq2OData.Client
 {
+    
     internal class QueryExecutor<T>(ODataQuery<T> oDataQuery)
     {
         private const string DataPropertyName = "d";
@@ -15,16 +16,21 @@ namespace Linq2OData.Client
             var url = oDataQuery.GenerateRequestUrl();
 
             using var response = await oDataQuery.ODataClient.HttpClient.GetAsync(url, token);
-            
+
             if (!response.IsSuccessStatusCode)
             {
+                if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return default;
+                }
+
                 var content = await response.Content.ReadAsStringAsync(token);
                 //throw new GraphQueryRequestException($"Http error! Status code {response.StatusCode} Error: {content}",
                 //    graphRequest.Query, graphRequest.Variables);
             }
 
             var rawResponse = await response.Content.ReadAsStringAsync(token);
-         
+
             return ProcessResponse(rawResponse);
         }
 
@@ -62,7 +68,7 @@ namespace Linq2OData.Client
 
 
 
-public static class ODataJsonCleanupHelper
+    public static class ODataJsonCleanupHelper
     {
         /// <summary>
         /// Removes OData system properties (e.g. __metadata, __deferred)

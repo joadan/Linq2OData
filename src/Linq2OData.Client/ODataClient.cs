@@ -31,6 +31,28 @@ namespace Linq2OData.Client
 
 
         public HttpClient HttpClient => httpClient;
-        public JsonSerializerOptions JsonOptions => jsonOptions;    
+        public JsonSerializerOptions JsonOptions => jsonOptions;
+
+
+
+        public async Task<bool> DeleteEntityAsync(string entitysetName, string keyExpression)
+        {
+            var result = await httpClient.DeleteAsync($"{entitysetName}({keyExpression})");
+
+            if (result.StatusCode == System.Net.HttpStatusCode.NotFound) { return false; }
+
+            result.EnsureSuccessStatusCode();
+            return true;
+        }
+
+        public async Task CreateEntityAsync(string entitysetName, ODataInputBase input)
+        {
+
+            var tt = input.GetValues();
+
+
+        }
+
+
     }
 }
