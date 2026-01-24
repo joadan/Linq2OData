@@ -5,15 +5,15 @@ namespace Linq2OData.DemoClient;
 internal class Program
 {
     //https://services.odata.org/V2/OData/OData.svc/
-    const string demoUrl = "https://services.odata.org/V2/(S(ljasynfkiocpfy01gzrvjsra))/OData/OData.svc/";
+    const string demoUrl = "https://services.odata.org/V2/(S(jo0zj0zu5nmnrfcfj2zv1ny2))/OData/OData.svc/";
 
     static async Task Main(string[] args)
     {
         Console.WriteLine("Hello, World!");
 
-        await GenerateClientAsync();
+        // await GenerateClientAsync();
 
-        //await TestClientAsync();
+        await TestClientAsync();
 
     }
 
@@ -26,6 +26,15 @@ internal class Program
 
         var client = new GeneratedClient.ODataDemoClient(httpClient);
 
+        var result = await client.ODataDemo.ProductsUpdateAsync(1, new GeneratedClient.ODataDemo.ProductInput
+        {
+            Name = "Test Product1",
+        });
+
+        var product = await client.ODataDemo
+                .ProductsByKey(1).Select().ExecuteAsync();
+
+        var name = product?.Name;
         //var result = await client.ODataDemo.Product(new GeneratedClient.ODataDemo.ProductInput
         //{
         //    ID = 999,

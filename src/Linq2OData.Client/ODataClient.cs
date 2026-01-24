@@ -49,7 +49,6 @@ namespace Linq2OData.Client
         public async Task<T> CreateEntityAsync<T>(string entitysetName, ODataInputBase input)
         {
             string json = JsonSerializer.Serialize(input.GetValues(), jsonOptions);
-
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync($"{entitysetName}", content);
          
@@ -68,10 +67,28 @@ namespace Linq2OData.Client
 
         public async Task<bool> UpdateEntityAsync(string entitysetName, string keyExpression, ODataInputBase input)
         {
+            string json = JsonSerializer.Serialize(input.GetValues(), jsonOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            // var response = await httpClient.PatchAsync($"{entitysetName}({keyExpression})", content);
 
-            var tt = input.GetValues();
+            var request = new HttpRequestMessage(new HttpMethod("MERGE"), $"{entitysetName}({keyExpression})")
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            };
 
-            return false;
+            var response = await httpClient.SendAsync(request);
+
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound) { return false; }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var contentResponse = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Error creating entity: {response.StatusCode}, Content: {contentResponse}");
+            }
+
+
+            return true;
 
         }
 
