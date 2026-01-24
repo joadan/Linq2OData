@@ -25,6 +25,7 @@ namespace Linq2OData.Client
                 }
 
                 var content = await response.Content.ReadAsStringAsync(token);
+                throw new InvalidOperationException($"Http error! Status code {response.StatusCode} Error: {content}");
                 //throw new GraphQueryRequestException($"Http error! Status code {response.StatusCode} Error: {content}",
                 //    graphRequest.Query, graphRequest.Variables);
             }

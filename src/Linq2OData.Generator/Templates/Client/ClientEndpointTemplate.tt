@@ -34,6 +34,20 @@ public class <#= metadata.EndpointName #>(ODataClient odataClient)
         return await odataClient.DeleteEntityAsync("<#= entitySet.Name #>", $"<#= entitySet.EntityType.KeyArgumentResultString #>");     
     }
 <# } #>
- 
 
+<# foreach (var entitySet in metadata.EntitySets) { #>
+    
+    public async Task<<#= entitySet.EntityTypeName #>> <#= entitySet.CSharpCreateMethodName #>(<#= entitySet.EntityType.InputName #> input)
+    { 
+        return await odataClient.CreateEntityAsync<<#= entitySet.EntityTypeName #>>("<#= entitySet.Name #>", input);     
+    }
+<# } #>
+ 
+ <# foreach (var entitySet in metadata.EntitySets) { #>
+    
+    public async Task<bool> <#= entitySet.CSharpUpdateMethodName #>(<#= entitySet.EntityType.KeyArgumentString #>, <#= entitySet.EntityType.InputName #> input)
+    { 
+        return await odataClient.UpdateEntityAsync("<#= entitySet.Name #>", $"<#= entitySet.EntityType.KeyArgumentResultString #>", input);     
+    }
+<# } #>
 }

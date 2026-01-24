@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Linq2OData.Client
 {
@@ -14,6 +16,13 @@ namespace Linq2OData.Client
         {
             return Values.ToDictionary(e => e.Key, e => e.Value);
         }
+
+        internal string GetValuesJson()
+        {
+            
+            return JsonSerializer.Serialize(GetValues());
+        }
+
 
         protected void ClearValues()
         {

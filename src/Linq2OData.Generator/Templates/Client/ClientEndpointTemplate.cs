@@ -182,7 +182,105 @@ namespace Linq2OData.Generator.Templates.Client
             
             #line default
             #line hidden
-            this.Write(" \r\n\r\n}");
+            this.Write("\r\n");
+            
+            #line 38 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+ foreach (var entitySet in metadata.EntitySets) { 
+            
+            #line default
+            #line hidden
+            this.Write("    \r\n    public async Task<");
+            
+            #line 40 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entitySet.EntityTypeName));
+            
+            #line default
+            #line hidden
+            this.Write("> ");
+            
+            #line 40 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entitySet.CSharpCreateMethodName));
+            
+            #line default
+            #line hidden
+            this.Write("(");
+            
+            #line 40 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entitySet.EntityType.InputName));
+            
+            #line default
+            #line hidden
+            this.Write(" input)\r\n    { \r\n        return await odataClient.CreateEntityAsync<");
+            
+            #line 42 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entitySet.EntityTypeName));
+            
+            #line default
+            #line hidden
+            this.Write(">(\"");
+            
+            #line 42 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entitySet.Name));
+            
+            #line default
+            #line hidden
+            this.Write("\", input);     \r\n    }\r\n");
+            
+            #line 44 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write(" \r\n ");
+            
+            #line 46 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+ foreach (var entitySet in metadata.EntitySets) { 
+            
+            #line default
+            #line hidden
+            this.Write("    \r\n    public async Task<bool> ");
+            
+            #line 48 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entitySet.CSharpUpdateMethodName));
+            
+            #line default
+            #line hidden
+            this.Write("(");
+            
+            #line 48 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entitySet.EntityType.KeyArgumentString));
+            
+            #line default
+            #line hidden
+            this.Write(", ");
+            
+            #line 48 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entitySet.EntityType.InputName));
+            
+            #line default
+            #line hidden
+            this.Write(" input)\r\n    { \r\n        return await odataClient.UpdateEntityAsync(\"");
+            
+            #line 50 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entitySet.Name));
+            
+            #line default
+            #line hidden
+            this.Write("\", $\"");
+            
+            #line 50 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entitySet.EntityType.KeyArgumentResultString));
+            
+            #line default
+            #line hidden
+            this.Write("\", input);     \r\n    }\r\n");
+            
+            #line 52 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientEndpointTemplate.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("}");
             return this.GenerationEnvironment.ToString();
         }
     }

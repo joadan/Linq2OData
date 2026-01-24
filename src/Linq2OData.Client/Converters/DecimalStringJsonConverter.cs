@@ -17,6 +17,8 @@ public class DecimalStringJsonConverter : JsonConverter<decimal>
 
     public override void Write(Utf8JsonWriter writer, decimal value, JsonSerializerOptions options)
     {
-        writer.WriteNumberValue(value);
+        //Odata 2.0 expects decimal values to be sent as strings
+        writer.WriteStringValue(value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+      
     }
 }

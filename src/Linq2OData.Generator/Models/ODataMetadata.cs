@@ -40,7 +40,9 @@ public class ODataEntitySet
     public string CSharpKeyMethodName => $"{Name}ByKey";
 
     public string CSharpDeleteMethodName => $"{Name}DeleteAsync";
-  
+    public string CSharpCreateMethodName => $"{Name}CreateAsync";
+    public string CSharpUpdateMethodName => $"{Name}UpdateAsync";
+
 }
 public class ODataEntityType
 {

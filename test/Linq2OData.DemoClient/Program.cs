@@ -11,9 +11,9 @@ internal class Program
     {
         Console.WriteLine("Hello, World!");
 
-         //await GenerateClientAsync();
+        await GenerateClientAsync();
 
-        await TestClientAsync();
+        //await TestClientAsync();
 
     }
 
@@ -26,27 +26,51 @@ internal class Program
 
         var client = new GeneratedClient.ODataDemoClient(httpClient);
 
-         await client.ODataDemo.ProductsDeleteAsync(1);
+        //var result = await client.ODataDemo.Product(new GeneratedClient.ODataDemo.ProductInput
+        //{
+        //    ID = 999,
+        //    Name = "Test Product",
+        //    Description = "This is a test product",
+        //    Rating = 5,
+        //    Price = 10,
 
-        var filteredResult = await client
-            .ODataDemo
-            .Products()
-            .Top(3)
-            .Filter("Rating eq 3")
-            .Expand("Category, Supplier")
-            .Select()
-            .ExecuteAsync();
-
-
-        var byKey = await client
-           .ODataDemo
-           .ProductsByKey(1)
-           .Expand("Category")
-           .Select()
-           .ExecuteAsync();
+        //});
 
 
-        var rr = byKey;
+        //var result = await client.ODataDemo.ProductsCreateAsync(new GeneratedClient.ODataDemo.ProductInput
+        //{
+        //    ID = 999,
+        //    Name = "Test Product",
+        //    Description = "This is a test product",
+        //    Rating = 5,
+        //    Price = 10,
+
+        //});
+
+        //var byKey = await client
+        //   .ODataDemo
+        //   .ProductsByKey(1)
+        //   .Select()
+        //   .ExecuteAsync();
+
+        //var e = byKey;
+
+        // await client.ODataDemo.ProductsDeleteAsync(1);
+
+        //var filteredResult = await client
+        //    .ODataDemo
+        //    .Products()
+        //    .Top(3)
+        //    .Filter("Rating eq 3")
+        //    .Expand("Category, Supplier")
+        //    .Select()
+        //    .ExecuteAsync();
+
+
+
+
+
+
 
     }
 
