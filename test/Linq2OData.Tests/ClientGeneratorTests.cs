@@ -34,7 +34,7 @@ public class ClientGeneratorTests
         // Act
         var files = generator.GenerateClient();
 
-        var supplier = files.First(f => f.FileName == "Supplier" && f.FolderPath == "Types"); 
+        var supplier = files.First(f => f.FileName == "Supplier.cs" && f.FolderPath == "Types"); 
 
         Console.WriteLine($"{supplier.Content}");
 

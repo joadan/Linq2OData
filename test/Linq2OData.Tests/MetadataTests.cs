@@ -135,7 +135,7 @@ namespace Linq2OData.Tests
             Assert.Equal(ODataVersion.V2, metadata.ODataVersion);
             
             // Verify entity types count
-            Assert.Equal(3, metadata.EntityTypes.Count);
+            Assert.Equal(4, metadata.EntityTypes.Count);
         }
 
         [Fact]
