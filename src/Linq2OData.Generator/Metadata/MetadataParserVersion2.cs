@@ -7,9 +7,9 @@ namespace Linq2OData.Generator.Metadata;
 
 internal static class MetadataParserVersion2
 {
-    internal static ODataMetadata Parse(string content)
+    internal static ODataMetadata Parse(XDocument doc)
     {
-        var doc = XDocument.Parse(content);
+        
         var metadata = new ODataMetadata
         {
             ODataVersion = ODataVersion.V2

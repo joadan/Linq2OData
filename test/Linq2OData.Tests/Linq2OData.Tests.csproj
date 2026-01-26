@@ -29,6 +29,9 @@
     <None Update="SampleData\Metadata\V2\ODataDemo.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="SampleData\Metadata\V4\ODataDemo.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
