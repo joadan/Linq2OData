@@ -1,0 +1,61 @@
+﻿@page "/generate-client"
+
+
+<h3>Generate OData Client</h3>
+
+<Dimmer Active=isLoading>
+
+    @*     <ItemSelect Items="demoOptions" @bind-SelectedValue="options" SelectedTextExpression="e => e.ClientName">
+        <ListTemplate>
+            @context.ClientName
+        </ListTemplate>
+    </ItemSelect> *@
+
+    <Card class="mt-3">
+        <CardBody>
+            <DataGrid>
+                <DataGridItem Title="Name">
+                    <InputText class="form-control" @bind-Value="request.Name" />
+                </DataGridItem>
+                <DataGridItem Title="Namespace">
+                    <InputText class="form-control" @bind-Value="request.Namespace" />
+                </DataGridItem>
+
+
+            </DataGrid>
+
+
+            <InputFile class="mt-3 form-control" OnChange="LoadFilesAsync" multiple accept=".xml" />
+
+
+            <div class="mt-3" />
+
+            @if (request.MetadataList?.Any() == true)
+            {
+                <Tabs>
+                    @foreach (var metadata in request.MetadataList!)
+                    {
+                        <Tab Title="Metadata">
+
+                            <textarea class="form-control" rows="40">
+                @metadata
+                </textarea>
+                        </Tab>
+                    }
+                </Tabs>
+            }
+
+
+
+            <Button class="mt-3" BackgroundColor="TablerColor.Primary" OnClick="GenerateClientJson">
+                Generate
+            </Button>
+
+            <Button class="mt-3 ms-3" BackgroundColor="TablerColor.Danger" OnClick="Refresh">
+                Refresh
+            </Button>
+        </CardBody>
+    </Card>
+
+</Dimmer>
+

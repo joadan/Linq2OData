@@ -1,0 +1,37 @@
+﻿
+﻿<Navbar Background="NavbarBackground.Dark" Direction="NavbarDirection.Vertical">
+
+   @*  <a href="https://github.com/linq2graphql/linq2graphql.client" class="navbar-brand navbar-brand-autodark">
+        <img src="img/logo.svg" alt="Linq2GraphQL" class="navbar-brand-image me-2">
+        <h2 class="text-secondary">
+            Linq2GraphQL
+        </h2>
+    </a> *@
+
+    <NavbarMenu>
+        <NavbarMenuItem Href="" Text="Home">
+            <MenuItemIcon>
+                <Icon class="icon" IconType="@Icons.Home" />
+            </MenuItemIcon>
+        </NavbarMenuItem>
+
+        <NavbarMenuItem Href="generate-client" Text="Generate Client">
+            <MenuItemIcon>
+                <Icon class="icon" IconType="@Icons.Adjustments_code" />
+            </MenuItemIcon>
+        </NavbarMenuItem>
+
+    @*     <NavbarMenuItem Text="Samples">
+            <MenuItemIcon>
+                <Icon class="icon" IconType="@Icons.Eye_exclamation" />
+            </MenuItemIcon>
+
+            <SubMenu>
+                <NavbarMenuItem Href="samples/queries" Text="Queries" />
+                <NavbarMenuItem Href="samples/interfaces" Text="Interfaces" />
+            </SubMenu>
+
+        </NavbarMenuItem> *@
+
+    </NavbarMenu>
+</Navbar>

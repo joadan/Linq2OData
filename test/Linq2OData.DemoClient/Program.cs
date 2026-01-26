@@ -12,8 +12,8 @@ internal class Program
     static async Task Main(string[] args)
     {
         Console.WriteLine("Here we go..");
-        // await GenerateClientAsync();
-        await TestClientAsync();
+         await GenerateDemoClientAsync();
+      //  await TestClientAsync();
 
     }
 
@@ -89,7 +89,7 @@ internal class Program
     }
 
 
-    private static async Task GenerateClientAsync()
+    private static async Task GenerateDemoClientAsync()
     {
         var httpClient = new HttpClient();
         var metadata = await httpClient.GetStringAsync(demoUrl + "$metadata");
