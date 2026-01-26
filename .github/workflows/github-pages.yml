@@ -25,7 +25,7 @@ jobs:
 
       # Publish the site
       - name: Publish
-        run: dotnet publish docs/Linq2OData.csproj -c:Release -o:publish -p:GHPages=true
+        run: dotnet publish docs/Linq2OData.Docs/Linq2OData.Docs.csproj -c:Release -o:publish -p:GHPages=true
 
       # Deploy the site
       - name: Deploy
