@@ -16,4 +16,10 @@ public partial class CategoryInput : ODataInputBase
 		set => SetValue("Name", value);
 	}
 
+    public List<ProductInput>? Products 
+	{
+		get => GetValue<List<ProductInput>?>("Products");
+		set => SetValue("Products", value);
+	}
+
 }

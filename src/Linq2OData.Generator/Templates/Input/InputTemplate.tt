@@ -11,10 +11,18 @@ namespace <#= namespaceName #>;
 public partial class <#= entityType.InputName #> : ODataInputBase
 {
 <# foreach (var property in entityType.Properties) { #>
-    public <#= property.CSharpTypeRaw #>? <#= property.Name #> 
+    public <#= property.CSharpNameInput #> <#= property.Name #> 
 	{
-		get => GetValue<<#= property.CSharpTypeRaw #>?>("<#= property.Name #>");
+		get => GetValue<<#= property.CSharpNameInput #>>("<#= property.Name #>");
 		set => SetValue("<#= property.Name #>", value);
+	}
+<# } #>
+
+<# foreach (var navigation in entityType.Navigations) { #>
+    public <#= navigation.CSharpPropertyInput #> <#= navigation.Name #> 
+	{
+		get => GetValue<<#= navigation.CSharpPropertyInput #>>("<#= navigation.Name #>");
+		set => SetValue("<#= navigation.Name #>", value);
 	}
 <# } #>
 

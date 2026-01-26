@@ -15,15 +15,21 @@ public partial class SupplierInput : ODataInputBase
 		get => GetValue<string?>("Name");
 		set => SetValue("Name", value);
 	}
-    public ODataDemo.Address? Address 
+    public ODataDemo.AddressInput? Address 
 	{
-		get => GetValue<ODataDemo.Address?>("Address");
+		get => GetValue<ODataDemo.AddressInput?>("Address");
 		set => SetValue("Address", value);
 	}
     public int? Concurrency 
 	{
 		get => GetValue<int?>("Concurrency");
 		set => SetValue("Concurrency", value);
+	}
+
+    public List<ProductInput>? Products 
+	{
+		get => GetValue<List<ProductInput>?>("Products");
+		set => SetValue("Products", value);
 	}
 
 }

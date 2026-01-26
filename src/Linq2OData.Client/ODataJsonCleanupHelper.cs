@@ -33,7 +33,7 @@ namespace Linq2OData.Client
                     foreach (var prop in element.EnumerateObject())
                     {
                         // Remove OData system properties
-                        if (prop.Name.StartsWith("__"))
+                        if (prop.Name.StartsWith("__") && prop.Name != "__count")
                             continue;
 
                         // Drop metadata-only objects completely

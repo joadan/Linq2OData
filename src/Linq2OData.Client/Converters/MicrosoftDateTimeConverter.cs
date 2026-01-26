@@ -35,6 +35,11 @@ internal static class MicrosoftDateTimeHelper
             ? value
             : value.ToUniversalTime();
 
+        ///Date(970358400000)/
+
+     //   return @"/Date(1436832000000)/";
+;
+
         var milliseconds = new DateTimeOffset(utc).ToUnixTimeMilliseconds();
         return $"/Date({milliseconds})/";
     }

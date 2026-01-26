@@ -1,8 +1,5 @@
 ﻿using Linq2OData.Client.Expressions;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace Linq2OData.Client
@@ -62,7 +59,7 @@ namespace Linq2OData.Client
         private string? skipExpression;
         private string? expandExpression;
         private string? filterExpression;
-
+        private string? inlineCountExpression;
 
         public ODataClient ODataClient => odataClient;
         public string EntitySetName => entitySetName;
@@ -72,6 +69,14 @@ namespace Linq2OData.Client
             if (!count.HasValue) { topExpression = null; }
 
             topExpression = $"$top={count}";
+            return this;
+        }
+
+        public ODataEntitySetQuery<T> InlineCount(bool include = true)
+        {
+            if (!include) { inlineCountExpression = null; }
+
+            inlineCountExpression = $"$inlinecount=allpages";
             return this;
         }
 
@@ -146,6 +151,11 @@ namespace Linq2OData.Client
             if (!string.IsNullOrWhiteSpace(filterExpression))
             {
                 queryParameters.Add(filterExpression);
+            }
+
+            if (!string.IsNullOrWhiteSpace(inlineCountExpression))
+            {
+                queryParameters.Add(inlineCountExpression);
             }
 
             if (queryParameters.Count > 0)

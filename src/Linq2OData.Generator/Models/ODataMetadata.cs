@@ -123,9 +123,6 @@ public class ODataEntityType
 
 
 
-
-
-
 public class ODataProperty
 {
     public required string Name { get; set; }
@@ -146,6 +143,22 @@ public class ODataProperty
 
     public bool Sortable { get; set; }
     public bool Filterable { get; set; }
+
+
+    public string CSharpNameInput
+    {
+        get
+        {
+            if (!DataType.StartsWith("Edm."))
+            {
+                return DataType + "Input?";
+            }
+
+            return CSharpTypeRaw + "?";
+
+        }
+    }
+
 
     public string CSharpTypeRaw
     {
@@ -181,7 +194,7 @@ public class ODataProperty
     {
         get
         {
-         
+
             var csharpType = CSharpTypeRaw;
 
             if (Nullable && csharpType != "string")
@@ -208,20 +221,26 @@ public class ODataNavigation
     {
         get
         {
-
             if (NavigationType == ODataNavigationType.Many)
             {
                 return $"List<{ToEntity}>?";
             }
-
             return ToEntity + "?";
-
-
         }
     }
 
+    public string CSharpPropertyInput
+    {
+        get
+        {
+            if (NavigationType == ODataNavigationType.Many)
+            {
+                return $"List<{ToEntity}Input>?";
+            }
+            return ToEntity + "Input" + "?";
+        }
+    }
 }
-
 public class ODataFunction
 {
     public required string Name { get; set; }

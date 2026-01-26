@@ -12,7 +12,7 @@ internal class Program
     static async Task Main(string[] args)
     {
         Console.WriteLine("Here we go..");
-         //await GenerateClientAsync();
+        // await GenerateClientAsync();
         await TestClientAsync();
 
     }
@@ -25,14 +25,13 @@ internal class Program
         };
 
         var client = new GeneratedClient.ODataDemoClient(httpClient);
-    
-        //var error = await client
-        // .ODataDemo
-        // .Products()
-        // .Top(30)
-        // .Expand("Error")
-        // .Select()
-        // .ExecuteAsync();
+
+        var error = await client
+         .ODataDemo
+         .Products()
+         //.InlineCount()
+         .Select()
+         .ExecuteAsync();
 
 
         ////Query entities
@@ -60,26 +59,25 @@ internal class Program
         //        .ProductsByKey(1)
         //        .Expand("Category")
         //        .Select()
-
         //        .ExecuteAsync();
 
 
-        //Create a new entity
-        var newProduct = await client.ODataDemo.ProductsCreateAsync(new ProductInput
-        {
-            ID = 1000,
-            Name = "Test Product",
-            Description = "This is a my test product",
-            Rating = 5,
-            ReleaseDate = DateTime.Now,
-            Price = 10,
-        });
+        ////Create a new entity
+        //var newProduct = await client.ODataDemo.ProductsCreateAsync(new ProductInput
+        //{
+        //    ID = 1000,
+        //    Name = "Test Product",
+        //    Description = "This is a my test product",
+        //    Rating = 5,
+        //    Price = 10,
+        //   ReleaseDate = DateTime.Now,
+        //});
 
 
-        var mm = newProduct;
+        //var mm = newProduct;
 
         ////Delete an entity by key
-        //await client.ODataDemo.ProductsDeleteAsync(1);
+        //await client.ODataDemo.ProductsDeleteAsync(1000);
 
 
 

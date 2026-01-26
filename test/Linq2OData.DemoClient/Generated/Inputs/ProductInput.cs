@@ -41,4 +41,15 @@ public partial class ProductInput : ODataInputBase
 		set => SetValue("Price", value);
 	}
 
+    public CategoryInput? Category 
+	{
+		get => GetValue<CategoryInput?>("Category");
+		set => SetValue("Category", value);
+	}
+    public SupplierInput? Supplier 
+	{
+		get => GetValue<SupplierInput?>("Supplier");
+		set => SetValue("Supplier", value);
+	}
+
 }
