@@ -7,11 +7,11 @@ using System.Text.Json;
 namespace Linq2OData.Client
 {
     
-    internal class QueryExecutor<T>(ODataQuery<T> oDataQuery)
+    internal class QueryExecutor<T>(ODataEntitySetQuery<T> oDataQuery)
     {
         private const string DataPropertyName = "d";
         private const string ResultsPropertyName = "results";
-        internal async Task<T?> ExecuteRequestAsync(CancellationToken token = default)
+        internal async Task<List<T>?> ExecuteRequestAsync(CancellationToken token = default)
         {
             var url = oDataQuery.GenerateRequestUrl();
 
@@ -37,7 +37,7 @@ namespace Linq2OData.Client
 
 
 
-        public T? ProcessResponse(string con)
+        public List<T>? ProcessResponse(string con)
         {
             //var document = JsonDocument.Parse(con);
 
@@ -55,10 +55,10 @@ namespace Linq2OData.Client
         }
 
 
-        private T DeserializeArray(JsonElement array)
+        private List<T> DeserializeArray(JsonElement array)
         {
             var cleanedJson = ODataJsonCleanupHelper.Clean(array.GetRawText());
-            return JsonSerializer.Deserialize<T>(cleanedJson, oDataQuery.ODataClient.JsonOptions)!;
+            return JsonSerializer.Deserialize<List<T>>(cleanedJson, oDataQuery.ODataClient.JsonOptions)!;
         }
 
 

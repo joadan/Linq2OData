@@ -23,6 +23,7 @@ namespace Linq2OData.Client
 
             jsonOptions = new JsonSerializerOptions();
             jsonOptions.Converters.Add(new MicrosoftDateTimeConverter());
+            jsonOptions.Converters.Add(new MicrosoftNullableDateTimeConverter());
             jsonOptions.Converters.Add(new MicrosoftDateTimeOffsetConverter());
 
             jsonOptions.Converters.Add(new DecimalStringJsonConverter());

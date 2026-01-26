@@ -5,26 +5,18 @@ using System.Text.RegularExpressions;
 
 namespace Linq2OData.Client.Converters;
 
-public class MicrosoftDateTimeConverter
-    : JsonConverter<DateTime>
+internal static class MicrosoftDateTimeHelper
 {
-    private static readonly Regex _regex =
+    internal static readonly Regex Regex =
         new Regex(@"^/Date\((\-?\d+)(?:[+-]\d{4})?\)/$",
                   RegexOptions.Compiled);
 
-    public override DateTime Read(
-        ref Utf8JsonReader reader,
-        Type typeToConvert,
-        JsonSerializerOptions options)
+    internal static DateTime ParseDateTime(string value)
     {
-        if (reader.TokenType != JsonTokenType.String)
-            throw new JsonException("Expected string for DateTime");
-
-        var value = reader.GetString();
         if (string.IsNullOrWhiteSpace(value))
             throw new JsonException("Date value cannot be empty");
 
-        var match = _regex.Match(value);
+        var match = Regex.Match(value);
         if (!match.Success)
             throw new JsonException($"Invalid date format: {value}");
 
@@ -36,10 +28,7 @@ public class MicrosoftDateTimeConverter
             .UtcDateTime;
     }
 
-    public override void Write(
-        Utf8JsonWriter writer,
-        DateTime value,
-        JsonSerializerOptions options)
+    internal static string FormatDateTime(DateTime value)
     {
         // Normalize to UTC to avoid surprises
         var utc = value.Kind == DateTimeKind.Utc
@@ -47,7 +36,63 @@ public class MicrosoftDateTimeConverter
             : value.ToUniversalTime();
 
         var milliseconds = new DateTimeOffset(utc).ToUnixTimeMilliseconds();
-        writer.WriteStringValue($"/Date({milliseconds})/");
+        return $"/Date({milliseconds})/";
+    }
+}
+
+public class MicrosoftDateTimeConverter : JsonConverter<DateTime>
+{
+    public override DateTime Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options)
+    {
+       
+        if (reader.TokenType != JsonTokenType.String)
+            throw new JsonException("Expected string for DateTime");
+
+        var value = reader.GetString()!;
+        return MicrosoftDateTimeHelper.ParseDateTime(value);
+    }
+
+    public override void Write(
+        Utf8JsonWriter writer,
+        DateTime value,
+        JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(MicrosoftDateTimeHelper.FormatDateTime(value));
+    }
+}
+
+public class MicrosoftNullableDateTimeConverter : JsonConverter<DateTime?>
+{
+    public override DateTime? Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Null)
+            return null;
+
+        if (reader.TokenType != JsonTokenType.String)
+            throw new JsonException("Expected string for DateTime");
+
+        var value = reader.GetString()!;
+        return MicrosoftDateTimeHelper.ParseDateTime(value);
+    }
+
+    public override void Write(
+        Utf8JsonWriter writer,
+        DateTime? value,
+        JsonSerializerOptions options)
+    {
+        if (!value.HasValue)
+        {
+            writer.WriteNullValue();
+            return;
+        }
+
+        writer.WriteStringValue(MicrosoftDateTimeHelper.FormatDateTime(value.Value));
     }
 }
 

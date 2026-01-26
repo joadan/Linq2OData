@@ -33,10 +33,10 @@ public class ODataEntitySet
     private bool EntityTypeHasKeys => EntityType?.Keys.Count > 0;
 
 
-    public string CSharpReturnType => $"ODataQuery<List<{EntityTypeName}>>";
+    public string CSharpReturnType => $"ODataEntitySetQuery<{EntityTypeName}>";
     public string CSharpMethodName => $"{Name}";
 
-    public string CSharpKeyReturnType => $"ODataQuery<{EntityTypeName}>";
+    public string CSharpKeyReturnType => $"ODataEntityQuery<{EntityTypeName}>";
     public string CSharpKeyMethodName => $"{Name}ByKey";
 
     public string CSharpDeleteMethodName => $"{Name}DeleteAsync";

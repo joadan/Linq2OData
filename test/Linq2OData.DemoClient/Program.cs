@@ -1,19 +1,20 @@
 ﻿
 
+using GeneratedClient.ODataDemo;
+
 namespace Linq2OData.DemoClient;
 
 internal class Program
 {
-    //https://services.odata.org/V2/OData/OData.svc/
     const string demoUrl = "https://services.odata.org/V2/(S(jo0zj0zu5nmnrfcfj2zv1ny2))/OData/OData.svc/";
 
     static async Task Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
+        Console.WriteLine("Here we go..");
 
-        // await GenerateClientAsync();
+         await GenerateClientAsync();
 
-        await TestClientAsync();
+      //  await TestClientAsync();
 
     }
 
@@ -26,54 +27,48 @@ internal class Program
 
         var client = new GeneratedClient.ODataDemoClient(httpClient);
 
-        var result = await client.ODataDemo.ProductsUpdateAsync(1, new GeneratedClient.ODataDemo.ProductInput
-        {
-            Name = "Test Product1",
-        });
+        //Query entities
+        var filteredResult = await client
+            .ODataDemo
+            .Products()
+            .Top(3)
+            .Filter(e => e.Rating >= 3)
+          //  .Expand("Category, Supplier")
+            .Select(e => e.Select(f => new {f.Rating, f.ID}))
+            .ExecuteAsync();
 
-        var product = await client.ODataDemo
-                .ProductsByKey(1).Select().ExecuteAsync();
+        var rr = filteredResult;
 
-        var name = product?.Name;
-        //var result = await client.ODataDemo.Product(new GeneratedClient.ODataDemo.ProductInput
-        //{
-        //    ID = 999,
-        //    Name = "Test Product",
-        //    Description = "This is a test product",
-        //    Rating = 5,
-        //    Price = 10,
-
-        //});
-
-
-        //var result = await client.ODataDemo.ProductsCreateAsync(new GeneratedClient.ODataDemo.ProductInput
-        //{
-        //    ID = 999,
-        //    Name = "Test Product",
-        //    Description = "This is a test product",
-        //    Rating = 5,
-        //    Price = 10,
-
-        //});
-
-        //var byKey = await client
-        //   .ODataDemo
-        //   .ProductsByKey(1)
-        //   .Select()
-        //   .ExecuteAsync();
-
-        //var e = byKey;
-
-        // await client.ODataDemo.ProductsDeleteAsync(1);
-
-        //var filteredResult = await client
+        ////Update an entity
+        //var result = await client
         //    .ODataDemo
-        //    .Products()
-        //    .Top(3)
-        //    .Filter("Rating eq 3")
-        //    .Expand("Category, Supplier")
-        //    .Select()
-        //    .ExecuteAsync();
+        //    .ProductsUpdateAsync(1, new ProductInput
+        //    {
+        //        Name = "Test Product1",
+        //    });
+
+        ////Select an entity by key
+        //var product = await client.ODataDemo
+        //        .ProductsByKey(1)
+        //        .Select()
+        //        .ExecuteAsync();
+
+
+        ////Create a new entity
+        //var newProduct = await client.ODataDemo.ProductsCreateAsync(new ProductInput
+        //{
+        //    ID = 999,
+        //    Name = "Test Product",
+        //    Description = "This is a test product",
+        //    Rating = 5,
+        //    Price = 10,
+        //});
+
+
+
+        ////Delete an entity by key
+        //await client.ODataDemo.ProductsDeleteAsync(1);
+
 
 
 

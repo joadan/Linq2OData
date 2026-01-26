@@ -7,35 +7,35 @@ public class ODataDemoEndpoint(ODataClient odataClient)
 {
 
     
-    public ODataQuery<List<Product>> Products()
+    public ODataEntitySetQuery<Product> Products()
     { 
-        return  new ODataQuery<List<Product>>(odataClient, "Products");
+        return  new ODataEntitySetQuery<Product>(odataClient, "Products");
     }
     
-    public ODataQuery<List<Category>> Categories()
+    public ODataEntitySetQuery<Category> Categories()
     { 
-        return  new ODataQuery<List<Category>>(odataClient, "Categories");
+        return  new ODataEntitySetQuery<Category>(odataClient, "Categories");
     }
     
-    public ODataQuery<List<Supplier>> Suppliers()
+    public ODataEntitySetQuery<Supplier> Suppliers()
     { 
-        return  new ODataQuery<List<Supplier>>(odataClient, "Suppliers");
+        return  new ODataEntitySetQuery<Supplier>(odataClient, "Suppliers");
     }
 
     
-    public ODataQuery<Product> ProductsByKey(int id)
+    public ODataEntityQuery<Product> ProductsByKey(int id)
     { 
-        return  new ODataQuery<Product>(odataClient, "Products", $"ID={id}");
+        return  new ODataEntityQuery<Product>(odataClient, "Products", $"ID={id}");
     }
     
-    public ODataQuery<Category> CategoriesByKey(int id)
+    public ODataEntityQuery<Category> CategoriesByKey(int id)
     { 
-        return  new ODataQuery<Category>(odataClient, "Categories", $"ID={id}");
+        return  new ODataEntityQuery<Category>(odataClient, "Categories", $"ID={id}");
     }
     
-    public ODataQuery<Supplier> SuppliersByKey(int id)
+    public ODataEntityQuery<Supplier> SuppliersByKey(int id)
     { 
-        return  new ODataQuery<Supplier>(odataClient, "Suppliers", $"ID={id}");
+        return  new ODataEntityQuery<Supplier>(odataClient, "Suppliers", $"ID={id}");
     }
 
     
