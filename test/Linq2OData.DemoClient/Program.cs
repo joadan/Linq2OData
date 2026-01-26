@@ -1,6 +1,7 @@
 ﻿
 
 using GeneratedClient.ODataDemo;
+using System.Runtime.CompilerServices;
 
 namespace Linq2OData.DemoClient;
 
@@ -11,10 +12,8 @@ internal class Program
     static async Task Main(string[] args)
     {
         Console.WriteLine("Here we go..");
-
-         await GenerateClientAsync();
-
-      //  await TestClientAsync();
+         //await GenerateClientAsync();
+        await TestClientAsync();
 
     }
 
@@ -26,45 +25,57 @@ internal class Program
         };
 
         var client = new GeneratedClient.ODataDemoClient(httpClient);
+    
+        var error = await client
+         .ODataDemo
+         .Products()
+         .Top(30)
+         .Expand("Error")
+         .Select()
+         .ExecuteAsync();
+
 
         //Query entities
         var filteredResult = await client
             .ODataDemo
             .Products()
-            .Top(3)
-            .Filter(e => e.Rating >= 3)
-          //  .Expand("Category, Supplier")
-            .Select(e => e.Select(f => new {f.Rating, f.ID}))
+            .Top(30)
+            .Filter(e => e.Rating >= 3 || e.ID == 999)
+            .Expand("Category")
+            .Select(e => e.Select(f => new { f.Rating, f.ID }))
             .ExecuteAsync();
 
         var rr = filteredResult;
 
-        ////Update an entity
-        //var result = await client
-        //    .ODataDemo
-        //    .ProductsUpdateAsync(1, new ProductInput
-        //    {
-        //        Name = "Test Product1",
-        //    });
+        //Update an entity
+        var result = await client
+            .ODataDemo
+            .ProductsUpdateAsync(1, new ProductInput
+            {
+                Name = "Test Product__",
+            });
 
-        ////Select an entity by key
-        //var product = await client.ODataDemo
-        //        .ProductsByKey(1)
-        //        .Select()
-        //        .ExecuteAsync();
+        //Select an entity by key
+        var product = await client.ODataDemo
+                .ProductsByKey(1)
+                .Expand("Category")
+                .Select()
 
-
-        ////Create a new entity
-        //var newProduct = await client.ODataDemo.ProductsCreateAsync(new ProductInput
-        //{
-        //    ID = 999,
-        //    Name = "Test Product",
-        //    Description = "This is a test product",
-        //    Rating = 5,
-        //    Price = 10,
-        //});
+                .ExecuteAsync();
 
 
+        //Create a new entity
+        var newProduct = await client.ODataDemo.ProductsCreateAsync(new ProductInput
+        {
+            ID = 888,
+            Name = "Test Product",
+            Description = "This is a my test product",
+            Rating = 5,
+            Price = 10,
+        });
+
+
+        var mm = newProduct;
 
         ////Delete an entity by key
         //await client.ODataDemo.ProductsDeleteAsync(1);

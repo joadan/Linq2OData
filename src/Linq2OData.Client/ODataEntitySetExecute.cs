@@ -7,15 +7,13 @@ namespace Linq2OData.Client;
 public class ODataEntityExecute<T, TResult>(ODataEntityQuery<T> oDataQuery, Expression<Func<T, TResult>>? selector)
 {
 
-    public T? BaseResult { get; set; }
+    public ODataResponse<T>? BaseResult { get; set; }
 
-    public async Task<T?> ExecuteBaseAsync(CancellationToken cancellationToken = default)
+    public async Task<ODataResponse<T>?> ExecuteBaseAsync(CancellationToken cancellationToken = default)
     {
-        //var exexutor = new QueryExecutor<T>(oDataQuery);
-        //BaseResult = await exexutor.ExecuteRequestAsync(cancellationToken);
-        //return BaseResult;
+        BaseResult = await oDataQuery.ODataClient.QueryEntityAsync<T>(oDataQuery.GenerateRequestUrl());
+        return BaseResult;
 
-        return default;
     }
 
     public async Task<TResult?> ExecuteAsync(CancellationToken cancellationToken = default)
@@ -27,11 +25,11 @@ public class ODataEntityExecute<T, TResult>(ODataEntityQuery<T> oDataQuery, Expr
             return default;
         }
 
-        return default;
+        
 
-        //if (selector == null) { return (TResult?)(object)BaseResult; }
+        if (selector == null) { return (TResult?)(object)BaseResult.Data; }
 
-        //return selector.Compile().Invoke(BaseResult);
+        return selector.Compile().Invoke(BaseResult.Data);
 
     }
 
@@ -42,12 +40,11 @@ public class ODataEntityExecute<T, TResult>(ODataEntityQuery<T> oDataQuery, Expr
 public class ODataEntitySetExecute<T, TResult>(ODataEntitySetQuery<T> oDataQuery, Expression<Func<List<T>, TResult>>? selector)
 {
 
-    public List<T>? BaseResult { get; set; }
+    public ODataResponse<List<T>>? BaseResult { get; set; }
 
-    public async Task<List<T>?> ExecuteBaseAsync(CancellationToken cancellationToken = default)
+    public async Task<ODataResponse<List<T>>?> ExecuteBaseAsync(CancellationToken cancellationToken = default)
     {
-        var exexutor = new QueryExecutor<T>(oDataQuery);
-        BaseResult = await exexutor.ExecuteRequestAsync(cancellationToken);
+        BaseResult = await oDataQuery.ODataClient.QueryEntityAsync<List<T>>(oDataQuery.GenerateRequestUrl());
         return BaseResult;
     }
 
@@ -60,9 +57,9 @@ public class ODataEntitySetExecute<T, TResult>(ODataEntitySetQuery<T> oDataQuery
             return default;
         }
 
-        if (selector == null) { return (TResult?)(object)BaseResult; }
+        if (selector == null) { return (TResult?)(object)BaseResult?.Data; }
 
-        return selector.Compile().Invoke(BaseResult);
+        return selector.Compile().Invoke(BaseResult.Data);
 
     }
 

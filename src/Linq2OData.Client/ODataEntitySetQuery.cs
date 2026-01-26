@@ -12,6 +12,16 @@ namespace Linq2OData.Client
     {
         private string? expandExpression;
 
+        public ODataClient ODataClient => odataClient;
+
+        public ODataEntityQuery<T> Expand(string? expand = null)
+        {
+            if (string.IsNullOrWhiteSpace(expand)) { expandExpression = null; }
+
+            expandExpression = $"$expand={expand}";
+            return this;
+        }
+
         public ODataEntityExecute<T, T> Select()
         {
             return new ODataEntityExecute<T, T>(this, null);
@@ -24,7 +34,7 @@ namespace Linq2OData.Client
         }
 
 
-        internal string? GenerateRequestUrl()
+        internal string GenerateRequestUrl()
         {
             var urlBuilder = new StringBuilder();
             urlBuilder.Append($"{entitySetName}({keyString})");
@@ -49,6 +59,7 @@ namespace Linq2OData.Client
     public class ODataEntitySetQuery<T>(ODataClient odataClient, string entitySetName)
     {
         private string? topExpression;
+        private string? skipExpression;
         private string? expandExpression;
         private string? filterExpression;
 
@@ -63,6 +74,15 @@ namespace Linq2OData.Client
             topExpression = $"$top={count}";
             return this;
         }
+
+        public ODataEntitySetQuery<T> Skip(int? skip)
+        {
+            if (!skip.HasValue) { skipExpression = null; }
+
+            skipExpression = $"$skip={skip}";
+            return this;
+        }
+
 
         public ODataEntitySetQuery<T> Expand(string? expand = null)
         {
@@ -101,7 +121,7 @@ namespace Linq2OData.Client
         }
 
 
-        internal string? GenerateRequestUrl()
+        internal string GenerateRequestUrl()
         {
             var urlBuilder = new StringBuilder();
             urlBuilder.Append(EntitySetName);
@@ -111,6 +131,11 @@ namespace Linq2OData.Client
             if (!string.IsNullOrWhiteSpace(topExpression))
             {
                 queryParameters.Add(topExpression);
+            }
+
+            if (!string.IsNullOrWhiteSpace(skipExpression))
+            {
+                queryParameters.Add(skipExpression);
             }
 
             if (!string.IsNullOrWhiteSpace(expandExpression))

@@ -1,27 +1,49 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Diagnostics;
+using System.Text.Json.Serialization;
 
-namespace Linq2OData.Client
+namespace Linq2OData.Client;
+
+public class ODataResponse<T>
 {
-    public class ODataResponse<T>
-    {
-        // OData V2 wrapped payloads: { "d": { "results": [...] } }
-        [JsonPropertyName("d")]
-        public ODataData<T>? Data { get; set; }
+    [JsonPropertyName("d")]
+    public T? Data { get; set; }
 
-        // Some services return arrays directly
-        [JsonIgnore]
-        public List<T> Results =>
-            Data?.Results ?? new List<T>();
-    }
+  
+}
 
-    public class ODataData<T>
-    {
-        // Main entity collection
-        [JsonPropertyName("results")]
-        public List<T> Results { get; set; } = new();
+public class ODataErrorResponse
+{
+    [JsonPropertyName("error")]
+    public ODataError? Error { get; set; }
 
-        // Paging
-        [JsonPropertyName("__next")]
-        public string? NextLink { get; set; }
-    }
+
+}
+
+public class ODataError
+{
+    [JsonPropertyName("code")]
+    public string? Code { get; set; }
+    [JsonPropertyName("message")]
+    public ODataErrorMessage? Message { get; set; }
+  
+    [JsonPropertyName("innererror")]
+    public ODataInnerError? InnerError { get; set; }
+}
+
+public class ODataErrorMessage
+{
+    [JsonPropertyName("lang")]
+    public string? Lang { get; set; }
+    [JsonPropertyName("value")]
+    public string? Value { get; set; }
+}
+
+public class ODataInnerError
+{
+    [JsonPropertyName("message")]
+    public string? Message { get; set; }
+    [JsonPropertyName("type")]
+    public string? Type { get; set; }
+    [JsonPropertyName("stacktrace")]
+    public string? Stacktrace { get; set; }
 }

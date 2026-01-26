@@ -1,74 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection.Metadata;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 
 namespace Linq2OData.Client
 {
-    
-    internal class QueryExecutor<T>(ODataEntitySetQuery<T> oDataQuery)
-    {
-        private const string DataPropertyName = "d";
-        private const string ResultsPropertyName = "results";
-        internal async Task<List<T>?> ExecuteRequestAsync(CancellationToken token = default)
-        {
-            var url = oDataQuery.GenerateRequestUrl();
-
-            using var response = await oDataQuery.ODataClient.HttpClient.GetAsync(url, token);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                {
-                    return default;
-                }
-
-                var content = await response.Content.ReadAsStringAsync(token);
-                throw new InvalidOperationException($"Http error! Status code {response.StatusCode} Error: {content}");
-                //throw new GraphQueryRequestException($"Http error! Status code {response.StatusCode} Error: {content}",
-                //    graphRequest.Query, graphRequest.Variables);
-            }
-
-            var rawResponse = await response.Content.ReadAsStringAsync(token);
-
-            return ProcessResponse(rawResponse);
-        }
-
-
-
-        public List<T>? ProcessResponse(string con)
-        {
-            //var document = JsonDocument.Parse(con);
-
-            var root = JsonDocument.Parse(con).RootElement;
-
-            root.TryGetProperty(DataPropertyName, out var dataElement);
-
-
-            if (dataElement.ValueKind == JsonValueKind.Array || dataElement.ValueKind == JsonValueKind.Object)
-            {
-                return DeserializeArray(dataElement);
-            }
-
-            throw new InvalidOperationException("Unexpected OData payload");
-        }
-
-
-        private List<T> DeserializeArray(JsonElement array)
-        {
-            var cleanedJson = ODataJsonCleanupHelper.Clean(array.GetRawText());
-            return JsonSerializer.Deserialize<List<T>>(cleanedJson, oDataQuery.ODataClient.JsonOptions)!;
-        }
-
-
-
-
-
-    }
-
-
-
     public static class ODataJsonCleanupHelper
     {
         /// <summary>
@@ -170,6 +104,5 @@ namespace Linq2OData.Client
             }
         }
     }
-
 
 }

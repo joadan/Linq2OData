@@ -47,7 +47,11 @@ public class MicrosoftDateTimeConverter : JsonConverter<DateTime>
         Type typeToConvert,
         JsonSerializerOptions options)
     {
-       
+
+        //If we get null we set min value rather then throw an exception
+        if (reader.TokenType == JsonTokenType.Null)
+            return DateTime.MinValue;
+
         if (reader.TokenType != JsonTokenType.String)
             throw new JsonException("Expected string for DateTime");
 
