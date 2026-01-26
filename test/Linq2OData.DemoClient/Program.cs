@@ -26,51 +26,52 @@ internal class Program
 
         var client = new GeneratedClient.ODataDemoClient(httpClient);
     
-        var error = await client
-         .ODataDemo
-         .Products()
-         .Top(30)
-         .Expand("Error")
-         .Select()
-         .ExecuteAsync();
+        //var error = await client
+        // .ODataDemo
+        // .Products()
+        // .Top(30)
+        // .Expand("Error")
+        // .Select()
+        // .ExecuteAsync();
 
 
-        //Query entities
-        var filteredResult = await client
-            .ODataDemo
-            .Products()
-            .Top(30)
-            .Filter(e => e.Rating >= 3 || e.ID == 999)
-            .Expand("Category")
-            .Select(e => e.Select(f => new { f.Rating, f.ID }))
-            .ExecuteAsync();
+        ////Query entities
+        //var filteredResult = await client
+        //    .ODataDemo
+        //    .Products()
+        //    .Top(30)
+        //    .Filter(e => e.Rating >= 3 || e.ID == 999)
+        //    .Expand("Category")
+        //    .Select(e => e.Select(f => new { f.Rating, f.ID }))
+        //    .ExecuteAsync();
 
-        var rr = filteredResult;
+        //var rr = filteredResult;
 
-        //Update an entity
-        var result = await client
-            .ODataDemo
-            .ProductsUpdateAsync(1, new ProductInput
-            {
-                Name = "Test Product__",
-            });
+        ////Update an entity
+        //var result = await client
+        //    .ODataDemo
+        //    .ProductsUpdateAsync(1, new ProductInput
+        //    {
+        //        Name = "Test Product__",
+        //    });
 
-        //Select an entity by key
-        var product = await client.ODataDemo
-                .ProductsByKey(1)
-                .Expand("Category")
-                .Select()
+        ////Select an entity by key
+        //var product = await client.ODataDemo
+        //        .ProductsByKey(1)
+        //        .Expand("Category")
+        //        .Select()
 
-                .ExecuteAsync();
+        //        .ExecuteAsync();
 
 
         //Create a new entity
         var newProduct = await client.ODataDemo.ProductsCreateAsync(new ProductInput
         {
-            ID = 888,
+            ID = 1000,
             Name = "Test Product",
             Description = "This is a my test product",
             Rating = 5,
+            ReleaseDate = DateTime.Now,
             Price = 10,
         });
 

@@ -28,8 +28,8 @@ namespace Linq2OData.Client
             jsonOptions.Converters.Add(new MicrosoftDateTimeOffsetConverter());
 
             jsonOptions.Converters.Add(new DecimalStringJsonConverter());
-            jsonOptions.Converters.Add(new Int32StringJsonConverter());
-            jsonOptions.Converters.Add(new NullableInt32StringJsonConverter());
+          //  jsonOptions.Converters.Add(new Int32StringJsonConverter());
+            //jsonOptions.Converters.Add(new NullableInt32StringJsonConverter());
             jsonOptions.Converters.Add(new Int64StringJsonConverter());
             jsonOptions.Converters.Add(new NullableInt64StringJsonConverter());
 
@@ -115,7 +115,7 @@ namespace Linq2OData.Client
         }
 
 
-        private async Task ValidateResponseAsync(HttpResponseMessage response )
+        private async Task ValidateResponseAsync(HttpResponseMessage response)
         {
 
             if (response.IsSuccessStatusCode)
@@ -134,8 +134,8 @@ namespace Linq2OData.Client
             catch
             {
             }
-
-            var ex = new ODataRequestException($"OData request failed with status code {(int)response.StatusCode} Error: {odataError?.Error?.Message?.Value} ", odataError);
+           
+            var ex = new ODataRequestException($"OData request failed status code: {(int)response.StatusCode} Error: {odataError?.Error?.Message?.Value} InnerError: {odataError?.Error?.InnerError?.Message}", response.RequestMessage,  odataError);
 
             throw ex;
         }
