@@ -1,4 +1,5 @@
 ﻿using Linq2OData.Client.Converters;
+using Linq2OData.Client.ODataResponse;
 using System.Collections;
 using System.Reflection.Metadata;
 using System.Text;
@@ -210,24 +211,46 @@ namespace Linq2OData.Client
                 return;
             }
 
+
+
             var content = await response.Content.ReadAsStringAsync();
 
+            ODataError odataError = new ODataError();
 
-            ODataErrorResponse? odataError = null;
             try
             {
-                odataError = JsonSerializer.Deserialize<ODataErrorResponse>(content);
+                if (odataVersion == ODataVersion.V4)
+                {
+                    var odataErrorV4 = JsonSerializer.Deserialize<ODataErrorResponseV4>(content);
+                    odataError.Message = odataErrorV4?.Error?.Message;
+                    odataError.Code = odataErrorV4?.Error?.Code;
+                    odataError.InnerError = new ODataInnerError
+                    {
+                        Message = odataErrorV4?.Error?.InnerError?.Message,
+                        Type = odataErrorV4?.Error?.InnerError?.Type,
+                        Stacktrace = odataErrorV4?.Error?.InnerError?.Stacktrace
+                    };
+                }
+                else
+                {
+                    var odataErrorV1_3 = JsonSerializer.Deserialize<ODataErrorResponseV1_3>(content);
+                    odataError.Message = odataErrorV1_3?.Error?.Message?.Value;
+                    odataError.Code = odataErrorV1_3?.Error?.Message?.Lang; //Not sure this is a good idea..
+                    odataError.InnerError = new ODataInnerError
+                    {
+                        Message = odataErrorV1_3?.Error?.InnerError?.Message,
+                        Type = odataErrorV1_3?.Error?.InnerError?.Type,
+                        Stacktrace = odataErrorV1_3?.Error?.InnerError?.Stacktrace
+                    };
+                }
             }
-            catch
+            catch (Exception ex)
             {
+                odataError.Message = $"Failed to parse error response: {ex.Message}";
             }
 
-            var ex = new ODataRequestException($"OData request failed status code: {(int)response.StatusCode} Error: {odataError?.Error?.Message?.Value} InnerError: {odataError?.Error?.InnerError?.Message}", response.RequestMessage, odataError);
-
-            throw ex;
+            throw new ODataRequestException($"OData request failed. Status code:{(int)response.StatusCode}. Error:{odataError?.Message}", response.RequestMessage, odataError);
         }
     }
-
-
 
 }

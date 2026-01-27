@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using Linq2OData.Client.ODataResponse;
+using System.Linq.Expressions;
 
 
 namespace Linq2OData.Client;

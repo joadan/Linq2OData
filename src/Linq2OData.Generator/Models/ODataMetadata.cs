@@ -46,8 +46,6 @@ public class ODataEntityType
     public required string Name { get; set; }
     public string? Label { get; set; }
 
-    //public List<string> Keys { get; set; } = [];
-
     public List<ODataProperty> Properties { get; set; } = [];
     public List<ODataNavigation> Navigations { get; set; } = [];
 
@@ -59,11 +57,11 @@ public class ODataEntityType
     {
         get
         {
-            if (KeyProperties.Count() == 0) { return string.Empty; }
+            if (!KeyProperties.Any()) { return string.Empty; }
 
             var keyArg = KeyProperties.Select(p =>
             {
-                return $"{p.CSharpType} {ToCamelCaseVariable(p.Name)}";
+                return $"{p.CSharpType} {Helpers.ToCamelCaseVariable(p.Name)}";
             });
             return string.Join(", ", keyArg);
 
@@ -74,45 +72,18 @@ public class ODataEntityType
     {
         get
         {
-            if (KeyProperties.Count() == 0) { return string.Empty; }
+            if (!KeyProperties.Any()) { return string.Empty; }
 
             var keyArg = KeyProperties.Select(p =>
             {
-                return $"{p.Name}={{{ToCamelCaseVariable(p.Name)}}}";
+                return $"{p.KeyArgumentResult}";
             });
 
             return string.Join(",", keyArg);
         }
     }
 
-    public static string ToCamelCaseVariable(string input)
-    {
-        if (string.IsNullOrEmpty(input))
-            return input;
-
-        int len = input.Length;
-        int i = 0;
-
-        // Find consecutive uppercase letters at the start
-        while (i < len && char.IsUpper(input[i]))
-            i++;
-
-        // If first char is the only uppercase, just lowercase it
-        if (i == 1)
-            return char.ToLower(input[0]) + input.Substring(1);
-
-        // If the whole string is uppercase (like "ID"), lowercase everything
-        if (i == len)
-            return input.ToLower();
-
-        // Lowercase all leading uppercase letters except the last if next char is lowercase
-        // Handles cases like "XMLHttpRequest" -> "xmlHttpRequest"
-        int endOfAcronym = i;
-        if (i > 1 && i < len && char.IsLower(input[i]))
-            endOfAcronym = i - 1;
-
-        return input.Substring(0, endOfAcronym).ToLower() + input.Substring(endOfAcronym);
-    }
+   
 
 
 }
@@ -140,6 +111,23 @@ public class ODataProperty
     public bool Sortable { get; set; }
     public bool Filterable { get; set; }
 
+    public string KeyArgumentResult
+    {
+        get
+        {
+            if(DataType.Equals("edm.string", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return $"{Name}='{{{Helpers.ToCamelCaseVariable(Name)}}}'";
+            }
+            else
+            {
+                return $"{Name}={{{Helpers.ToCamelCaseVariable(Name)}}}";
+            }
+            
+        }
+    }
+
+   
 
     public string CSharpNameInput
     {

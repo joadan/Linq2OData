@@ -14,7 +14,7 @@ internal class Program
     {
         Console.WriteLine("Here we go..");
        // await GenerateDemoClientV2Async();
-      //  await GenerateDemoClientV4Async();
+       // await GenerateDemoClientV4Async();
           await TestV4ClientAsync();
 
     }
@@ -31,8 +31,8 @@ internal class Program
         var products = await clientV4
          .ODataDemo
          .Products()
+         .Expand("Category")
          .Count()
-         //.InlineCount()
          .Select()
          .ExecuteAsync();
 
@@ -40,17 +40,17 @@ internal class Program
         var p = products;
 
 
-        ////Query entities
-        //var filteredResult = await client
-        //    .ODataDemo
-        //    .Products()
-        //    .Top(30)
-        //    .Filter(e => e.Rating >= 3 || e.ID == 999)
-        //    .Expand("Category")
-        //    .Select(e => e.Select(f => new { f.Rating, f.ID }))
-        //    .ExecuteAsync();
+        //Query entities
+        var filteredResult = await clientV4
+            .ODataDemo
+            .Products()
+            .Top(30)
+            .Filter(e => e.Rating >= 3 || e.ID == 999)
+            .Expand("Category")
+            .Select(e => e.Select(f => new { f.Rating, f.ID }))
+            .ExecuteAsync();
 
-        //var rr = filteredResult;
+        var rr = filteredResult;
 
         ////Update an entity
         //var result = await client
