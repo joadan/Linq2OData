@@ -128,10 +128,6 @@ internal static class MetadataParserVersion2
                     keyProp?.IsKey = true;
                 }
 
-                //entity.Keys = keyElement.Descendants(edmNamespace + "PropertyRef")
-                //    .Select(pr => pr.Attribute("Name")?.Value)
-                //    .Where(k => !string.IsNullOrEmpty(k))
-                //    .ToList()!;
             }
 
 

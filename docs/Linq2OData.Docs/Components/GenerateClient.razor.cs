@@ -3,6 +3,7 @@ using Linq2OData.Generator.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System.IO.Compression;
+using System.Text;
 using TabBlazor;
 using TabBlazor.Services;
 
@@ -32,9 +33,43 @@ namespace Linq2OData.Docs.Components
 
         private async Task LoadFilesAsync(InputFileChangeEventArgs e)
         {
-            foreach (var browserFile in e.GetMultipleFiles(10))
+            const long maxSize = 10 * 1024 * 1024; // must be >= file size
+            const int bufferSize = 8 * 1024;      // 8 KB
+
+            foreach (var file in e.GetMultipleFiles(10))
             {
-                request.MetadataList.Add(await new StreamReader(browserFile.OpenReadStream(10 * 1024 * 1024)).ReadToEndAsync());
+
+                if(file.Size > maxSize)
+                {
+                    await toastService.AddToastAsync(new()
+                    {
+                        Title = "File Too Large",
+                        Message = $"{file.Name} exceeds the [10] MB size limit and will be skipped.",
+                         SubTitle = "Please upload a smaller file."
+                         
+                    });
+                    continue;
+                }
+
+               
+                using var stream = file.OpenReadStream(maxSize);
+                using var reader = new StreamReader(stream);
+
+                var sb = new StringBuilder((int)Math.Min(file.Size, int.MaxValue));
+                char[] buffer = new char[bufferSize];
+
+                int read;
+                while ((read = await reader.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                {
+                    sb.Append(buffer, 0, read);
+
+                    // optional: keep UI responsive
+                    await Task.Yield();
+                }
+
+                //string xml = sb.ToString();
+
+                request.MetadataList.Add(sb.ToString());
             }
         }
 

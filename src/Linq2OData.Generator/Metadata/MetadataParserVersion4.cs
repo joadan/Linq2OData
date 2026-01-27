@@ -84,7 +84,7 @@ internal static class MetadataParserVersion4
                 Name = name
             };
 
-           
+
             // Parse properties
             foreach (var prop in entityType.Elements(edmNamespace + "Property"))
             {
@@ -104,8 +104,8 @@ internal static class MetadataParserVersion4
 
                 foreach (var keyName in keys)
                 {
-                    var prop = entity.Properties.FirstOrDefault(p => p.Name == keyName);    
-                    prop!.IsKey = true;
+                    var prop = entity.Properties.FirstOrDefault(p => p.Name == keyName);
+                    prop?.IsKey = true;
                 }
             }
 
