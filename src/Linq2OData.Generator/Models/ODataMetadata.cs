@@ -10,11 +10,8 @@ public class ODataMetadata
     public List<ODataEntityType> EntityTypes { get; set; } = [];
     public List<ODataFunction> Functions { get; set; } = [];
 
-
     public string EndpointName => $"{Namespace}Endpoint";
     public string NamespaceEndpointName => $"{Namespace}.{EndpointName}";
-
-
 
 }
 public enum ODataVersion
@@ -30,7 +27,7 @@ public class ODataEntitySet
     public required string EntityTypeName { get; set; }
     public required ODataEntityType EntityType { get; set; }
 
-    private bool EntityTypeHasKeys => EntityType?.Keys.Count > 0;
+    private bool EntityTypeHasKeys => EntityType?.KeyProperties.Count() > 0;
 
 
     public string CSharpReturnType => $"ODataEntitySetQuery<{EntityTypeName}>";
@@ -49,12 +46,12 @@ public class ODataEntityType
     public required string Name { get; set; }
     public string? Label { get; set; }
 
-    public List<string> Keys { get; set; } = [];
+    //public List<string> Keys { get; set; } = [];
 
     public List<ODataProperty> Properties { get; set; } = [];
     public List<ODataNavigation> Navigations { get; set; } = [];
 
-    public List<ODataProperty> KeyProperties => Properties.Where(p => Keys.Contains(p.Name)).ToList();
+    public IEnumerable<ODataProperty> KeyProperties => Properties.Where(p => p.IsKey);
 
     public string InputName => $"{Name}Input";
 
@@ -62,7 +59,7 @@ public class ODataEntityType
     {
         get
         {
-            if (KeyProperties.Count == 0) { return string.Empty; }
+            if (KeyProperties.Count() == 0) { return string.Empty; }
 
             var keyArg = KeyProperties.Select(p =>
             {
@@ -77,7 +74,7 @@ public class ODataEntityType
     {
         get
         {
-            if (KeyProperties.Count == 0) { return string.Empty; }
+            if (KeyProperties.Count() == 0) { return string.Empty; }
 
             var keyArg = KeyProperties.Select(p =>
             {
@@ -126,7 +123,7 @@ public class ODataProperty
 {
     public required string Name { get; set; }
     public bool Nullable { get; set; } = true;
-
+    public bool IsKey { get; set; } 
     public required string DataType { get; set; }
 
     public string? Description { get; set; }

@@ -84,22 +84,29 @@ internal static class MetadataParserVersion4
                 Name = name
             };
 
-            // Parse keys
-            var keyElement = entityType.Element(edmNamespace + "Key");
-            if (keyElement != null)
-            {
-                entity.Keys = keyElement.Descendants(edmNamespace + "PropertyRef")
-                    .Select(pr => pr.Attribute("Name")?.Value)
-                    .Where(k => !string.IsNullOrEmpty(k))
-                    .ToList()!;
-            }
-
+           
             // Parse properties
             foreach (var prop in entityType.Elements(edmNamespace + "Property"))
             {
                 var property = ParseProperty(prop);
                 if (property != null)
                     entity.Properties.Add(property);
+            }
+
+            // Parse keys
+            var keyElement = entityType.Element(edmNamespace + "Key");
+            if (keyElement != null)
+            {
+                var keys = keyElement.Descendants(edmNamespace + "PropertyRef")
+                    .Select(pr => pr.Attribute("Name")?.Value)
+                    .Where(k => !string.IsNullOrEmpty(k))
+                    .ToList()!;
+
+                foreach (var keyName in keys)
+                {
+                    var prop = entity.Properties.FirstOrDefault(p => p.Name == keyName);    
+                    prop!.IsKey = true;
+                }
             }
 
             // Parse navigation properties (V4 style - inline Type attribute)

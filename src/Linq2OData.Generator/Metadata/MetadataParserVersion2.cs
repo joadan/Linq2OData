@@ -103,15 +103,7 @@ internal static class MetadataParserVersion2
                 Label = entityType.Attribute(sap + "label")?.Value
             };
 
-            // Parse keys
-            var keyElement = entityType.Element(edmNamespace + "Key");
-            if (keyElement != null)
-            {
-                entity.Keys = keyElement.Descendants(edmNamespace + "PropertyRef")
-                    .Select(pr => pr.Attribute("Name")?.Value)
-                    .Where(k => !string.IsNullOrEmpty(k))
-                    .ToList()!;
-            }
+        
 
             // Parse properties
             foreach (var prop in entityType.Elements(edmNamespace + "Property"))
@@ -120,6 +112,28 @@ internal static class MetadataParserVersion2
                 if (property != null)
                     entity.Properties.Add(property);
             }
+
+            // Parse keys
+            var keyElement = entityType.Element(edmNamespace + "Key");
+            if (keyElement != null)
+            {
+                var keys = keyElement.Descendants(edmNamespace + "PropertyRef")
+                    .Select(pr => pr.Attribute("Name")?.Value)
+                    .Where(k => !string.IsNullOrEmpty(k))
+                    .ToList()!;
+
+                foreach (var key in keys)
+                {
+                    var keyProp = entity.Properties.FirstOrDefault(p => p.Name == key);
+                    keyProp?.IsKey = true;
+                }
+
+                //entity.Keys = keyElement.Descendants(edmNamespace + "PropertyRef")
+                //    .Select(pr => pr.Attribute("Name")?.Value)
+                //    .Where(k => !string.IsNullOrEmpty(k))
+                //    .ToList()!;
+            }
+
 
             // Parse navigation properties (will be completed after associations are parsed)
             foreach (var navProp in entityType.Elements(edmNamespace + "NavigationProperty"))

@@ -34,7 +34,7 @@ namespace Linq2OData.Tests
             Assert.Equal("Sales Quotation Header", salesQuotationEntity.Label);
             
             // Verify keys
-            Assert.Contains("SalesQuotation", salesQuotationEntity.Keys);
+            Assert.Contains("SalesQuotation", salesQuotationEntity.KeyProperties.Select(e=> e.Name));
             
             // Verify some properties exist
             Assert.NotEmpty(salesQuotationEntity.Properties);
@@ -152,8 +152,8 @@ namespace Linq2OData.Tests
             Assert.NotNull(productEntity);
             
             // Verify key
-            Assert.Single(productEntity.Keys);
-            Assert.Contains("ID", productEntity.Keys);
+            Assert.Single(productEntity.KeyProperties);
+            Assert.Contains("ID", productEntity.KeyProperties.Select(e=> e.Name));
             
             // Verify properties
             Assert.Equal(7, productEntity.Properties.Count);
@@ -196,8 +196,8 @@ namespace Linq2OData.Tests
             Assert.NotNull(categoryEntity);
             
             // Verify key
-            Assert.Single(categoryEntity.Keys);
-            Assert.Contains("ID", categoryEntity.Keys);
+            Assert.Single(categoryEntity.KeyProperties);
+            Assert.Contains("ID", categoryEntity.KeyProperties.Select(e=>e.Name));
             
             // Verify properties
             Assert.Equal(2, categoryEntity.Properties.Count);
@@ -230,8 +230,8 @@ namespace Linq2OData.Tests
             Assert.NotNull(supplierEntity);
             
             // Verify key
-            Assert.Single(supplierEntity.Keys);
-            Assert.Contains("ID", supplierEntity.Keys);
+            Assert.Single(supplierEntity.KeyProperties);
+            Assert.Contains("ID", supplierEntity.KeyProperties.Select(e=>e.Name));
             
             // Verify properties
             Assert.Equal(4, supplierEntity.Properties.Count);
@@ -354,8 +354,8 @@ namespace Linq2OData.Tests
             Assert.NotNull(productEntity);
             
             // Verify key
-            Assert.Single(productEntity.Keys);
-            Assert.Contains("ID", productEntity.Keys);
+            Assert.Single(productEntity.KeyProperties);
+            Assert.Contains("ID", productEntity.KeyProperties.Select(e => e.Name));
             
             // Verify properties
             var idProperty = productEntity.Properties.FirstOrDefault(p => p.Name == "ID");
