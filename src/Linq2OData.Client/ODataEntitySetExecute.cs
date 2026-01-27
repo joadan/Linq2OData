@@ -52,12 +52,12 @@ public class ODataEntitySetExecute<T, TResult>(ODataEntitySetQuery<T> oDataQuery
     {
         await ExecuteBaseAsync(cancellationToken);
 
-        if (BaseResult == null)
+        if (BaseResult?.Data == null)
         {
             return default;
         }
 
-        if (selector == null) { return (TResult?)(object)BaseResult?.Data; }
+        if (selector == null) { return (TResult?)(object?)BaseResult?.Data; }
 
         return selector.Compile().Invoke(BaseResult.Data);
 

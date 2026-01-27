@@ -59,7 +59,7 @@ namespace Linq2OData.Client
         private string? skipExpression;
         private string? expandExpression;
         private string? filterExpression;
-        private string? inlineCountExpression;
+        private string? countExpression;
 
         public ODataClient ODataClient => odataClient;
         public string EntitySetName => entitySetName;
@@ -72,11 +72,19 @@ namespace Linq2OData.Client
             return this;
         }
 
-        public ODataEntitySetQuery<T> InlineCount(bool include = true)
+        public ODataEntitySetQuery<T> Count(bool include = true)
         {
-            if (!include) { inlineCountExpression = null; }
+            if (!include) { countExpression = null; }
 
-            inlineCountExpression = $"$inlinecount=allpages";
+            if (odataClient.ODataVersion == ODataVersion.V4)
+            {
+                countExpression = $"$count=true";
+            }
+            else
+            {
+                countExpression = $"$inlinecount=allpages";
+            }
+        
             return this;
         }
 
@@ -153,9 +161,9 @@ namespace Linq2OData.Client
                 queryParameters.Add(filterExpression);
             }
 
-            if (!string.IsNullOrWhiteSpace(inlineCountExpression))
+            if (!string.IsNullOrWhiteSpace(countExpression))
             {
-                queryParameters.Add(inlineCountExpression);
+                queryParameters.Add(countExpression);
             }
 
             if (queryParameters.Count > 0)

@@ -88,7 +88,6 @@ public class ODataEntityType
         }
     }
 
-
     public static string ToCamelCaseVariable(string input)
     {
         if (string.IsNullOrEmpty(input))
@@ -173,6 +172,7 @@ public class ODataProperty
             var csharpType = DataType switch
             {
                 "Edm.String" => "string",
+                "Edm.Int16" => "short",
                 "Edm.Int32" => "int",
                 "Edm.Int64" => "long",
                 "Edm.Boolean" => "bool",

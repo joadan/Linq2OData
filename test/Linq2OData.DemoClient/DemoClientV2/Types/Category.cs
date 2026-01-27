@@ -5,9 +5,9 @@
 
 using Linq2OData.Client;
 
-namespace GeneratedClient.ODataDemo;
+namespace DemoClientV2.ODataDemo;
 
-public partial class Supplier
+public partial class Category
 {
 
     [ODataMember("ID")]
@@ -15,12 +15,6 @@ public partial class Supplier
 
     [ODataMember("Name")]
     public string Name { get; set; }
-
-    [ODataMember("Address")]
-    public ODataDemo.Address Address { get; set; }
-
-    [ODataMember("Concurrency")]
-    public int Concurrency { get; set; }
 
 
 

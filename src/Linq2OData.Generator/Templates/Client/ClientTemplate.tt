@@ -4,13 +4,17 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 
+
 namespace <#= clientNamespace #>;
 
 public class <#= clientName #> 
 {
+    private Linq2OData.Client.ODataClient odataClient;
+    public Linq2OData.Client.ODataClient ODataClient => odataClient;
+
     public <#= clientName #>(HttpClient httpClient) 
     {
-         var odataClient = new Linq2OData.Client.ODataClient(httpClient); 
+         odataClient = new Linq2OData.Client.ODataClient(httpClient, <#= GetODataVersionParameter() #>); 
           <# foreach (var metadata in metadataList) { #>
     <#= metadata.Namespace #> = new <#= metadata.NamespaceEndpointName #>(odataClient);
 <# } #>

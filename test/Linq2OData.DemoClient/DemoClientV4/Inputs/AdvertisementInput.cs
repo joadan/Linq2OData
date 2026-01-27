@@ -1,0 +1,30 @@
+
+using Linq2OData.Client;
+
+namespace DemoClientV4.ODataDemo;
+
+public partial class AdvertisementInput : ODataInputBase
+{
+    public Guid? ID 
+	{
+		get => GetValue<Guid?>("ID");
+		set => SetValue("ID", value);
+	}
+    public string? Name 
+	{
+		get => GetValue<string?>("Name");
+		set => SetValue("Name", value);
+	}
+    public DateTimeOffset? AirDate 
+	{
+		get => GetValue<DateTimeOffset?>("AirDate");
+		set => SetValue("AirDate", value);
+	}
+
+    public FeaturedProductInput? FeaturedProduct 
+	{
+		get => GetValue<FeaturedProductInput?>("FeaturedProduct");
+		set => SetValue("FeaturedProduct", value);
+	}
+
+}

@@ -1,0 +1,45 @@
+
+using Linq2OData.Client;
+
+namespace DemoClientV4.ODataDemo;
+
+public partial class PersonDetailInput : ODataInputBase
+{
+    public int? PersonID 
+	{
+		get => GetValue<int?>("PersonID");
+		set => SetValue("PersonID", value);
+	}
+    public object? Age 
+	{
+		get => GetValue<object?>("Age");
+		set => SetValue("Age", value);
+	}
+    public bool? Gender 
+	{
+		get => GetValue<bool?>("Gender");
+		set => SetValue("Gender", value);
+	}
+    public string? Phone 
+	{
+		get => GetValue<string?>("Phone");
+		set => SetValue("Phone", value);
+	}
+    public ODataDemo.AddressInput? Address 
+	{
+		get => GetValue<ODataDemo.AddressInput?>("Address");
+		set => SetValue("Address", value);
+	}
+    public object? Photo 
+	{
+		get => GetValue<object?>("Photo");
+		set => SetValue("Photo", value);
+	}
+
+    public PersonInput? Person 
+	{
+		get => GetValue<PersonInput?>("Person");
+		set => SetValue("Person", value);
+	}
+
+}

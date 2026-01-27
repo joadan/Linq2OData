@@ -11,15 +11,33 @@ public class ClientGenerator(ClientRequest request)
 
     private List<FileEntry> files = [];
     private List<ODataMetadata> metadataCollection = [];
+    private ODataVersion? version = null;
 
     public List<FileEntry> GenerateClient()
     {
+        
         files.Clear();
 
+        if (request.MetadataList == null || request.MetadataList.Count == 0)
+        {
+            throw new Exception("At least one metadata document must be provided.");
+        }
+
+        
           //Parse Metadata
         foreach (var metadataContent in request.MetadataList)
         {
             var metadata = Metadata.MetadataParser.Parse(metadataContent);
+            if (version != null && metadata.ODataVersion != version)
+            {
+                throw new Exception($"All metadata documents must have the same OData version. Current is {version.ToString()}, trying to add {metadata.Namespace}: {metadata.ODataVersion}");
+            }
+            else
+            {
+                version = metadata.ODataVersion;
+            }
+
+
             metadataCollection.Add(metadata);
         }
 
@@ -53,7 +71,7 @@ public class ClientGenerator(ClientRequest request)
 
     private void GenerateClientCode()
     {
-        var templateText = new ClientTemplate(request.Name, request.Namespace, metadataCollection).TransformText();
+        var templateText = new ClientTemplate(request.Name, request.Namespace, metadataCollection, (ODataVersion)version!).TransformText();
         AddFile("Client", request.Name + ".cs", templateText);
 
 

@@ -5,7 +5,7 @@
 
 using Linq2OData.Client;
 
-namespace GeneratedClient.ODataDemo;
+namespace DemoClientV4.ODataDemo;
 
 public partial class Category
 {

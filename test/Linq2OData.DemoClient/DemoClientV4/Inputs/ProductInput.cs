@@ -1,7 +1,7 @@
 
 using Linq2OData.Client;
 
-namespace GeneratedClient.ODataDemo;
+namespace DemoClientV4.ODataDemo;
 
 public partial class ProductInput : ODataInputBase
 {
@@ -20,36 +20,41 @@ public partial class ProductInput : ODataInputBase
 		get => GetValue<string?>("Description");
 		set => SetValue("Description", value);
 	}
-    public DateTime? ReleaseDate 
+    public DateTimeOffset? ReleaseDate 
 	{
-		get => GetValue<DateTime?>("ReleaseDate");
+		get => GetValue<DateTimeOffset?>("ReleaseDate");
 		set => SetValue("ReleaseDate", value);
 	}
-    public DateTime? DiscontinuedDate 
+    public DateTimeOffset? DiscontinuedDate 
 	{
-		get => GetValue<DateTime?>("DiscontinuedDate");
+		get => GetValue<DateTimeOffset?>("DiscontinuedDate");
 		set => SetValue("DiscontinuedDate", value);
 	}
-    public int? Rating 
+    public short? Rating 
 	{
-		get => GetValue<int?>("Rating");
+		get => GetValue<short?>("Rating");
 		set => SetValue("Rating", value);
 	}
-    public decimal? Price 
+    public double? Price 
 	{
-		get => GetValue<decimal?>("Price");
+		get => GetValue<double?>("Price");
 		set => SetValue("Price", value);
 	}
 
-    public CategoryInput? Category 
+    public List<CategoryInput>? Categories 
 	{
-		get => GetValue<CategoryInput?>("Category");
-		set => SetValue("Category", value);
+		get => GetValue<List<CategoryInput>?>("Categories");
+		set => SetValue("Categories", value);
 	}
     public SupplierInput? Supplier 
 	{
 		get => GetValue<SupplierInput?>("Supplier");
 		set => SetValue("Supplier", value);
+	}
+    public ProductDetailInput? ProductDetail 
+	{
+		get => GetValue<ProductDetailInput?>("ProductDetail");
+		set => SetValue("ProductDetail", value);
 	}
 
 }

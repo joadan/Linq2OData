@@ -5,7 +5,18 @@ using System.Text;
 
 namespace Linq2OData.Generator.Templates.Client
 {
-    public partial class ClientTemplate(string clientName, string clientNamespace, List<ODataMetadata> metadataList)
+    public partial class ClientTemplate(string clientName, string clientNamespace, List<ODataMetadata> metadataList, ODataVersion oDataVersion)
     {
+
+
+        private string GetODataVersionParameter()
+        {
+            return oDataVersion switch
+            {
+                ODataVersion.V2 => "Linq2OData.Client.ODataVersion.V2",
+                ODataVersion.V4 => "Linq2OData.Client.ODataVersion.V4",
+                _ => ""
+            };
+        }   
     }
 }

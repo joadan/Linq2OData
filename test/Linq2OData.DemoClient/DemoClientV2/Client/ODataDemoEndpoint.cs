@@ -1,6 +1,6 @@
 using Linq2OData.Client;
 
-namespace GeneratedClient.ODataDemo;
+namespace DemoClientV2.ODataDemo;
 
 
 public class ODataDemoEndpoint(ODataClient odataClient) 

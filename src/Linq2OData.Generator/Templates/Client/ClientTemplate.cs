@@ -28,80 +28,88 @@ namespace Linq2OData.Generator.Templates.Client
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("\r\nnamespace ");
+            this.Write("\r\n\r\nnamespace ");
             
-            #line 7 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 8 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientNamespace));
             
             #line default
             #line hidden
             this.Write(";\r\n\r\npublic class ");
             
-            #line 9 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 10 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             
             #line default
             #line hidden
-            this.Write(" \r\n{\r\n    public ");
+            this.Write(" \r\n{\r\n    private Linq2OData.Client.ODataClient odataClient;\r\n    public Linq2ODa" +
+                    "ta.Client.ODataClient ODataClient => odataClient;\r\n\r\n    public ");
             
-            #line 11 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 15 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             
             #line default
             #line hidden
-            this.Write("(HttpClient httpClient) \r\n    {\r\n         var odataClient = new Linq2OData.Client" +
-                    ".ODataClient(httpClient); \r\n          ");
+            this.Write("(HttpClient httpClient) \r\n    {\r\n         odataClient = new Linq2OData.Client.ODa" +
+                    "taClient(httpClient, ");
             
-            #line 14 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 17 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GetODataVersionParameter()));
+            
+            #line default
+            #line hidden
+            this.Write("); \r\n          ");
+            
+            #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
  foreach (var metadata in metadataList) { 
             
             #line default
             #line hidden
             this.Write("    ");
             
-            #line 15 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 19 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(metadata.Namespace));
             
             #line default
             #line hidden
             this.Write(" = new ");
             
-            #line 15 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 19 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(metadata.NamespaceEndpointName));
             
             #line default
             #line hidden
             this.Write("(odataClient);\r\n");
             
-            #line 16 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 20 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("       \r\n    }\r\n\r\n    ");
             
-            #line 20 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 24 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
  foreach (var metadata in metadataList) { 
             
             #line default
             #line hidden
             this.Write("    public ");
             
-            #line 21 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 25 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(metadata.NamespaceEndpointName));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 21 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 25 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(metadata.Namespace));
             
             #line default
             #line hidden
             this.Write(" { get; set; }\r\n");
             
-            #line 22 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 26 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
  } 
             
             #line default

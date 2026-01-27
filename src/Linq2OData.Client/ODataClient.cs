@@ -1,4 +1,5 @@
 ﻿using Linq2OData.Client.Converters;
+using System.Collections;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
@@ -11,28 +12,30 @@ namespace Linq2OData.Client
     {
 
         private HttpClient httpClient;
-
+        private ODataVersion odataVersion;
         private JsonSerializerOptions jsonOptions;
 
-        public ODataClient(HttpClient httpClient)
+        public ODataClient(HttpClient httpClient, ODataVersion odataVersion)
         {
-
             httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
             this.httpClient = httpClient;
-
+            this.odataVersion = odataVersion;
             jsonOptions = new JsonSerializerOptions();
-            jsonOptions.Converters.Add(new MicrosoftDateTimeConverter());
-            jsonOptions.Converters.Add(new MicrosoftNullableDateTimeConverter());
-            jsonOptions.Converters.Add(new MicrosoftDateTimeOffsetConverter());
 
-            jsonOptions.Converters.Add(new DecimalStringJsonConverter());
-            //  jsonOptions.Converters.Add(new Int32StringJsonConverter());
-            //jsonOptions.Converters.Add(new NullableInt32StringJsonConverter());
-            jsonOptions.Converters.Add(new Int64StringJsonConverter());
-            jsonOptions.Converters.Add(new NullableInt64StringJsonConverter());
+            if (odataVersion < ODataVersion.V4) //Not really sure about this but I belive it is a good start
+            {
+                jsonOptions.Converters.Add(new MicrosoftDateTimeConverter());
+                jsonOptions.Converters.Add(new MicrosoftNullableDateTimeConverter());
+                jsonOptions.Converters.Add(new MicrosoftDateTimeOffsetConverter());
+                jsonOptions.Converters.Add(new DecimalStringJsonConverter());
+                jsonOptions.Converters.Add(new Int64StringJsonConverter());
+                jsonOptions.Converters.Add(new NullableInt64StringJsonConverter());
+            }
+
 
         }
         public HttpClient HttpClient => httpClient;
+        public ODataVersion ODataVersion => odataVersion;
         public JsonSerializerOptions JsonOptions => jsonOptions;
 
 
@@ -86,7 +89,6 @@ namespace Linq2OData.Client
 
         public async Task<ODataResponse<T>?> QueryEntityAsync<T>(string url, CancellationToken token = default)
         {
-
             using var response = await httpClient.GetAsync(url, token);
 
             if (!response.IsSuccessStatusCode)
@@ -105,20 +107,78 @@ namespace Linq2OData.Client
 
         private ODataResponse<T>? ProcessQueryResponse<T>(string rawResponse)
         {
-            JsonNode? root = JsonNode.Parse(ODataJsonCleanupHelper.Clean(rawResponse));
-        
+
+            if (string.IsNullOrWhiteSpace(rawResponse))
+            {
+                return null;
+            }
+            JsonNode? root = JsonNode.Parse(rawResponse);
+
             if (root == null)
             {
                 return null;
             }
-            var d = root["d"];
 
+
+            var isCollection = IsCollection<T>();
+
+
+            if (odataVersion == ODataVersion.V4)
+            {
+                return ProcessQueryResponseV4<T>(root, isCollection);
+            }
+            else
+            {
+                return ProcessQueryResponseV1_3<T>(root, isCollection);
+            }
+
+
+        }
+
+        bool IsCollection<T>()
+        {
+            return typeof(System.Collections.IEnumerable).IsAssignableFrom(typeof(T));
+        }
+
+        private ODataResponse<T>? ProcessQueryResponseV4<T>(JsonNode root, bool isCollection)
+        {
+            var response = new ODataResponse<T>();
+            if (isCollection)
+            {
+
+                var results = root["value"];
+                if (results == null)
+                {
+                    return null;
+                }
+                response.Data = results.Deserialize<T>(jsonOptions);
+                var countNode = root["@odata.count"];
+                if (countNode != null)
+                {
+                    if (long.TryParse(countNode.AsValue().ToString(), out var countValue))
+                    {
+                        response.Count = countValue;
+                    }
+                }
+            }
+            else
+            {
+                response.Data = root.Deserialize<T>(jsonOptions);
+            }
+
+            return response;
+
+        }
+
+        private ODataResponse<T>? ProcessQueryResponseV1_3<T>(JsonNode root, bool isCollection)
+        {
+            var d = root["d"];
             if (d == null) { return null; }
 
             JsonNode? results = null;
             if (d.GetValueKind() == JsonValueKind.Object)
             {
-               results = d["results"];
+                results = d["results"];
             }
 
             var response = new ODataResponse<T>();
