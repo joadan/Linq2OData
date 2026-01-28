@@ -13,6 +13,10 @@ public class ODataMetadata
     public string EndpointName => $"{Namespace}Endpoint";
     public string NamespaceEndpointName => $"{Namespace}.{EndpointName}";
 
+    public IEnumerable<ODataEntityType> GetDerivedTypes(string entityTypeName) {
+        return EntityTypes.Where(et => et.BaseType == $"{Namespace}.{entityTypeName}");
+    }
+
 }
 public enum ODataVersion
 {
@@ -26,9 +30,6 @@ public class ODataEntitySet
     public required string Name { get; set; }
     public required string EntityTypeName { get; set; }
     public required ODataEntityType EntityType { get; set; }
-
-    private bool EntityTypeHasKeys => EntityType?.KeyProperties.Count() > 0;
-
 
     public string CSharpReturnType => $"ODataEntitySetQuery<{EntityTypeName}>";
     public string CSharpMethodName => $"{Name}";
@@ -52,6 +53,7 @@ public class ODataEntityType
     public List<ODataNavigation> Navigations { get; set; } = [];
 
     public IEnumerable<ODataProperty> KeyProperties => Properties.Where(p => p.IsKey);
+
 
     public string InputName => $"{Name}Input";
 

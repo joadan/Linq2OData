@@ -14,9 +14,9 @@ internal class Program
     static async Task Main(string[] args)
     {
         Console.WriteLine("Here we go..");
-        await GenerateDemoClientV2Async();
-        await GenerateDemoClientV4Async();
-       //   await TestV4ClientAsync();
+        //await GenerateDemoClientV2Async();
+        //await GenerateDemoClientV4Async();
+          await TestV4ClientAsync();
 
     }
 

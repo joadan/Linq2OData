@@ -4,9 +4,11 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 using Linq2OData.Client;
+using System.Text.Json.Serialization;
 
-namespace <#= namespaceName #>;
+namespace <#= fullNamspace #>;
 
+<#= GetDerivedAttributes() #>
 public partial class <#= entityType.Name #> <#= BaseTypeDerived #>
 {
 <# foreach (var property in entityType.Properties) { #>
