@@ -7,7 +7,7 @@ using Linq2OData.Client;
 
 namespace <#= namespaceName #>;
 
-public partial class <#= entityType.Name #>
+public partial class <#= entityType.Name #> <#= BaseTypeDerived #>
 {
 <# foreach (var property in entityType.Properties) { #>
     [ODataMember("<#= property.Name #>")]

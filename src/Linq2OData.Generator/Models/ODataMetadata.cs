@@ -46,6 +46,8 @@ public class ODataEntityType
     public required string Name { get; set; }
     public string? Label { get; set; }
 
+    public string? BaseType { get; set; }
+
     public List<ODataProperty> Properties { get; set; } = [];
     public List<ODataNavigation> Navigations { get; set; } = [];
 
@@ -53,6 +55,7 @@ public class ODataEntityType
 
     public string InputName => $"{Name}Input";
 
+    
     public string KeyArgumentString
     {
         get
@@ -82,8 +85,6 @@ public class ODataEntityType
             return string.Join(",", keyArg);
         }
     }
-
-   
 
 
 }

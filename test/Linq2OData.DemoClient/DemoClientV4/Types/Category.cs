@@ -7,7 +7,7 @@ using Linq2OData.Client;
 
 namespace DemoClientV4.ODataDemo;
 
-public partial class Category
+public partial class Category 
 {
 
     [ODataMember("ID")]

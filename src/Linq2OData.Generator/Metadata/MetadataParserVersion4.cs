@@ -76,12 +76,14 @@ internal static class MetadataParserVersion4
         foreach (var entityType in schema.Descendants(edmNamespace + "EntityType"))
         {
             var name = entityType.Attribute("Name")?.Value;
+            var baseType = entityType.Attribute("BaseType")?.Value;
             if (string.IsNullOrEmpty(name))
                 continue;
 
             var entity = new ODataEntityType
             {
-                Name = name
+                Name = name,
+                BaseType = baseType
             };
 
 

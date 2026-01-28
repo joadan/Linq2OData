@@ -46,6 +46,13 @@ namespace Linq2OData.Generator.Templates.Types
             
             #line default
             #line hidden
+            this.Write(" ");
+            
+            #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(BaseTypeDerived));
+            
+            #line default
+            #line hidden
             this.Write("\n{\n");
             
             #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"

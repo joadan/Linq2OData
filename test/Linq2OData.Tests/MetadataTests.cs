@@ -509,6 +509,39 @@ namespace Linq2OData.Tests
             Assert.Equal("Edm.Int64", employeeIdProperty.DataType);
         }
 
+        [Fact]
+        public void ParseODataDemoV4Metadata_ShouldParseBaseType()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV4);
+
+            // Assert - Verify BaseType is correctly parsed for derived entities
+            
+            // FeaturedProduct derives from Product
+            var featuredProductEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "FeaturedProduct");
+            Assert.NotNull(featuredProductEntity);
+            Assert.Equal("ODataDemo.Product", featuredProductEntity.BaseType);
+            
+            // Customer derives from Person
+            var customerEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Customer");
+            Assert.NotNull(customerEntity);
+            Assert.Equal("ODataDemo.Person", customerEntity.BaseType);
+            
+            // Employee derives from Person
+            var employeeEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Employee");
+            Assert.NotNull(employeeEntity);
+            Assert.Equal("ODataDemo.Person", employeeEntity.BaseType);
+            
+            // Verify base types don't have BaseType set
+            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            Assert.NotNull(productEntity);
+            Assert.Null(productEntity.BaseType);
+            
+            var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
+            Assert.NotNull(personEntity);
+            Assert.Null(personEntity.BaseType);
+        }
+
         #endregion
     }
 }

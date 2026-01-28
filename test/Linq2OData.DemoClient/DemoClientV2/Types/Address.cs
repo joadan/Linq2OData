@@ -7,7 +7,7 @@ using Linq2OData.Client;
 
 namespace DemoClientV2.ODataDemo;
 
-public partial class Address
+public partial class Address 
 {
 
     [ODataMember("Street")]
