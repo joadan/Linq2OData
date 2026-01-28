@@ -71,8 +71,6 @@ namespace Linq2OData.Client
         {
             string json = JsonSerializer.Serialize(input.GetValues(), jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-
             var request = new HttpRequestMessage(new HttpMethod("MERGE"), $"{entitysetName}({keyExpression})")
             {
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
@@ -84,12 +82,33 @@ namespace Linq2OData.Client
             await ValidateResponseAsync(response);
 
             return true;
+        }
 
+        public async Task<ODataResponse<List<T>>?> QueryEntitySetAsync<T>(string entitySetName, string? expand=null, string? filter=null, bool? count = null, int? top = null, int? skip = null, CancellationToken token = default)
+        {
+            var url = GenerateUrl(entitySetName: entitySetName, expand: expand, filter: filter, count: count, top: top, skip: skip);
+
+            using var response = await httpClient.GetAsync(url, token);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return null;
+                }
+
+                await ValidateResponseAsync(response);
+            }
+
+            var rawResponse = await response.Content.ReadAsStringAsync(token);
+            return ProcessQueryResponse<List<T>>(rawResponse);
         }
 
 
-        public async Task<ODataResponse<T>?> QueryEntityAsync<T>(string url, CancellationToken token = default)
+        public async Task<ODataResponse<T>?> QueryEntityAsync<T>(string entitySetName, string keyString, string? expand = null, CancellationToken token = default)
         {
+            var url = GenerateUrl(entitySetName: entitySetName, keyString:keyString, expand: expand);
+
             using var response = await httpClient.GetAsync(url, token);
 
             if (!response.IsSuccessStatusCode)
@@ -106,9 +125,63 @@ namespace Linq2OData.Client
             return ProcessQueryResponse<T>(rawResponse);
         }
 
-        private ODataResponse<T>? ProcessQueryResponse<T>(string rawResponse)
+        private string GenerateUrl(string entitySetName, string? keyString=null, string? expand = null, string? filter = null, bool? count= null, int? top = null, int? skip = null)
         {
 
+            var urlBuilder = new StringBuilder();
+            urlBuilder.Append(entitySetName);
+
+            if (!string.IsNullOrWhiteSpace(keyString))
+            {
+                urlBuilder.Append($"({keyString})");
+            }
+
+            var queryParameters = new List<string>();
+            if (top > 0)
+            {
+                queryParameters.Add($"$top={top}");
+            }
+
+            if (skip > 0)
+            {
+                queryParameters.Add($"$skip={skip}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(expand))
+            {
+                queryParameters.Add($"$expand={expand}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                queryParameters.Add($"$filter={filter}");
+            }
+
+            if (count == true)
+            {
+                if (odataVersion == ODataVersion.V4)
+                {
+                    queryParameters.Add($"$count=true");
+                }
+                else
+                {
+                    queryParameters.Add($"inlinecount=allpages");
+                }
+            }
+
+            if (queryParameters.Count > 0)
+            {
+                urlBuilder.Append("?");
+                urlBuilder.Append(string.Join("&", queryParameters));
+            }
+            return urlBuilder.ToString();
+        }
+
+
+
+
+        private ODataResponse<T>? ProcessQueryResponse<T>(string rawResponse)
+        {
             if (string.IsNullOrWhiteSpace(rawResponse))
             {
                 return null;
@@ -120,9 +193,7 @@ namespace Linq2OData.Client
                 return null;
             }
 
-
             var isCollection = IsCollection<T>();
-
 
             if (odataVersion == ODataVersion.V4)
             {
@@ -132,13 +203,11 @@ namespace Linq2OData.Client
             {
                 return ProcessQueryResponseV1_3<T>(root, isCollection);
             }
-
-
         }
 
         bool IsCollection<T>()
         {
-            return typeof(System.Collections.IEnumerable).IsAssignableFrom(typeof(T));
+            return typeof(IEnumerable).IsAssignableFrom(typeof(T));
         }
 
         private ODataResponse<T>? ProcessQueryResponseV4<T>(JsonNode root, bool isCollection)
@@ -210,8 +279,6 @@ namespace Linq2OData.Client
             {
                 return;
             }
-
-
 
             var content = await response.Content.ReadAsStringAsync();
 

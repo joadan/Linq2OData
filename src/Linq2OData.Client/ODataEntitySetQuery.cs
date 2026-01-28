@@ -7,15 +7,14 @@ namespace Linq2OData.Client
 
     public class ODataEntityQuery<T>(ODataClient odataClient, string entitySetName, string keyString)
     {
-        private string? expandExpression;
-
+        public string? ExpandValue { get; private set; }
         public ODataClient ODataClient => odataClient;
+        public string EntitySetName => entitySetName;
+        public string KeyString => keyString;
 
         public ODataEntityQuery<T> Expand(string? expand = null)
         {
-            if (string.IsNullOrWhiteSpace(expand)) { expandExpression = null; }
-
-            expandExpression = $"$expand={expand}";
+            ExpandValue = expand;
             return this;
         }
 
@@ -30,95 +29,57 @@ namespace Linq2OData.Client
             return new ODataEntityExecute<T, TResult>(this, selector);
         }
 
-
-        internal string GenerateRequestUrl()
-        {
-            var urlBuilder = new StringBuilder();
-            urlBuilder.Append($"{entitySetName}({keyString})");
-
-            var queryParameters = new List<string>();
-            if (!string.IsNullOrWhiteSpace(expandExpression))
-            {
-                queryParameters.Add(expandExpression);
-            }
-
-            if (queryParameters.Count > 0)
-            {
-                urlBuilder.Append("?");
-                urlBuilder.Append(string.Join("&", queryParameters));
-            }
-            return urlBuilder.ToString();
-        }
-
     }
 
 
     public class ODataEntitySetQuery<T>(ODataClient odataClient, string entitySetName)
     {
-        private string? topExpression;
-        private string? skipExpression;
-        private string? expandExpression;
-        private string? filterExpression;
-        private string? countExpression;
-
         public ODataClient ODataClient => odataClient;
         public string EntitySetName => entitySetName;
 
-        public ODataEntitySetQuery<T> Top(int? count)
-        {
-            if (!count.HasValue) { topExpression = null; }
 
-            topExpression = $"$top={count}";
+        public bool CountValue { get; private set; }
+        public int? TopValue { get; private set; }
+        public int? SkipValue { get; private set; }
+        public string? SelectValue { get; private set; }
+        public string? ExpandValue { get; private set; }
+        public string? FilterValue { get; private set; }
+
+
+        public ODataEntitySetQuery<T> Top(int? top)
+        {
+            TopValue = top;
             return this;
         }
 
-        public ODataEntitySetQuery<T> Count(bool include = true)
+        public ODataEntitySetQuery<T> Count(bool count = true)
         {
-            if (!include) { countExpression = null; }
-
-            if (odataClient.ODataVersion == ODataVersion.V4)
-            {
-                countExpression = $"$count=true";
-            }
-            else
-            {
-                countExpression = $"$inlinecount=allpages";
-            }
-        
+            CountValue = count;
             return this;
         }
 
         public ODataEntitySetQuery<T> Skip(int? skip)
         {
-            if (!skip.HasValue) { skipExpression = null; }
-
-            skipExpression = $"$skip={skip}";
+            SkipValue = skip;
             return this;
         }
 
-
         public ODataEntitySetQuery<T> Expand(string? expand = null)
         {
-            if (string.IsNullOrWhiteSpace(expand)) { expandExpression = null; }
-
-            expandExpression = $"$expand={expand}";
+            ExpandValue = expand;
             return this;
         }
 
         public ODataEntitySetQuery<T> Filter(string? filter = null)
         {
-            if (string.IsNullOrWhiteSpace(filter)) { filterExpression = null; }
-
-            filterExpression = $"$filter={filter}";
+            FilterValue = filter;
             return this;
         }
 
         public ODataEntitySetQuery<T> Filter(Expression<Func<T, bool>> expression)
         {
             var oDataFilterVisitor = new ODataFilterVisitor();
-            var filter = oDataFilterVisitor.ToFilter(expression);
-
-            filterExpression = $"$filter={filter}";
+            FilterValue = oDataFilterVisitor.ToFilter(expression);
             return this;
         }
 
@@ -132,48 +93,5 @@ namespace Linq2OData.Client
             //ParseExpression(selector);
             return new ODataEntitySetExecute<T, TResult>(this, selector);
         }
-
-
-        internal string GenerateRequestUrl()
-        {
-            var urlBuilder = new StringBuilder();
-            urlBuilder.Append(EntitySetName);
-
-
-            var queryParameters = new List<string>();
-            if (!string.IsNullOrWhiteSpace(topExpression))
-            {
-                queryParameters.Add(topExpression);
-            }
-
-            if (!string.IsNullOrWhiteSpace(skipExpression))
-            {
-                queryParameters.Add(skipExpression);
-            }
-
-            if (!string.IsNullOrWhiteSpace(expandExpression))
-            {
-                queryParameters.Add(expandExpression);
-            }
-
-            if (!string.IsNullOrWhiteSpace(filterExpression))
-            {
-                queryParameters.Add(filterExpression);
-            }
-
-            if (!string.IsNullOrWhiteSpace(countExpression))
-            {
-                queryParameters.Add(countExpression);
-            }
-
-            if (queryParameters.Count > 0)
-            {
-                urlBuilder.Append("?");
-                urlBuilder.Append(string.Join("&", queryParameters));
-            }
-            return urlBuilder.ToString();
-        }
-
-
     }
 }

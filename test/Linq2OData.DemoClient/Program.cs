@@ -3,6 +3,7 @@
 using DemoClientV2;
 using DemoClientV4;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace Linq2OData.DemoClient;
 
@@ -26,18 +27,22 @@ internal class Program
             BaseAddress = new Uri(demoUrlV4)
         };
 
+       
+
         var clientV4 = new ODataDemoClientV4(httpClient);
+
+
+        //Test raw client
+        var rawResult = await clientV4.ODataClient.QueryEntitySetAsync<JsonElement>("Products");
+        var rawEntity = await clientV4.ODataClient.QueryEntityAsync<JsonElement>("Products", "ID=99999");
+
 
         var products = await clientV4
          .ODataDemo
          .Products()
-         .Expand("Category")
-         .Count()
          .Select()
          .ExecuteAsync();
 
-
-        var p = products;
 
 
         //Query entities
@@ -46,7 +51,7 @@ internal class Program
             .Products()
             .Top(30)
             .Filter(e => e.Rating >= 3 || e.ID == 999)
-            .Expand("Category")
+            .Expand("Categories")
             .Select(e => e.Select(f => new { f.Rating, f.ID }))
             .ExecuteAsync();
 
