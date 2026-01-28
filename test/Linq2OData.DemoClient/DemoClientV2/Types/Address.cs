@@ -3,6 +3,8 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
+#nullable enable
+
 
 
 
@@ -30,7 +32,6 @@ public partial class Address
 
     [ODataMember("Country")]
     public string Country { get; set; }
-
 
 
 

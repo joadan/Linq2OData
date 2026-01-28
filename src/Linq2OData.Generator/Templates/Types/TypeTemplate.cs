@@ -95,7 +95,7 @@ namespace Linq2OData.Generator.Templates.Types
             
             #line default
             #line hidden
-            this.Write("\n\n\n");
+            this.Write("\n\n");
             
             #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
  foreach (var navigation in entityType.Navigations) { 

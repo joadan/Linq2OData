@@ -16,7 +16,6 @@ public partial class <#= entityType.Name #> <#= BaseTypeDerived #>
     public <#= property.CSharpType #> <#= property.Name #> { get; set; }
 <# } #>
 
-
 <# foreach (var navigation in entityType.Navigations) { #>
     [ODataMember("<#= navigation.Name #>")]
     public <#= navigation.CSharpProperty #> <#= navigation.Name #> { get; set; }

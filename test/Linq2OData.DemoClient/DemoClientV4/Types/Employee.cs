@@ -3,6 +3,8 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
+#nullable enable
+
 
 
 
@@ -24,7 +26,6 @@ public partial class Employee : ODataDemo.Person
 
     [ODataMember("Salary")]
     public object Salary { get; set; }
-
 
 
 

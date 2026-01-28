@@ -3,6 +3,8 @@
 //     Changes to this file may cause incorrect behavior and will be lost if the code is regenerated.
 // </auto-generated>
 
+#nullable enable
+
 
 
 
@@ -15,7 +17,6 @@ namespace DemoClientV4.ODataDemo;
 
 public partial class FeaturedProduct : ODataDemo.Product
 {
-
 
 
 

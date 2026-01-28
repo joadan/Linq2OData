@@ -4,15 +4,11 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 using Linq2OData.Client;
-
 namespace <#= endpointNamespace #>;
-
 
 public class <#= metadata.EndpointName #>(ODataClient odataClient) 
 {
-
 <# foreach (var entitySet in metadata.EntitySets) { #>
-    
     public <#= entitySet.CSharpReturnType #> <#= entitySet.CSharpMethodName #>()
     { 
         return  new <#= entitySet.CSharpReturnType #>(odataClient, "<#= entitySet.Name #>");
@@ -20,7 +16,6 @@ public class <#= metadata.EndpointName #>(ODataClient odataClient)
 <# } #>
 
 <# foreach (var entitySet in metadata.EntitySets) { #>
-    
     public <#= entitySet.CSharpKeyReturnType #> <#= entitySet.CSharpKeyMethodName #>(<#= entitySet.EntityType.KeyArgumentString #>)
     { 
         return  new <#= entitySet.CSharpKeyReturnType #>(odataClient, "<#= entitySet.Name #>", $"<#= entitySet.EntityType.KeyArgumentResultString #>");
@@ -28,7 +23,6 @@ public class <#= metadata.EndpointName #>(ODataClient odataClient)
 <# } #>
 
 <# foreach (var entitySet in metadata.EntitySets) { #>
-    
     public async Task<bool> <#= entitySet.CSharpDeleteMethodName #>(<#= entitySet.EntityType.KeyArgumentString #>)
     { 
         return await odataClient.DeleteEntityAsync("<#= entitySet.Name #>", $"<#= entitySet.EntityType.KeyArgumentResultString #>");     
@@ -36,7 +30,6 @@ public class <#= metadata.EndpointName #>(ODataClient odataClient)
 <# } #>
 
 <# foreach (var entitySet in metadata.EntitySets) { #>
-    
     public async Task<<#= entitySet.EntityTypeName #>> <#= entitySet.CSharpCreateMethodName #>(<#= entitySet.EntityType.InputName #> input)
     { 
         return await odataClient.CreateEntityAsync<<#= entitySet.EntityTypeName #>>("<#= entitySet.Name #>", input);     
@@ -44,7 +37,6 @@ public class <#= metadata.EndpointName #>(ODataClient odataClient)
 <# } #>
  
  <# foreach (var entitySet in metadata.EntitySets) { #>
-    
     public async Task<bool> <#= entitySet.CSharpUpdateMethodName #>(<#= entitySet.EntityType.KeyArgumentString #>, <#= entitySet.EntityType.InputName #> input)
     { 
         return await odataClient.UpdateEntityAsync("<#= entitySet.Name #>", $"<#= entitySet.EntityType.KeyArgumentResultString #>", input);     
