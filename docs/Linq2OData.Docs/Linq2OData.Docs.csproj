@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -17,5 +17,5 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Linq2OData.Generator\Linq2OData.Generator.csproj" />
   </ItemGroup>
-
+	
 </Project>
