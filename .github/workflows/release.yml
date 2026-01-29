@@ -25,8 +25,8 @@ jobs:
         id: nbgv
       - run: echo 'SemVer2=${{ steps.nbgv.outputs.SemVer2 }}'
 
-      - name: Pack Linq2OData.Client
-        working-directory: src/Linq2OData.Client
+      - name: Pack Linq2OData.Core
+        working-directory: src/Linq2OData.Core
         run: dotnet pack -c Release
 
       # Get a short-lived NuGet API key
@@ -34,11 +34,11 @@ jobs:
         uses: NuGet/login@v1
         id: login
         with:
-          user:  ${{ secrets.NUGET_USER }} # Recommended: use a secret like ${{ secrets.NUGET_USER }} for your nuget.org username (profile name), NOT your email address
+          user:  ${{ secrets.NUGET_USER }} 
 
 
-      - name: Push Linq2OData.Client
-        working-directory: src/Linq2OData.Client/bin/Release
+      - name: Push Linq2OData.Core
+        working-directory: src/Linq2OData.Core/bin/Release
         run: dotnet nuget push *.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
 
       - name: Extract branch name
