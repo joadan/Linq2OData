@@ -1,0 +1,47 @@
+name: Create Release
+
+on: [ workflow_dispatch ]
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Nerdbank.GitVersioning
+        uses: dotnet/nbgv@v0.4.0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: dotnet/nbgv@master
+        id: nbgv
+      - run: echo 'SemVer2=${{ steps.nbgv.outputs.SemVer2 }}'
+
+      - name: Pack Linq2OData.Client
+        working-directory: src/Linq2OData.Client
+        run: dotnet pack -c Release
+
+      - name: Push Linq2OData.Client
+        working-directory: src/Linq2OData.Client/bin/Release
+        run: dotnet nuget push *.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }}
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Create Release
+        uses: actions/create-release@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.nbgv.outputs.SemVer2 }}
+          release_name: Release ${{ steps.nbgv.outputs.SemVer2 }}
+          draft: false
+          prerelease: ${{ !startsWith(steps.extract_branch.outputs.branch, 'release/') }}
