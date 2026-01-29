@@ -10,7 +10,7 @@
 		<RepositoryUrl>https://github.com/joadan/Linq2OData</RepositoryUrl>
 		<PackageProjectUrl>https://joadan.github.io/Linq2OData/</PackageProjectUrl>
 		<Title>Linq2OData.Core</Title>
-		<Description>Linq to OData client</Description>
+		<Description>Linq2OData Core Client</Description>
 		<Copyright>Copyright 2026 (c) Joakim Dangården. All rights reserved.</Copyright>
 		<PackageTags>Linq OData Client</PackageTags>
 	</PropertyGroup>
