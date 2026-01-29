@@ -42,16 +42,16 @@ namespace Linq2OData.Generator.Templates.Client
             
             #line default
             #line hidden
-            this.Write(" \r\n{\r\n    private Linq2OData.Client.ODataClient odataClient;\r\n    public Linq2ODa" +
-                    "ta.Client.ODataClient ODataClient => odataClient;\r\n\r\n    public ");
+            this.Write(" \r\n{\r\n    private Linq2OData.Core.ODataClient odataClient;\r\n    public Linq2OData" +
+                    ".Core.ODataClient ODataClient => odataClient;\r\n\r\n    public ");
             
             #line 15 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             
             #line default
             #line hidden
-            this.Write("(HttpClient httpClient) \r\n    {\r\n         odataClient = new Linq2OData.Client.ODa" +
-                    "taClient(httpClient, ");
+            this.Write("(HttpClient httpClient) \r\n    {\r\n         odataClient = new Linq2OData.Core.OData" +
+                    "Client(httpClient, ");
             
             #line 17 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GetODataVersionParameter()));

@@ -38,23 +38,6 @@
     </Compile>
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Templates\Client\ClientEndpointTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>ClientEndpointTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\Client\ClientTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>ClientTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\Input\InputTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>InputTemplate.cs</LastGenOutput>
-    </None>
-    <None Update="Templates\Types\TypeTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>TypeTemplate.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
+
 
 </Project>

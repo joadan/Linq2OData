@@ -9,12 +9,12 @@ namespace <#= clientNamespace #>;
 
 public class <#= clientName #> 
 {
-    private Linq2OData.Client.ODataClient odataClient;
-    public Linq2OData.Client.ODataClient ODataClient => odataClient;
+    private Linq2OData.Core.ODataClient odataClient;
+    public Linq2OData.Core.ODataClient ODataClient => odataClient;
 
     public <#= clientName #>(HttpClient httpClient) 
     {
-         odataClient = new Linq2OData.Client.ODataClient(httpClient, <#= GetODataVersionParameter() #>); 
+         odataClient = new Linq2OData.Core.ODataClient(httpClient, <#= GetODataVersionParameter() #>); 
           <# foreach (var metadata in metadataList) { #>
     <#= metadata.Namespace #> = new <#= metadata.NamespaceEndpointName #>(odataClient);
 <# } #>

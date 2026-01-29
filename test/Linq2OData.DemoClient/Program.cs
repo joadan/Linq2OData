@@ -1,7 +1,7 @@
 ﻿
 
-using DemoClientV2;
-using DemoClientV4;
+//using DemoClientV2;
+//using DemoClientV4;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
@@ -15,47 +15,47 @@ internal class Program
     {
         Console.WriteLine("Here we go..");
         //await GenerateDemoClientV2Async();
-        await GenerateDemoClientV4Async();
+       // await GenerateDemoClientV4Async();
          // await TestV4ClientAsync();
 
     }
 
-    private static async Task TestV4ClientAsync()
-    {
-        var httpClient = new HttpClient
-        {
-            BaseAddress = new Uri(demoUrlV4)
-        };
+    //private static async Task TestV4ClientAsync()
+    //{
+    //    var httpClient = new HttpClient
+    //    {
+    //        BaseAddress = new Uri(demoUrlV4)
+    //    };
 
        
 
-        var clientV4 = new ODataDemoClientV4(httpClient);
+    //    var clientV4 = new ODataDemoClientV4(httpClient);
 
 
-        //Test raw client
-        var rawResult = await clientV4.ODataClient.QueryEntitySetAsync<JsonElement>("Products");
-        var rawEntity = await clientV4.ODataClient.QueryEntityAsync<JsonElement>("Products", "ID=99999");
+    //    //Test raw client
+    //    var rawResult = await clientV4.ODataClient.QueryEntitySetAsync<JsonElement>("Products");
+    //    var rawEntity = await clientV4.ODataClient.QueryEntityAsync<JsonElement>("Products", "ID=99999");
 
 
-        var products = await clientV4
-         .ODataDemo
-         .Products()
-         .Select()
-         .ExecuteAsync();
+    //    var products = await clientV4
+    //     .ODataDemo
+    //     .Products()
+    //     .Select()
+    //     .ExecuteAsync();
 
 
 
-        //Query entities
-        var filteredResult = await clientV4
-            .ODataDemo
-            .Products()
-            .Top(30)
-            .Filter(e => e.Rating >= 3 || e.ID == 999)
-            .Expand("Categories")
-            .Select(e => e.Select(f => new { f.Rating, f.ID }))
-            .ExecuteAsync();
+    //    //Query entities
+    //    var filteredResult = await clientV4
+    //        .ODataDemo
+    //        .Products()
+    //        .Top(30)
+    //        .Filter(e => e.Rating >= 3 || e.ID == 999)
+    //        .Expand("Categories")
+    //        .Select(e => e.Select(f => new { f.Rating, f.ID }))
+    //        .ExecuteAsync();
 
-        var rr = filteredResult;
+    //    var rr = filteredResult;
 
         ////Update an entity
         //var result = await client
@@ -97,7 +97,7 @@ internal class Program
 
 
 
-    }
+    //}
 
 
     private static async Task GenerateDemoClientV2Async()

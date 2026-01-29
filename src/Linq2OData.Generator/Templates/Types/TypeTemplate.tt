@@ -3,7 +3,7 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
-using Linq2OData.Client;
+using Linq2OData.Core;
 using System.Text.Json.Serialization;
 
 namespace <#= fullNamspace #>;

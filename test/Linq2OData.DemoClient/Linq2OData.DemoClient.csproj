@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Linq2OData.Client\Linq2OData.Client.csproj" />
+    <ProjectReference Include="..\..\src\Linq2OData.Core\Linq2OData.Core.csproj" />
     <ProjectReference Include="..\..\src\Linq2OData.Generator\Linq2OData.Generator.csproj" />
   </ItemGroup>
 

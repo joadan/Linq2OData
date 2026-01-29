@@ -32,7 +32,7 @@ namespace Linq2OData.Generator.Templates.Types
             this.Write("\n");
             this.Write("\n");
             this.Write("\n");
-            this.Write("\nusing Linq2OData.Client;\nusing System.Text.Json.Serialization;\n\nnamespace ");
+            this.Write("\nusing Linq2OData.Core;\nusing System.Text.Json.Serialization;\n\nnamespace ");
             
             #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fullNamspace));

@@ -174,7 +174,7 @@ public class ClientGeneratorTests
     /// This method:
     /// 1. Creates a global usings file to provide implicit .NET types (Task, List, etc.)
     /// 2. Parses all generated files into syntax trees
-    /// 3. Loads all necessary assembly references including Linq2OData.Client
+    /// 3. Loads all necessary assembly references including Linq2OData.Core
     /// 4. Creates a CSharpCompilation and returns it for diagnostic analysis
     /// </summary>
     /// <param name="files">The list of generated files to compile</param>
@@ -210,19 +210,19 @@ global using System.Threading.Tasks;
 
         // Force load Linq2OData.Client if not already loaded
         var linq2ODataClientAssembly = AppDomain.CurrentDomain.GetAssemblies()
-            .FirstOrDefault(a => a.GetName().Name == "Linq2OData.Client");
+            .FirstOrDefault(a => a.GetName().Name == "Linq2OData.Core");
 
         if (linq2ODataClientAssembly == null)
         {
             // Load it from the output directory
-            var clientPath = Path.Combine(AppContext.BaseDirectory, "Linq2OData.Client.dll");
+            var clientPath = Path.Combine(AppContext.BaseDirectory, "Linq2OData.Core.dll");
             if (File.Exists(clientPath))
             {
                 linq2ODataClientAssembly = Assembly.LoadFrom(clientPath);
             }
         }
 
-        // Add all currently loaded assemblies (after ensuring Linq2OData.Client is loaded)
+        // Add all currently loaded assemblies (after ensuring Linq2OData.Core is loaded)
         var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location))
             .ToList();

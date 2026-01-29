@@ -13,8 +13,8 @@ namespace Linq2OData.Generator.Templates.Client
         {
             return oDataVersion switch
             {
-                ODataVersion.V2 => "Linq2OData.Client.ODataVersion.V2",
-                ODataVersion.V4 => "Linq2OData.Client.ODataVersion.V4",
+                ODataVersion.V2 => "Linq2OData.Core.ODataVersion.V2",
+                ODataVersion.V4 => "Linq2OData.Core.ODataVersion.V4",
                 _ => ""
             };
         }   
