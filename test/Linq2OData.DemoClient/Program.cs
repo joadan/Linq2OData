@@ -15,8 +15,8 @@ internal class Program
     {
         Console.WriteLine("Here we go..");
         //await GenerateDemoClientV2Async();
-       // await GenerateDemoClientV4Async();
-         // await TestV4ClientAsync();
+        await GenerateDemoClientV4Async();
+        //  await TestV4ClientAsync();
 
     }
 

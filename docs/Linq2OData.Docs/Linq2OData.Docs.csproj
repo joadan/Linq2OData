@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -10,11 +10,13 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="PublishSPAforGitHubPages.Build" />
     <PackageReference Include="TabBlazor" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Linq2OData.Core\Linq2OData.Core.csproj" />
     <ProjectReference Include="..\..\src\Linq2OData.Generator\Linq2OData.Generator.csproj" />
   </ItemGroup>
 	

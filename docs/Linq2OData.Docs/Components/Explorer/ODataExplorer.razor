@@ -1,0 +1,56 @@
+﻿@page "/odata-explorer"
+@using Linq2OData.Generator.Models
+
+
+@if (isLoading)
+{
+    <Loader Title="Loading..." />
+}
+else
+{
+    <Row class="g-2 align-items-center mb-3">
+        <RowCol Columns="12" Md="8">
+            <PagePretitle>OData Explorer</PagePretitle>
+            <PageMainTitle>Test - Testr</PageMainTitle>
+            <div class="page-subtitle">
+                <div class="text-secondary fst-italic fs-5">
+                    this is my Description
+                </div>
+            </div>
+        </RowCol>
+        @* <RowCol Columns="12" Md="4" class="ms-auto d-print-none">
+			<div class="d-flex justify-content-end gap-2">
+				<Button BackgroundColor="TablerColor.Secondary"
+				        OnClick="@(() => Nav.NavigateTo($"/api-playground/{ProgramName}"))">
+					Back to @ProgramName
+				</Button>
+			</div>
+		</RowCol> *@
+    </Row>
+    <hr class="my-2" />
+
+    @* <TablerForm Model="odataOptions" OnValidSubmit="RunTransactionAsync">
+
+		</TablerForm> *@
+
+
+    @if (metadata != null)
+    {
+
+        <Tabs>
+            <Tab Title="EntitySets">
+
+                <Table Item="ODataEntitySet" Items="metadata.EntitySets">
+                    <Column Item="ODataEntitySet" Property="e => e.Name" Sortable Searchable />
+                    <Column Item="ODataEntitySet" Property="e => e.EntityTypeName" Sortable Searchable />
+
+                </Table>
+
+
+            </Tab>
+
+
+        </Tabs>
+
+    }
+}
