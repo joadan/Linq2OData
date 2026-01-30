@@ -2,6 +2,7 @@
 
 //using DemoClientV2;
 //using DemoClientV4;
+using DemoClientV4.ODataDemo;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 
@@ -15,33 +16,44 @@ internal class Program
     {
         Console.WriteLine("Here we go..");
         //await GenerateDemoClientV2Async();
-        await GenerateDemoClientV4Async();
-        //  await TestV4ClientAsync();
+        //await GenerateDemoClientV4Async();
+        await TestV4ClientAsync();
 
     }
 
-    //private static async Task TestV4ClientAsync()
-    //{
-    //    var httpClient = new HttpClient
-    //    {
-    //        BaseAddress = new Uri(demoUrlV4)
-    //    };
-
-       
-
-    //    var clientV4 = new ODataDemoClientV4(httpClient);
+    private static async Task TestV4ClientAsync()
+    {
+        var httpClient = new HttpClient
+        {
+            BaseAddress = new Uri(demoUrlV4)
+        };
 
 
-    //    //Test raw client
-    //    var rawResult = await clientV4.ODataClient.QueryEntitySetAsync<JsonElement>("Products");
-    //    var rawEntity = await clientV4.ODataClient.QueryEntityAsync<JsonElement>("Products", "ID=99999");
+
+        var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
 
 
-    //    var products = await clientV4
-    //     .ODataDemo
-    //     .Products()
-    //     .Select()
-    //     .ExecuteAsync();
+        //Test raw client
+        var rawResult = await clientV4.ODataClient.QueryEntitySetAsync<JsonElement>("Products");
+        var rawEntity = await clientV4.ODataClient.QueryEntityAsync<JsonElement>("Products", "ID=99999");
+
+
+        var persons = await clientV4
+              .ODataClient
+              .QueryEntity<Person>()
+              .Select()
+              .ExecuteAsync();
+
+
+        var customers = await clientV4
+                  .ODataClient
+                  .QueryEntity<Customer>()
+                  .Select()
+                  .ExecuteAsync();
+
+        var t = customers;
+
+    }
 
 
 
@@ -57,38 +69,38 @@ internal class Program
 
     //    var rr = filteredResult;
 
-        ////Update an entity
-        //var result = await client
-        //    .ODataDemo
-        //    .ProductsUpdateAsync(1, new ProductInput
-        //    {
-        //        Name = "Test Product__",
-        //    });
+    ////Update an entity
+    //var result = await client
+    //    .ODataDemo
+    //    .ProductsUpdateAsync(1, new ProductInput
+    //    {
+    //        Name = "Test Product__",
+    //    });
 
-        ////Select an entity by key
-        //var product = await client.ODataDemo
-        //        .ProductsByKey(1)
-        //        .Expand("Category")
-        //        .Select()
-        //        .ExecuteAsync();
-
-
-        ////Create a new entity
-        //var newProduct = await client.ODataDemo.ProductsCreateAsync(new ProductInput
-        //{
-        //    ID = 1000,
-        //    Name = "Test Product",
-        //    Description = "This is a my test product",
-        //    Rating = 5,
-        //    Price = 10,
-        //   ReleaseDate = DateTime.Now,
-        //});
+    ////Select an entity by key
+    //var product = await client.ODataDemo
+    //        .ProductsByKey(1)
+    //        .Expand("Category")
+    //        .Select()
+    //        .ExecuteAsync();
 
 
-        //var mm = newProduct;
+    ////Create a new entity
+    //var newProduct = await client.ODataDemo.ProductsCreateAsync(new ProductInput
+    //{
+    //    ID = 1000,
+    //    Name = "Test Product",
+    //    Description = "This is a my test product",
+    //    Rating = 5,
+    //    Price = 10,
+    //   ReleaseDate = DateTime.Now,
+    //});
 
-        ////Delete an entity by key
-        //await client.ODataDemo.ProductsDeleteAsync(1000);
+
+    //var mm = newProduct;
+
+    ////Delete an entity by key
+    //await client.ODataDemo.ProductsDeleteAsync(1000);
 
 
 

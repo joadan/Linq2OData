@@ -14,8 +14,8 @@ using System.Text.Json.Serialization;
 
 namespace DemoClientV4.ODataDemo;
 
-
-public partial class Employee : ODataDemo.Person
+[ODataEntitySet("Employees")]
+public partial class Employee : ODataDemo.Person, IODataEntitySet
 {
 
     [ODataMember("EmployeeID")]
