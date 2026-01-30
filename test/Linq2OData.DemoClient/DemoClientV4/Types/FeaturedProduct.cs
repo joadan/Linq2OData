@@ -15,7 +15,8 @@ using System.Text.Json.Serialization;
 namespace DemoClientV4.ODataDemo;
 
 
-public partial class FeaturedProduct : ODataDemo.Product
+[ODataEntitySet("Products/ODataDemo.FeaturedProduct")]
+public partial class FeaturedProduct : ODataDemo.Product, IODataEntitySet
 {
 
 

@@ -26,9 +26,9 @@ public partial class EmployeeInput : ODataInputBase
 		get => GetValue<DateTimeOffset?>("HireDate");
 		set => SetValue("HireDate", value);
 	}
-    public object? Salary 
+    public float? Salary 
 	{
-		get => GetValue<object?>("Salary");
+		get => GetValue<float?>("Salary");
 		set => SetValue("Salary", value);
 	}
 

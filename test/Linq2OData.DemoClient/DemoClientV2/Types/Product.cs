@@ -12,11 +12,8 @@
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
 
-namespace DemoClientV4.ODataDemo;
+namespace DemoClientV2.ODataDemo;
 
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "@odata.type", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]
-[JsonDerivedType(typeof(Product))]
-[JsonDerivedType(typeof(FeaturedProduct), "#ODataDemo.FeaturedProduct")]
 
 [ODataEntitySet("Products")]
 public partial class Product  : IODataEntitySet
@@ -32,27 +29,24 @@ public partial class Product  : IODataEntitySet
     public string Description { get; set; }
 
     [ODataMember("ReleaseDate")]
-    public DateTimeOffset ReleaseDate { get; set; }
+    public DateTime ReleaseDate { get; set; }
 
     [ODataMember("DiscontinuedDate")]
-    public DateTimeOffset? DiscontinuedDate { get; set; }
+    public DateTime? DiscontinuedDate { get; set; }
 
     [ODataMember("Rating")]
-    public short Rating { get; set; }
+    public int Rating { get; set; }
 
     [ODataMember("Price")]
-    public double Price { get; set; }
+    public decimal Price { get; set; }
 
 
 
-    [ODataMember("Categories")]
-    public List<Category>? Categories { get; set; }
+    [ODataMember("Category")]
+    public Category? Category { get; set; }
 
     [ODataMember("Supplier")]
     public Supplier? Supplier { get; set; }
-
-    [ODataMember("ProductDetail")]
-    public ProductDetail? ProductDetail { get; set; }
 
 }
 

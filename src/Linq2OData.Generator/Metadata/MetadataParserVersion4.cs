@@ -38,8 +38,13 @@ internal static class MetadataParserVersion4
             metadata.Functions = ParseActionImports(entityContainer, edm, metadata.Namespace);
         }
 
+        metadata.SetEntityPaths();
+
+
         return metadata;
     }
+
+    
 
     private static List<ODataEntityType> ParseComplexTypes(XElement schema, XNamespace edmNamespace)
     {
@@ -200,6 +205,7 @@ internal static class MetadataParserVersion4
                     ? entityType.Split('.').Last()
                     : entityType;
 
+               
                 entitySets.Add(new ODataEntitySet
                 {
                     Name = name,
@@ -211,6 +217,8 @@ internal static class MetadataParserVersion4
 
         return entitySets;
     }
+
+    
 
     private static List<ODataFunction> ParseActionImports(XElement entityContainer, XNamespace edmNamespace, string schemaNamespace)
     {

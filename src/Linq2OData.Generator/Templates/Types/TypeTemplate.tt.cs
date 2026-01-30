@@ -10,7 +10,50 @@ namespace Linq2OData.Generator.Templates.Types
     {
 
 
-        public string BaseTypeDerived => string.IsNullOrWhiteSpace(entityType.BaseType) ? "" : $": {entityType.BaseType}";
+        //public string BaseTypeDerived => string.IsNullOrWhiteSpace(entityType.BaseType) ? "" : $": {entityType.BaseType}";
+
+        public string BaseTypeAndInterface
+        {
+            get
+            {
+                var result = string.IsNullOrWhiteSpace(entityType.BaseType) ? "" : $": {entityType.BaseType}";
+
+                if (entityType.IsEntitySet)
+                {
+                    if (string.IsNullOrWhiteSpace(result))
+                    {
+                        result = " : IODataEntitySet";
+                    }
+                    else
+                    {
+                        result += ", IODataEntitySet";
+                    }
+                }
+
+                return result;
+            }
+        }
+
+
+        private string GetEntitySetAttribute()
+        {
+            if (entityType.IsEntitySet)
+            {
+                return $"[ODataEntitySet(\"{entityType.EntityPath}\")]";
+            }
+
+            return "";
+        }
+
+        private string GetEntitySetInterface()
+        {
+            if (entityType.IsEntitySet)
+            {
+                return $" : IODataEntitySet";
+            }
+
+            return "";
+        }
 
 
         private string GetDerivedAttributes()

@@ -51,6 +51,8 @@ internal static class MetadataParserVersion2
         // Parse Associations to determine navigation cardinality
         ParseAssociations(schema, currentEdmNamespace, metadata.EntityTypes);
 
+        metadata.SetEntityPaths();
+
         return metadata;
     }
 

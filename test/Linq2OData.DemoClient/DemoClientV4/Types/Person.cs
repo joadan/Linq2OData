@@ -18,8 +18,9 @@ namespace DemoClientV4.ODataDemo;
 [JsonDerivedType(typeof(Person))]
 [JsonDerivedType(typeof(Customer), "#ODataDemo.Customer")]
 [JsonDerivedType(typeof(Employee), "#ODataDemo.Employee")]
+
 [ODataEntitySet("Persons")]
-public partial class Person : IODataEntitySet
+public partial class Person  : IODataEntitySet
 {
 
     [ODataMember("ID")]

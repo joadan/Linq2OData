@@ -12,7 +12,7 @@
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
 
-namespace DemoClientV4.ODataDemo;
+namespace DemoClientV2.ODataDemo;
 
 
 [ODataEntitySet("Suppliers")]
@@ -26,10 +26,7 @@ public partial class Supplier  : IODataEntitySet
     public string Name { get; set; }
 
     [ODataMember("Address")]
-    public ODataDemo.Address? Address { get; set; }
-
-    [ODataMember("Location")]
-    public object? Location { get; set; }
+    public ODataDemo.Address Address { get; set; }
 
     [ODataMember("Concurrency")]
     public int Concurrency { get; set; }

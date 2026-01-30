@@ -14,7 +14,8 @@ using System.Text.Json.Serialization;
 
 namespace DemoClientV4.ODataDemo;
 
-[ODataEntitySet("Employees")]
+
+[ODataEntitySet("Persons/ODataDemo.Employee")]
 public partial class Employee : ODataDemo.Person, IODataEntitySet
 {
 
@@ -25,7 +26,7 @@ public partial class Employee : ODataDemo.Person, IODataEntitySet
     public DateTimeOffset HireDate { get; set; }
 
     [ODataMember("Salary")]
-    public object Salary { get; set; }
+    public float Salary { get; set; }
 
 
 

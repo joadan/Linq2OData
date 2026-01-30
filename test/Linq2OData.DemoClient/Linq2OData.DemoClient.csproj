@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Spatial" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Linq2OData.Core\Linq2OData.Core.csproj" />
     <ProjectReference Include="..\..\src\Linq2OData.Generator\Linq2OData.Generator.csproj" />
   </ItemGroup>

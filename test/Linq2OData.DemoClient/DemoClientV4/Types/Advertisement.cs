@@ -15,7 +15,8 @@ using System.Text.Json.Serialization;
 namespace DemoClientV4.ODataDemo;
 
 
-public partial class Advertisement 
+[ODataEntitySet("Advertisements")]
+public partial class Advertisement  : IODataEntitySet
 {
 
     [ODataMember("ID")]

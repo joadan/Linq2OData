@@ -9,7 +9,8 @@ using System.Text.Json.Serialization;
 namespace <#= fullNamspace #>;
 
 <#= GetDerivedAttributes() #>
-public partial class <#= entityType.Name #> <#= BaseTypeDerived #>
+<#= GetEntitySetAttribute() #>
+public partial class <#= entityType.Name #> <#= BaseTypeAndInterface #>
 {
 <# foreach (var property in entityType.Properties) { #>
     [ODataMember("<#= property.Name #>")]

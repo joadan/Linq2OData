@@ -15,7 +15,8 @@ using System.Text.Json.Serialization;
 namespace DemoClientV4.ODataDemo;
 
 
-public partial class Category 
+[ODataEntitySet("Categories")]
+public partial class Category  : IODataEntitySet
 {
 
     [ODataMember("ID")]

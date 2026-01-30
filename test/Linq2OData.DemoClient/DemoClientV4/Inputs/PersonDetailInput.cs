@@ -21,9 +21,9 @@ public partial class PersonDetailInput : ODataInputBase
 		get => GetValue<int?>("PersonID");
 		set => SetValue("PersonID", value);
 	}
-    public object? Age 
+    public byte? Age 
 	{
-		get => GetValue<object?>("Age");
+		get => GetValue<byte?>("Age");
 		set => SetValue("Age", value);
 	}
     public bool? Gender 

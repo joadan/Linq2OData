@@ -1,4 +1,4 @@
-﻿using System.Data;
+﻿
 
 namespace Linq2OData.Generator.Models;
 
@@ -10,14 +10,35 @@ public class ODataMetadata
     public List<ODataEntityType> EntityTypes { get; set; } = [];
     public List<ODataFunction> Functions { get; set; } = [];
 
-    public string EndpointName => $"{Namespace}Endpoint";
-    public string NamespaceEndpointName => $"{Namespace}.{EndpointName}";
+    internal string EndpointName => $"{Namespace}Endpoint";
+    internal string NamespaceEndpointName => $"{Namespace}.{EndpointName}";
 
-    public IEnumerable<ODataEntityType> GetDerivedTypes(string entityTypeName) {
+    public IEnumerable<ODataEntityType> GetDerivedTypes(string entityTypeName)
+    {
         return EntityTypes.Where(et => et.BaseType == $"{Namespace}.{entityTypeName}");
     }
 
+   
+
+    internal void SetEntityPaths()
+    {
+        foreach (var entitySet in EntitySets)
+        {
+            entitySet.EntityType.EntityPath = entitySet.Name;
+            SetEntityDerivedPaths(entitySet.EntityType);
+        }
+    }
+
+    internal void SetEntityDerivedPaths(ODataEntityType entityType)
+    {
+        foreach (var derivedType in GetDerivedTypes(entityType.Name))
+        {
+            derivedType.EntityPath = $"{entityType.EntityPath}/{Namespace}.{derivedType.Name}";
+            SetEntityDerivedPaths(derivedType);
+        }
+    }
 }
+
 public enum ODataVersion
 {
     V2,
@@ -31,15 +52,15 @@ public class ODataEntitySet
     public required string EntityTypeName { get; set; }
     public required ODataEntityType EntityType { get; set; }
 
-    public string CSharpReturnType => $"ODataEntitySetQuery<{EntityTypeName}>";
-    public string CSharpMethodName => $"{Name}";
+    internal string CSharpReturnType => $"ODataEntitySetQuery<{EntityTypeName}>";
+    internal string CSharpMethodName => $"{Name}";
 
-    public string CSharpKeyReturnType => $"ODataEntityQuery<{EntityTypeName}>";
-    public string CSharpKeyMethodName => $"{Name}ByKey";
+    internal string CSharpKeyReturnType => $"ODataEntityQuery<{EntityTypeName}>";
+    internal string CSharpKeyMethodName => $"{Name}ByKey";
 
-    public string CSharpDeleteMethodName => $"{Name}DeleteAsync";
-    public string CSharpCreateMethodName => $"{Name}CreateAsync";
-    public string CSharpUpdateMethodName => $"{Name}UpdateAsync";
+    internal string CSharpDeleteMethodName => $"{Name}DeleteAsync";
+    internal string CSharpCreateMethodName => $"{Name}CreateAsync";
+    internal string CSharpUpdateMethodName => $"{Name}UpdateAsync";
 
 }
 public class ODataEntityType
@@ -49,16 +70,20 @@ public class ODataEntityType
 
     public string? BaseType { get; set; }
 
+    public bool IsEntitySet => !string.IsNullOrWhiteSpace(EntityPath);
+
+    public string? EntityPath { get; set; }
+
     public List<ODataProperty> Properties { get; set; } = [];
     public List<ODataNavigation> Navigations { get; set; } = [];
 
     public IEnumerable<ODataProperty> KeyProperties => Properties.Where(p => p.IsKey);
 
 
-    public string InputName => $"{Name}Input";
+    internal string InputName => $"{Name}Input";
 
-    
-    public string KeyArgumentString
+
+    internal string KeyArgumentString
     {
         get
         {
@@ -73,7 +98,7 @@ public class ODataEntityType
         }
     }
 
-    public string KeyArgumentResultString
+    internal string KeyArgumentResultString
     {
         get
         {
@@ -97,7 +122,7 @@ public class ODataProperty
 {
     public required string Name { get; set; }
     public bool Nullable { get; set; } = true;
-    public bool IsKey { get; set; } 
+    public bool IsKey { get; set; }
     public required string DataType { get; set; }
 
     public string? Description { get; set; }
@@ -114,11 +139,11 @@ public class ODataProperty
     public bool Sortable { get; set; }
     public bool Filterable { get; set; }
 
-    public string KeyArgumentResult
+    internal string KeyArgumentResult
     {
         get
         {
-            if(DataType.Equals("edm.string", StringComparison.CurrentCultureIgnoreCase))
+            if (DataType.Equals("edm.string", StringComparison.CurrentCultureIgnoreCase))
             {
                 return $"{Name}='{{{Helpers.ToCamelCaseVariable(Name)}}}'";
             }
@@ -126,13 +151,13 @@ public class ODataProperty
             {
                 return $"{Name}={{{Helpers.ToCamelCaseVariable(Name)}}}";
             }
-            
+
         }
     }
 
-   
 
-    public string CSharpNameInput
+
+    internal string CSharpNameInput
     {
         get
         {
@@ -147,7 +172,7 @@ public class ODataProperty
     }
 
 
-    public string CSharpTypeRaw
+    internal string CSharpTypeRaw
     {
         get
         {
@@ -159,17 +184,33 @@ public class ODataProperty
 
             var csharpType = DataType switch
             {
+                // Common for v2 & v4
                 "Edm.String" => "string",
+                "Edm.Boolean" => "bool",
+                "Edm.Byte" => "byte",
+                "Edm.SByte" => "sbyte",
                 "Edm.Int16" => "short",
                 "Edm.Int32" => "int",
                 "Edm.Int64" => "long",
-                "Edm.Boolean" => "bool",
-                "Edm.DateTime" => "DateTime",
-                "Edm.DateTimeOffset" => "DateTimeOffset",
                 "Edm.Decimal" => "decimal",
+                "Edm.Single" => "float",
                 "Edm.Double" => "double",
                 "Edm.Guid" => "Guid",
+                "Edm.Binary" => "byte[]",
+
+                // OData v2 only
+                "Edm.DateTime" => "DateTime",
                 "Edm.Time" => "TimeSpan",
+
+                // OData v4 only
+                "Edm.Date" => "DateOnly",          // or DateTime or DateOnly in .NET 6+
+                "Edm.DateTimeOffset" => "DateTimeOffset",
+                "Edm.TimeOfDay" => "TimeSpan",
+                "Edm.GeographyPoint" => "object", // "Microsoft.Spatial.GeographyPoint", //This would make a dependancy to Microsoft.Spatial JsonConverter is needed..
+                "Edm.GeometryPoint" => "object", // "Microsoft.Spatial.GeometryPoint",  //This would make a dependancy to Microsoft.Spatial 
+                "Edm.Stream" => "object", //For now we use object not sure if we should handle this
+
+                // Fallback
                 _ => "object"
             };
 
@@ -178,7 +219,7 @@ public class ODataProperty
 
     }
 
-    public string CSharpType
+    internal string CSharpType
     {
         get
         {
@@ -205,7 +246,7 @@ public class ODataNavigation
 
     public ODataNavigationType NavigationType { get; set; }
 
-    public string CSharpProperty
+    internal string CSharpProperty
     {
         get
         {
@@ -217,7 +258,7 @@ public class ODataNavigation
         }
     }
 
-    public string CSharpPropertyInput
+    internal string CSharpPropertyInput
     {
         get
         {

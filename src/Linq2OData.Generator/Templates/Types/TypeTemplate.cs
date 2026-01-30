@@ -46,6 +46,13 @@ namespace Linq2OData.Generator.Templates.Types
             
             #line default
             #line hidden
+            this.Write("\n");
+            
+            #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GetEntitySetAttribute()));
+            
+            #line default
+            #line hidden
             this.Write("\npublic partial class ");
             
             #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
@@ -56,7 +63,7 @@ namespace Linq2OData.Generator.Templates.Types
             this.Write(" ");
             
             #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(BaseTypeDerived));
+            this.Write(this.ToStringHelper.ToStringWithCulture(BaseTypeAndInterface));
             
             #line default
             #line hidden

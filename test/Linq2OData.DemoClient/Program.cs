@@ -3,7 +3,6 @@
 //using DemoClientV2;
 //using DemoClientV4;
 using DemoClientV4.ODataDemo;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace Linq2OData.DemoClient;
@@ -15,9 +14,9 @@ internal class Program
     static async Task Main(string[] args)
     {
         Console.WriteLine("Here we go..");
-        //await GenerateDemoClientV2Async();
-        //await GenerateDemoClientV4Async();
-        await TestV4ClientAsync();
+       // await GenerateDemoClientV2Async();
+       // await GenerateDemoClientV4Async();
+       await TestV4ClientAsync();
 
     }
 
@@ -34,9 +33,14 @@ internal class Program
 
 
         //Test raw client
-        var rawResult = await clientV4.ODataClient.QueryEntitySetAsync<JsonElement>("Products");
-        var rawEntity = await clientV4.ODataClient.QueryEntityAsync<JsonElement>("Products", "ID=99999");
+       // var rawResult = await clientV4.ODataClient.QueryEntitySetAsync<JsonElement>("Products");
+     //   var rawEntity = await clientV4.ODataClient.QueryEntityAsync<JsonElement>("Products", "ID=99999");
 
+        var suppliers  = await clientV4
+              .ODataClient
+              .QueryEntity<Supplier>()
+              .Select()
+              .ExecuteAsync();
 
         var persons = await clientV4
               .ODataClient

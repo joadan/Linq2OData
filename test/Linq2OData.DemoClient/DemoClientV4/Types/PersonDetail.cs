@@ -15,14 +15,15 @@ using System.Text.Json.Serialization;
 namespace DemoClientV4.ODataDemo;
 
 
-public partial class PersonDetail 
+[ODataEntitySet("PersonDetails")]
+public partial class PersonDetail  : IODataEntitySet
 {
 
     [ODataMember("PersonID")]
     public int PersonID { get; set; }
 
     [ODataMember("Age")]
-    public object Age { get; set; }
+    public byte Age { get; set; }
 
     [ODataMember("Gender")]
     public bool Gender { get; set; }
