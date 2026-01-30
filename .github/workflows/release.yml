@@ -30,6 +30,10 @@ jobs:
         working-directory: src/Linq2OData.Core
         run: dotnet pack -c Release
 
+      - name: Pack Linq2OData.Generator
+        working-directory: src/Linq2OData.Generator
+        run: dotnet pack -c Release
+
       # Get a short-lived NuGet API key
       - name: NuGet login (OIDC → temp API key)
         uses: NuGet/login@v1
@@ -41,6 +45,11 @@ jobs:
       - name: Push Linq2OData.Core
         working-directory: src/Linq2OData.Core/bin/Release
         run: dotnet nuget push *.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+
+      - name: Push Linq2OData.Generator
+        working-directory: src/Linq2OData.Generator/bin/Release
+        run: dotnet nuget push *.nupkg --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+
 
       - name: Extract branch name
         shell: bash
