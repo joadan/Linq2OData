@@ -1,9 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<Authors>Joakim Dangården</Authors>
+		<Company>Linq2OData</Company>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/joadan/Linq2OData</RepositoryUrl>
+		<PackageProjectUrl>https://joadan.github.io/Linq2OData/</PackageProjectUrl>
+		<Title>Linq2OData.Generator</Title>
+		<Description>Linq2OData Core Client Generator</Description>
+		<Copyright>Copyright 2026 (c) Joakim Dangården. All rights reserved.</Copyright>
+		<PackageTags>Linq OData Client</PackageTags>
 	</PropertyGroup>
 
 
