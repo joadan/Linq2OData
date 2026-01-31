@@ -8,6 +8,7 @@ public class ODataMetadata
     public string Namespace { get; set; } = string.Empty;
     public List<ODataEntitySet> EntitySets { get; set; } = [];
     public List<ODataEntityType> EntityTypes { get; set; } = [];
+    public List<ODataEnumType> EnumTypes { get; set; } = [];
     public List<ODataFunction> Functions { get; set; } = [];
 
     internal string EndpointName => $"{Namespace}Endpoint";
@@ -139,6 +140,8 @@ public class ODataProperty
     public bool Sortable { get; set; }
     public bool Filterable { get; set; }
 
+    public bool IsEnumType { get; set; } = false;
+
     internal string KeyArgumentResult
     {
         get
@@ -161,8 +164,42 @@ public class ODataProperty
     {
         get
         {
+            // Handle Collection types
+            if (DataType.StartsWith("Collection(") && DataType.EndsWith(")"))
+            {
+                var innerType = DataType.Substring("Collection(".Length, DataType.Length - "Collection(".Length - 1);
+                
+                // Check if it's an Edm type
+                if (innerType.StartsWith("Edm."))
+                {
+                    // For Edm collections, use CSharpTypeRaw which already handles this
+                    return CSharpTypeRaw + "?";
+                }
+                else
+                {
+                    // Custom type (complex type or enum)
+                    var typeName = innerType.Contains('.') ? innerType.Split('.').Last() : innerType;
+                    
+                    // If the inner type is an enum, don't add "Input"
+                    if (IsEnumType)
+                    {
+                        return $"List<{typeName}>?";
+                    }
+                    
+                    // For complex types, add "Input"
+                    return $"List<{typeName}Input>?";
+                }
+            }
+            
             if (!DataType.StartsWith("Edm."))
             {
+                // For enum types, use the enum type directly without appending "Input"
+                if (IsEnumType)
+                {
+                    return CSharpTypeRaw + "?";
+                }
+                
+                // For complex types, append "Input"
                 return DataType + "Input?";
             }
 
@@ -176,9 +213,49 @@ public class ODataProperty
     {
         get
         {
+            // Handle Collection types
+            if (DataType.StartsWith("Collection(") && DataType.EndsWith(")"))
+            {
+                var innerType = DataType.Substring("Collection(".Length, DataType.Length - "Collection(".Length - 1);
+                
+                // Check if it's an Edm type
+                if (innerType.StartsWith("Edm."))
+                {
+                    var elementType = innerType switch
+                    {
+                        "Edm.String" => "string",
+                        "Edm.Boolean" => "bool",
+                        "Edm.Byte" => "byte",
+                        "Edm.SByte" => "sbyte",
+                        "Edm.Int16" => "short",
+                        "Edm.Int32" => "int",
+                        "Edm.Int64" => "long",
+                        "Edm.Decimal" => "decimal",
+                        "Edm.Single" => "float",
+                        "Edm.Double" => "double",
+                        "Edm.Guid" => "Guid",
+                        "Edm.Binary" => "byte[]",
+                        "Edm.DateTime" => "DateTime",
+                        "Edm.Time" => "TimeSpan",
+                        "Edm.Date" => "DateOnly",
+                        "Edm.DateTimeOffset" => "DateTimeOffset",
+                        "Edm.TimeOfDay" => "TimeSpan",
+                        _ => "object"
+                    };
+                    return $"List<{elementType}>";
+                }
+                else
+                {
+                    // Custom type (complex type or enum) - strip namespace
+                    var typeName = innerType.Contains('.') ? innerType.Split('.').Last() : innerType;
+                    return $"List<{typeName}>";
+                }
+            }
+            
             if (!DataType.StartsWith("Edm."))
             {
-                return DataType;
+                // For custom types (complex types or enums), strip namespace prefix
+                return DataType.Contains('.') ? DataType.Split('.').Last() : DataType;
             }
 
 
@@ -291,5 +368,17 @@ public enum ODataNavigationType
     ZeroOrOne,
     One,
     Many
+}
+
+public class ODataEnumType
+{
+    public required string Name { get; set; }
+    public List<ODataEnumMember> Members { get; set; } = [];
+}
+
+public class ODataEnumMember
+{
+    public required string Name { get; set; }
+    public required int Value { get; set; }
 }
 
