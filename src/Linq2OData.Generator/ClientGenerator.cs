@@ -116,7 +116,7 @@ public class ClientGenerator(ClientRequest request)
             foreach (var enumType in metadata.EnumTypes)
             {
                 var enumText = new Templates.Types.EnumTemplate(enumType, fullNamspace).TransformText();
-                AddFile("Types", enumType.Name + ".cs", enumText);
+                AddFile("Enums", enumType.Name + ".cs", enumText);
             }
 
             // Generate entity and complex types

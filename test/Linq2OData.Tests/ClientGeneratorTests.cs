@@ -308,7 +308,7 @@ global using System.Threading.Tasks;
         var files = generator.GenerateClient();
 
         // Assert - Check that enum files are generated
-        var personGenderEnum = files.FirstOrDefault(f => f.FileName == "PersonGender.cs" && f.FolderPath == "Types");
+        var personGenderEnum = files.FirstOrDefault(f => f.FileName == "PersonGender.cs" && f.FolderPath == "Enums");
         Assert.NotNull(personGenderEnum);
         Assert.Contains("public enum PersonGender", personGenderEnum.Content);
         Assert.Contains("Male = 0", personGenderEnum.Content);
@@ -316,7 +316,7 @@ global using System.Threading.Tasks;
         Assert.Contains("Unknown = 2", personGenderEnum.Content);
         Assert.Contains("[JsonConverter(typeof(JsonStringEnumConverter))]", personGenderEnum.Content);
 
-        var featureEnum = files.FirstOrDefault(f => f.FileName == "Feature.cs" && f.FolderPath == "Types");
+        var featureEnum = files.FirstOrDefault(f => f.FileName == "Feature.cs" && f.FolderPath == "Enums");
         Assert.NotNull(featureEnum);
         Assert.Contains("public enum Feature", featureEnum.Content);
         Assert.Contains("Feature1 = 0", featureEnum.Content);
