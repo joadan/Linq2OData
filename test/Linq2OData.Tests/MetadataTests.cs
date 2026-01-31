@@ -8,6 +8,7 @@ namespace Linq2OData.Tests
         private string odataDemoMetadataV2;
         private string sapSalesQuotationMetadataV2;
         private string odataDemoMetadataV4;
+        private string trippinMetadataV4;
 
         public MetadataTests()
         {
@@ -15,6 +16,7 @@ namespace Linq2OData.Tests
             odataDemoMetadataV2 =  File.ReadAllText(Path.Combine("SampleData", "Metadata", "V2", "ODataDemo.xml"));
             sapSalesQuotationMetadataV2 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V2", "SapSalesQuotation.xml"));
             odataDemoMetadataV4 =  File.ReadAllText(Path.Combine("SampleData", "Metadata", "V4", "ODataDemo.xml"));
+            trippinMetadataV4 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V4", "Trippin.xml"));
         }
 
 
@@ -540,6 +542,97 @@ namespace Linq2OData.Tests
             var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
             Assert.NotNull(personEntity);
             Assert.Null(personEntity.BaseType);
+        }
+
+        #endregion
+
+        #region Enum Tests
+
+        [Fact]
+        public void ParseTrippinMetadata_ShouldParseEnumTypes()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(trippinMetadataV4);
+
+            // Assert
+            Assert.NotNull(metadata.EnumTypes);
+            Assert.Equal(2, metadata.EnumTypes.Count);
+
+            // Verify PersonGender enum
+            var personGenderEnum = metadata.EnumTypes.FirstOrDefault(e => e.Name == "PersonGender");
+            Assert.NotNull(personGenderEnum);
+            Assert.Equal(3, personGenderEnum.Members.Count);
+
+            var maleMember = personGenderEnum.Members.FirstOrDefault(m => m.Name == "Male");
+            Assert.NotNull(maleMember);
+            Assert.Equal(0, maleMember.Value);
+
+            var femaleMember = personGenderEnum.Members.FirstOrDefault(m => m.Name == "Female");
+            Assert.NotNull(femaleMember);
+            Assert.Equal(1, femaleMember.Value);
+
+            var unknownMember = personGenderEnum.Members.FirstOrDefault(m => m.Name == "Unknown");
+            Assert.NotNull(unknownMember);
+            Assert.Equal(2, unknownMember.Value);
+
+            // Verify Feature enum
+            var featureEnum = metadata.EnumTypes.FirstOrDefault(e => e.Name == "Feature");
+            Assert.NotNull(featureEnum);
+            Assert.Equal(4, featureEnum.Members.Count);
+
+            var feature1 = featureEnum.Members.FirstOrDefault(m => m.Name == "Feature1");
+            Assert.NotNull(feature1);
+            Assert.Equal(0, feature1.Value);
+
+            var feature4 = featureEnum.Members.FirstOrDefault(m => m.Name == "Feature4");
+            Assert.NotNull(feature4);
+            Assert.Equal(3, feature4.Value);
+        }
+
+        [Fact]
+        public void ParseTrippinMetadata_ShouldParsePropertiesWithEnumTypes()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(trippinMetadataV4);
+
+            // Assert
+            var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
+            Assert.NotNull(personEntity);
+
+            // Verify Gender property with PersonGender enum type
+            var genderProperty = personEntity.Properties.FirstOrDefault(p => p.Name == "Gender");
+            Assert.NotNull(genderProperty);
+            Assert.Equal("Trippin.PersonGender", genderProperty.DataType);
+            Assert.False(genderProperty.Nullable);
+
+            // Verify FavoriteFeature property with Feature enum type
+            var favoriteFeatureProperty = personEntity.Properties.FirstOrDefault(p => p.Name == "FavoriteFeature");
+            Assert.NotNull(favoriteFeatureProperty);
+            Assert.Equal("Trippin.Feature", favoriteFeatureProperty.DataType);
+            Assert.False(favoriteFeatureProperty.Nullable);
+        }
+
+        [Fact]
+        public void ParseTrippinMetadata_ShouldParseCorrectly()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(trippinMetadataV4);
+
+            // Assert
+            Assert.NotNull(metadata);
+            Assert.Equal(ODataVersion.V4, metadata.ODataVersion);
+            Assert.Equal("Trippin", metadata.Namespace);
+
+            // Verify entity types exist
+            Assert.NotEmpty(metadata.EntityTypes);
+            var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
+            Assert.NotNull(personEntity);
+
+            // Verify entity sets
+            Assert.NotEmpty(metadata.EntitySets);
+            var peopleSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "People");
+            Assert.NotNull(peopleSet);
+            Assert.Equal("Person", peopleSet.EntityTypeName);
         }
 
         #endregion

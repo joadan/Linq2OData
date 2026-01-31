@@ -112,6 +112,14 @@ public class ClientGenerator(ClientRequest request)
         {
             var fullNamspace = request.Namespace + "." + metadata.Namespace;
 
+            // Generate enums
+            foreach (var enumType in metadata.EnumTypes)
+            {
+                var enumText = new Templates.Types.EnumTemplate(enumType, fullNamspace).TransformText();
+                AddFile("Enums", enumType.Name + ".cs", enumText);
+            }
+
+            // Generate entity and complex types
             foreach (var entityType in metadata.EntityTypes)
             {
                 var classText = new TypeTemplate(entityType, fullNamspace, metadata.GetDerivedTypes(entityType.Name), metadata.Namespace).TransformText();

@@ -24,6 +24,9 @@ internal static class MetadataParserVersion4
 
         metadata.Namespace = schema.Attribute("Namespace")?.Value ?? string.Empty;
 
+        // Parse EnumTypes
+        metadata.EnumTypes = ParseEnumTypes(schema, edm);
+
         // Parse EntityTypes
         metadata.EntityTypes = ParseEntityTypes(schema, edm);
 
@@ -40,8 +43,46 @@ internal static class MetadataParserVersion4
 
         metadata.SetEntityPaths();
 
+        // Mark properties that use enum types
+        MarkEnumProperties(metadata);
 
         return metadata;
+    }
+
+    private static List<ODataEnumType> ParseEnumTypes(XElement schema, XNamespace edmNamespace)
+    {
+        var enumTypes = new List<ODataEnumType>();
+
+        foreach (var enumType in schema.Descendants(edmNamespace + "EnumType"))
+        {
+            var typeName = enumType.Attribute("Name")?.Value;
+            if (string.IsNullOrEmpty(typeName))
+                continue;
+
+            var enumDef = new ODataEnumType
+            {
+                Name = typeName
+            };
+
+            foreach (var member in enumType.Elements(edmNamespace + "Member"))
+            {
+                var memberName = member.Attribute("Name")?.Value;
+                var memberValue = member.Attribute("Value")?.Value;
+                
+                if (!string.IsNullOrEmpty(memberName) && int.TryParse(memberValue, out int value))
+                {
+                    enumDef.Members.Add(new ODataEnumMember
+                    {
+                        Name = memberName,
+                        Value = value
+                    });
+                }
+            }
+
+            enumTypes.Add(enumDef);
+        }
+
+        return enumTypes;
     }
 
     
@@ -353,5 +394,36 @@ internal static class MetadataParserVersion4
         }
 
         return functions;
+    }
+
+    private static void MarkEnumProperties(ODataMetadata metadata)
+    {
+        // Create a set of fully qualified enum type names for quick lookup
+        var enumTypeNames = new HashSet<string>(
+            metadata.EnumTypes.Select(e => $"{metadata.Namespace}.{e.Name}")
+        );
+
+        // Mark properties that reference enum types
+        foreach (var entityType in metadata.EntityTypes)
+        {
+            foreach (var property in entityType.Properties)
+            {
+                // Check if it's a direct enum reference
+                if (enumTypeNames.Contains(property.DataType))
+                {
+                    property.IsEnumType = true;
+                }
+                // Check if it's a collection of enums
+                else if (property.DataType.StartsWith("Collection(") && property.DataType.EndsWith(")"))
+                {
+                    var innerType = property.DataType.Substring("Collection(".Length, 
+                        property.DataType.Length - "Collection(".Length - 1);
+                    if (enumTypeNames.Contains(innerType))
+                    {
+                        property.IsEnumType = true;
+                    }
+                }
+            }
+        }
     }
 }

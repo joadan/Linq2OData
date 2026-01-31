@@ -13,6 +13,7 @@ public class ClientGeneratorTests
     private string odataDemoMetadataV4;
     private string sapSalesQuotationMetadataV2;
     private string largeMetadaV4;
+    private string trippinMetadataV4;
 
     public ClientGeneratorTests()
     {
@@ -21,6 +22,7 @@ public class ClientGeneratorTests
         odataDemoMetadataV4 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V4", "ODataDemo.xml"));
         sapSalesQuotationMetadataV2 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V2", "SapSalesQuotation.xml"));
         largeMetadaV4 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V4", "LargeMetadata.xml"));
+        trippinMetadataV4 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V4", "Trippin.xml"));
     }
 
     [Fact]
@@ -287,6 +289,77 @@ global using System.Threading.Tasks;
         );
 
         return compilation;
+    }
+
+    [Fact]
+    public void GenerateClient_WithEnums_ShouldGenerateEnumFiles()
+    {
+        // Arrange
+        var request = new ClientRequest
+        {
+            Name = "TrippinClient",
+            Namespace = "MyApp.OData",
+            MetadataList = [trippinMetadataV4]
+        };
+
+        var generator = new ClientGenerator(request);
+
+        // Act
+        var files = generator.GenerateClient();
+
+        // Assert - Check that enum files are generated
+        var personGenderEnum = files.FirstOrDefault(f => f.FileName == "PersonGender.cs" && f.FolderPath == "Enums");
+        Assert.NotNull(personGenderEnum);
+        Assert.Contains("public enum PersonGender", personGenderEnum.Content);
+        Assert.Contains("Male = 0", personGenderEnum.Content);
+        Assert.Contains("Female = 1", personGenderEnum.Content);
+        Assert.Contains("Unknown = 2", personGenderEnum.Content);
+        Assert.Contains("[JsonConverter(typeof(JsonStringEnumConverter))]", personGenderEnum.Content);
+
+        var featureEnum = files.FirstOrDefault(f => f.FileName == "Feature.cs" && f.FolderPath == "Enums");
+        Assert.NotNull(featureEnum);
+        Assert.Contains("public enum Feature", featureEnum.Content);
+        Assert.Contains("Feature1 = 0", featureEnum.Content);
+        Assert.Contains("Feature4 = 3", featureEnum.Content);
+        Assert.Contains("[JsonConverter(typeof(JsonStringEnumConverter))]", featureEnum.Content);
+
+        // Assert - Check that Person entity has properties with enum types
+        var personEntity = files.FirstOrDefault(f => f.FileName == "Person.cs" && f.FolderPath == "Types");
+        Assert.NotNull(personEntity);
+        Assert.Contains("public PersonGender Gender { get; set; }", personEntity.Content);
+        Assert.Contains("public Feature FavoriteFeature { get; set; }", personEntity.Content);
+    }
+
+    [Fact]
+    public void GeneratedClientWithEnums_ShouldCompileSuccessfully()
+    {
+        // Arrange
+        var request = new ClientRequest
+        {
+            Name = "TrippinClient",
+            Namespace = "MyApp.OData",
+            MetadataList = [trippinMetadataV4]
+        };
+
+        var generator = new ClientGenerator(request);
+        var files = generator.GenerateClient();
+
+        // Act - Compile the generated code using Roslyn
+        var compilation = CompileGeneratedCode(files);
+
+        // Assert
+        var diagnostics = compilation.GetDiagnostics()
+            .Where(d => d.Severity == DiagnosticSeverity.Error)
+            .ToList();
+
+        if (diagnostics.Any())
+        {
+            var errors = string.Join("\n", diagnostics.Select(d =>
+                $"{d.Id}: {d.GetMessage()} at {d.Location.GetLineSpan()}"));
+            Assert.Fail($"Compilation failed with {diagnostics.Count} error(s):\n{errors}");
+        }
+
+        Assert.Empty(diagnostics);
     }
 
 }
