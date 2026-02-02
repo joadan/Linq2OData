@@ -94,18 +94,8 @@ public class ClientGenerator(ClientRequest request)
     {
         var templateText = new ClientTemplate(request.Name, request.Namespace, metadataCollection, (ODataVersion)version!).TransformText();
         AddFile("Client", request.Name + ".cs", templateText);
-
-
-        ////Generate Endpoints
-        //foreach (var metadata in metadataCollection)
-        //{
-        //    var fullNamspace = request.Namespace + "." + metadata.Namespace;
-        //    var contextText = new ClientEndpointTemplate(fullNamspace, metadata).TransformText();
-        //    AddFile("Client", metadata.EndpointName + ".cs", contextText);
-        //}
-
-
     }
+
     private void GenerateTypesCode()
     {
         foreach (var metadata in metadataCollection)
