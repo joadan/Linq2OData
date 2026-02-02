@@ -2,7 +2,7 @@
 
 
 
-using DemoClientV4.ODataDemo;
+//using DemoClientV4.ODataDemo;
 using System.Text.Json;
 
 namespace Linq2OData.DemoClient;
@@ -15,38 +15,38 @@ internal class Program
     {
         Console.WriteLine("Here we go..");
         // await GenerateDemoClientV2Async();
-        //await GenerateDemoClientV4Async();
-        await TestV4ClientAsync();
+        await GenerateDemoClientV4Async();
+        //await TestV4ClientAsync();
 
     }
 
-    private static async Task TestV4ClientAsync()
-    {
-        var httpClient = new HttpClient
-        {
-            BaseAddress = new Uri(demoUrlV4)
-        };
+    //private static async Task TestV4ClientAsync()
+    //{
+    //    var httpClient = new HttpClient
+    //    {
+    //        BaseAddress = new Uri(demoUrlV4)
+    //    };
 
-        var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
+    //    var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
 
-        var result = await clientV4
-            .For<Person>()
-            .Key(e => e.ID = 1)
-            .Get()
-            .Expand("PersonDetail")
-            .Select()
-            .ExecuteAsync();
+    //    var result = await clientV4
+    //        .For<Person>()
+    //        .Key(e => e.ID = 1)
+    //        .Get()
+    //        .Expand("PersonDetail")
+    //        .Select()
+    //        .ExecuteAsync();
 
 
-        var result2 = await clientV4
-          .For<Person>()
-          .Query()
-          .Expand("PersonDetail")
-          .Select()
-          .ExecuteAsync();
+    //    var result2 = await clientV4
+    //      .For<Person>()
+    //      .Query()
+    //      .Expand("PersonDetail")
+    //      .Select()
+    //      .ExecuteAsync();
 
-        var t = result;
-
+    //    var t = result;
+    //}
         //var result = await clientV4
         //    .For<Person>()
         //    .Key(e => { e.ID = 2; e.Name = "dff"; })
@@ -61,7 +61,7 @@ internal class Program
         //}
         //  );
 
-    }
+    
 
 
 
