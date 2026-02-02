@@ -83,19 +83,8 @@ namespace Linq2OData.Core
             return true;
         }
 
-        public ODataEntitySetQuery<T> QueryEntity<T>() where T : IODataEntitySet
-        {
-            var attr = typeof(T).GetCustomAttribute<ODataEntitySetAttribute>();
-            if (attr == null)
-            {
-                throw new InvalidOperationException($"The type {typeof(T).FullName} is missing the ODataEntitySetAttribute.");
-            }
 
-            return new ODataEntitySetQuery<T>(this,attr.EntityPath);
-        }
-
-
-        public async Task<ODataResponse<List<T>>?> QueryEntitySetAsync<T>(string entitySetName, string? expand=null, string? filter=null, bool? count = null, int? top = null, int? skip = null, CancellationToken token = default)
+        public async Task<ODataResponse<List<T>>?> QueryEntitySetAsync<T>(string entitySetName, string? select, string? expand=null, string? filter=null, bool? count = null, int? top = null, int? skip = null, CancellationToken token = default)
         {
             var url = GenerateUrl(entitySetName: entitySetName, expand: expand, filter: filter, count: count, top: top, skip: skip);
 

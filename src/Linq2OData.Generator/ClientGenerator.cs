@@ -76,7 +76,7 @@ public class ClientGenerator(ClientRequest request)
     {
 
         //var sharedPath = Path.Combine("Dependencies", "Linq2OData.Client");
- 
+
         //if(Directory.Exists(sharedPath))
         //{
         //    var sharedFiles = Directory.GetFiles(sharedPath, "*.cs", SearchOption.AllDirectories);
@@ -94,7 +94,7 @@ public class ClientGenerator(ClientRequest request)
 
     private void GenerateClientCode()
     {
-        var templateText = new ClientTemplate(request.Name, request.Namespace, metadataCollection, (ODataVersion)version!).TransformText();
+        var templateText = new ClientTemplate(request, (ODataVersion)version!).TransformText();
         AddFile("Client", request.Name + ".cs", templateText);
     }
 
@@ -114,7 +114,7 @@ public class ClientGenerator(ClientRequest request)
             // Generate entity and complex types
             foreach (var entityType in metadata.EntityTypes)
             {
-                var classText = new TypeTemplate(entityType, fullNamspace, metadata.GetDerivedTypes(entityType.Name), metadata.Namespace).TransformText();
+                var classText = new TypeTemplate(entityType, fullNamspace, request.InterfaceName, metadata.GetDerivedTypes(entityType.Name), metadata.Namespace).TransformText();
                 AddFile("Types", entityType.Name + ".cs", classText);
             }
         }

@@ -4,13 +4,13 @@ using System.Linq.Expressions;
 namespace Linq2OData.Core.Builders;
 
 
-public class QueryExecutor<T, TResult>(QueryBuilder<T> queryBuilder, Expression<Func<List<T>, TResult>>? selector)
+public class QueryExecutor<T, TResult>(QueryBuilder<T> queryBuilder, Expression<Func<List<T>, TResult>>? selector) where T : IODataEntitySet, new() 
 {
     public ODataResponse<List<T>>? BaseResult { get; set; }
 
     public async Task<ODataResponse<List<T>>?> ExecuteBaseAsync(CancellationToken cancellationToken = default)
     {
-        BaseResult = await queryBuilder.ODataClient.QueryEntitySetAsync<T>(queryBuilder.EntityPath, queryBuilder.expand, queryBuilder.filter, queryBuilder.count, queryBuilder.top, queryBuilder.skip, cancellationToken);
+        BaseResult = await queryBuilder.ODataClient.QueryEntitySetAsync<T>(queryBuilder.EntityPath, queryBuilder.select, queryBuilder.expand, queryBuilder.filter, queryBuilder.count, queryBuilder.top, queryBuilder.skip, cancellationToken);
         return BaseResult;
     }
 

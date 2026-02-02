@@ -1,4 +1,5 @@
-﻿using Linq2OData.Core.ODataResponse;
+﻿using Linq2OData.Core.Metadata;
+using Linq2OData.Core.ODataResponse;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -6,7 +7,7 @@ using System.Text;
 
 namespace Linq2OData.Core.Builders
 {
-    public class GetExecutor<T, TResult>(GetBuilder<T> getBuilder, Expression<Func<T, TResult>>? selector)
+    public class GetExecutor<T, TResult>(GetBuilder<T> getBuilder, Expression<Func<T, TResult>>? selector) where T : IODataEntitySet, new()
     {
         public ODataResponse<T>? BaseResult { get; set; }
 

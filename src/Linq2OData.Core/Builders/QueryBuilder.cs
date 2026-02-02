@@ -3,8 +3,18 @@ using System.Linq.Expressions;
 
 namespace Linq2OData.Core.Builders;
 
-public class QueryBuilder<T>(ODataClient odataClient, string entityPath)
+public class QueryBuilder<T> where T : IODataEntitySet, new()
 {
+
+    private ODataClient odataClient;
+    private string entityPath;
+    public QueryBuilder(ODataClient odataClient)
+    {
+        this.odataClient = odataClient;
+        entityPath = BuilderHelper.GetEntityPath<T>();
+
+    }
+
     internal bool count;
     internal int? top;
     internal int? skip;
@@ -51,6 +61,14 @@ public class QueryBuilder<T>(ODataClient odataClient, string entityPath)
         this.filter = oDataFilterVisitor.ToFilter(expression);
         return this;
     }
+
+    public async Task<List<T>?> ExecuteAsync(CancellationToken cancellationToken = default)
+    {
+        var result = await odataClient.QueryEntitySetAsync<T>(EntityPath, select, expand, filter, count, top, skip, cancellationToken);
+        return result?.Data;
+    }
+
+
 
     public QueryExecutor<T, List<T>> Select()
     {

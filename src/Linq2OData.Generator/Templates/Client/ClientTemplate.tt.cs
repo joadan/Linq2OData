@@ -7,9 +7,8 @@ using System.Text;
 
 namespace Linq2OData.Generator.Templates.Client;
 
-public partial class ClientTemplate(string clientName, string clientNamespace, List<ODataMetadata> metadataList, ODataVersion oDataVersion)
+public partial class ClientTemplate(ClientRequest request, ODataVersion oDataVersion)
 {
-
 
     private string GetODataVersionParameter()
     {

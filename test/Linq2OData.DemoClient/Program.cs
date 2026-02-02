@@ -2,7 +2,7 @@
 
 
 
-//using DemoClientV4.ODataDemo;
+using DemoClientV4.ODataDemo;
 using System.Text.Json;
 
 namespace Linq2OData.DemoClient;
@@ -15,29 +15,39 @@ internal class Program
     {
         Console.WriteLine("Here we go..");
         // await GenerateDemoClientV2Async();
-        await GenerateDemoClientV4Async();
+           await GenerateDemoClientV4Async();
         //await TestV4ClientAsync();
 
     }
 
-    //private static async Task TestV4ClientAsync()
-    //{
-    //    var httpClient = new HttpClient
-    //    {
-    //        BaseAddress = new Uri(demoUrlV4)
-    //    };
+    private static async Task TestV4ClientAsync()
+    {
+        var httpClient = new HttpClient
+        {
+            BaseAddress = new Uri(demoUrlV4)
+        };
 
-    //    var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
-
-    //    var result = await clientV4
-    //        .For<Person>()
-    //        .Key(e => e.ID = 1)
-    //        .Get()
-    //        .Expand("PersonDetail")
-    //        .Select()
-    //        .ExecuteAsync();
+        var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
 
 
+        var result2 = await clientV4
+           .Query<Person>()
+           .Expand("PersonDetail")
+           .Filter(e => e.ID > 4)    
+           .Select()
+           .ExecuteAsync();
+
+        var result3 = await clientV4
+          .Get<Person>(e => e.ID = 1)
+          .Select("ID, Name")
+          .ExecuteAsync();
+
+        var result22 = await clientV4
+          .Delete<Person>(e => e.ID = 1)
+          .ExecuteAsync();
+
+
+    }
     //    var result2 = await clientV4
     //      .For<Person>()
     //      .Query()
@@ -47,21 +57,21 @@ internal class Program
 
     //    var t = result;
     //}
-        //var result = await clientV4
-        //    .For<Person>()
-        //    .Key(e => { e.ID = 2; e.Name = "dff"; })
-        //    .DeleteAsync();
+    //var result = await clientV4
+    //    .For<Person>()
+    //    .Key(e => { e.ID = 2; e.Name = "dff"; })
+    //    .DeleteAsync();
 
-        //var persons = clientV4.For<Person>().Key(e => e.ID = 11);
+    //var persons = clientV4.For<Person>().Key(e => e.ID = 11);
 
-        //var newPerson = clientV4.For<Person>().CreateAsync(new PersonInput
-        //{
-        //    ID = 11,
-        //    Name = "John Doe"
-        //}
-        //  );
+    //var newPerson = clientV4.For<Person>().CreateAsync(new PersonInput
+    //{
+    //    ID = 11,
+    //    Name = "John Doe"
+    //}
+    //  );
 
-    
+
 
 
 

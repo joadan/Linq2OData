@@ -1,13 +1,29 @@
 ﻿namespace Linq2OData.Core.Builders;
 
-public class GetBuilder<T>(ODataClient odataClient, string entityPath, string keyExpression)
+
+
+
+public class GetBuilder<T> where T : IODataEntitySet, new()
 {
+
+    private ODataClient odataClient;
+    private string entityPath;
+    private string keyExpression;
+
+    public GetBuilder(ODataClient odataClient, Action<T> keySetter)
+    {
+        this.odataClient = odataClient;
+        entityPath = BuilderHelper.GetEntityPath<T>();
+        keyExpression = BuilderHelper.GetEntityKeys<T>(keySetter);
+    }
+
     internal string? select;
     internal string? expand;
 
     internal ODataClient ODataClient => odataClient;
-    internal string EntityPath => entityPath;
+    internal  string EntityPath => entityPath;
     internal string KeyExpression => keyExpression;
+
 
     public GetBuilder<T> Expand(string? expand = null)
     {
