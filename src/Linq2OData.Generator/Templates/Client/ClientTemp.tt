@@ -45,3 +45,4 @@ public class <#= request.Name #>
         return new CreateBuilder<T>(odataClient);
     }
 }
+

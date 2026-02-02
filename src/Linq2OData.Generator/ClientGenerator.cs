@@ -94,7 +94,7 @@ public class ClientGenerator(ClientRequest request)
 
     private void GenerateClientCode()
     {
-        var templateText = new ClientTemplate(request, (ODataVersion)version!).TransformText();
+        var templateText = new ClientTemp(request, (ODataVersion)version!).TransformText();
         AddFile("Client", request.Name + ".cs", templateText);
     }
 

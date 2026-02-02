@@ -2,7 +2,7 @@
 
 
 
-using DemoClientV4.ODataDemo;
+//using DemoClientV4.ODataDemo;
 using System.Text.Json;
 
 namespace Linq2OData.DemoClient;
@@ -20,34 +20,34 @@ internal class Program
 
     }
 
-    private static async Task TestV4ClientAsync()
-    {
-        var httpClient = new HttpClient
-        {
-            BaseAddress = new Uri(demoUrlV4)
-        };
+    //private static async Task TestV4ClientAsync()
+    //{
+    //    var httpClient = new HttpClient
+    //    {
+    //        BaseAddress = new Uri(demoUrlV4)
+    //    };
 
-        var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
-
-
-        var result2 = await clientV4
-           .Query<Person>()
-           .Expand("PersonDetail")
-           .Filter(e => e.ID > 4)    
-           .Select()
-           .ExecuteAsync();
-
-        var result3 = await clientV4
-          .Get<Person>(e => e.ID = 1)
-          .Select("ID, Name")
-          .ExecuteAsync();
-
-        var result22 = await clientV4
-          .Delete<Person>(e => e.ID = 1)
-          .ExecuteAsync();
+    //    var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
 
 
-    }
+    //    var result2 = await clientV4
+    //       .Query<Person>()
+    //       .Expand("PersonDetail")
+    //       .Filter(e => e.ID > 4)    
+    //       .Select()
+    //       .ExecuteAsync();
+
+    //    var result3 = await clientV4
+    //      .Get<Person>(e => e.ID = 1)
+    //      .Select("ID, Name")
+    //      .ExecuteAsync();
+
+    //    var result22 = await clientV4
+    //      .Delete<Person>(e => e.ID = 1)
+    //      .ExecuteAsync();
+
+
+    //}
     //    var result2 = await clientV4
     //      .For<Person>()
     //      .Query()

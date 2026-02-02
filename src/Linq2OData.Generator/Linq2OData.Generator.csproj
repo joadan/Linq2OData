@@ -25,10 +25,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Update="Templates\Client\ClientTemplate.cs">
+		<Compile Update="Templates\Client\ClientTemp.cs">
 		  <DesignTime>True</DesignTime>
 		  <AutoGen>True</AutoGen>
-		  <DependentUpon>ClientTemplate.tt</DependentUpon>
+		  <DependentUpon>ClientTemp.tt</DependentUpon>
 		</Compile>
 		<Compile Update="Templates\Input\InputTemplate.cs">
 			<DesignTime>True</DesignTime>
@@ -49,9 +49,9 @@
 
 
 	<ItemGroup>
-		<None Update="Templates\Client\ClientTemplate.tt">
-			<Generator>TextTemplatingFilePreprocessor</Generator>
-			<LastGenOutput>ClientTemplate.cs</LastGenOutput>
+		<None Update="Templates\Client\ClientTemp.tt">
+		  <Generator>TextTemplatingFilePreprocessor</Generator>
+		  <LastGenOutput>ClientTemp.cs</LastGenOutput>
 		</None>
 		<None Update="Templates\Input\InputTemplate.tt">
 			<Generator>TextTemplatingFilePreprocessor</Generator>
