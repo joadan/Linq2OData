@@ -16,7 +16,7 @@ namespace DemoClientV4.ODataDemo;
 
 
 [ODataEntitySet("PersonDetails")]
-public partial class PersonDetail  : IODataEntitySet
+public partial class PersonDetail  : IODataEntitySet, IPersonDetailKeys
 {
 
     [ODataMember("PersonID")]
@@ -32,7 +32,7 @@ public partial class PersonDetail  : IODataEntitySet
     public string Phone { get; set; }
 
     [ODataMember("Address")]
-    public ODataDemo.Address? Address { get; set; }
+    public Address? Address { get; set; }
 
     [ODataMember("Photo")]
     public object Photo { get; set; }
@@ -42,5 +42,19 @@ public partial class PersonDetail  : IODataEntitySet
     [ODataMember("Person")]
     public Person? Person { get; set; }
 
+
+
+ public string __Keys => $"PersonID={PersonID}"; 
+
+
+
+}
+
+
+public interface IPersonDetailKeys
+{
+
+	int PersonID { get; set; }
+    
 }
 

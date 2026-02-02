@@ -21,5 +21,19 @@ public partial class <#= entityType.Name #> <#= BaseTypeAndInterface #>
     [ODataMember("<#= navigation.Name #>")]
     public <#= navigation.CSharpProperty #> <#= navigation.Name #> { get; set; }
 <# } #>
+
+<# if (entityType.KeyProperties.Any()) { #>
+ public string __Keys => $"<#= entityType.KeyResultString #>"; 
+<# } #>
+
+
 }
 
+<# if (entityType.KeyProperties.Any()) { #>
+public interface <#= GetKeyInterface() #>
+{
+<# foreach (var keyProperty in entityType.KeyProperties) { #>
+	<#= keyProperty.CSharpType #> <#= keyProperty.Name #> { get; set; }
+    <# } #>
+}
+<# } #>

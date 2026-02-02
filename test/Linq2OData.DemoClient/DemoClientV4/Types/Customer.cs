@@ -24,5 +24,10 @@ public partial class Customer : ODataDemo.Person, IODataEntitySet
 
 
 
+
+
+
+
 }
+
 

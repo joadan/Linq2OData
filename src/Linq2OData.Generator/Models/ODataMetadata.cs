@@ -114,6 +114,21 @@ public class ODataEntityType
         }
     }
 
+    internal string KeyResultString
+    {
+        get
+        {
+            if (!KeyProperties.Any()) { return string.Empty; }
+
+            var keysResult = KeyProperties.Select(p =>
+            {
+                return $"{p.KeyResult}";
+            });
+
+            return string.Join(",", keysResult);
+        }
+    }
+
 
 }
 
@@ -153,6 +168,22 @@ public class ODataProperty
             else
             {
                 return $"{Name}={{{Helpers.ToCamelCaseVariable(Name)}}}";
+            }
+
+        }
+    }
+
+    internal string KeyResult
+    {
+        get
+        {
+            if (DataType.Equals("edm.string", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return $"{Name}='{{{Name}}}'";
+            }
+            else
+            {
+                return $"{Name}={{{Name}}}";
             }
 
         }

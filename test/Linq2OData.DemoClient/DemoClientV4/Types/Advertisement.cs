@@ -16,7 +16,7 @@ namespace DemoClientV4.ODataDemo;
 
 
 [ODataEntitySet("Advertisements")]
-public partial class Advertisement  : IODataEntitySet
+public partial class Advertisement  : IODataEntitySet, IAdvertisementKeys
 {
 
     [ODataMember("ID")]
@@ -33,5 +33,19 @@ public partial class Advertisement  : IODataEntitySet
     [ODataMember("FeaturedProduct")]
     public FeaturedProduct? FeaturedProduct { get; set; }
 
+
+
+ public string __Keys => $"ID={ID}"; 
+
+
+
+}
+
+
+public interface IAdvertisementKeys
+{
+
+	Guid ID { get; set; }
+    
 }
 

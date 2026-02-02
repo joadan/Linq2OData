@@ -4,7 +4,9 @@ using System.Text;
 
 namespace Linq2OData.Core
 {
+   
     public interface IODataEntitySet
     {
+        public string __Keys { get; }
     }
 }

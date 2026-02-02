@@ -24,5 +24,10 @@ public partial class FeaturedProduct : ODataDemo.Product, IODataEntitySet
     [ODataMember("Advertisement")]
     public Advertisement? Advertisement { get; set; }
 
+
+
+
+
 }
+
 

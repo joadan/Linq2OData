@@ -21,6 +21,11 @@ public class <#= clientName #>
        
     }
 
+     public ForBuilder<T> For<T>() where T : IODataEntitySet, new() //TODO: Add Interfaces specific to this service
+     {
+        return new ForBuilder<T>(odataClient);
+     }
+
     <# foreach (var metadata in metadataList) { #>
     public <#= metadata.NamespaceEndpointName #> <#= metadata.Namespace #> { get; set; }
 <# } #>

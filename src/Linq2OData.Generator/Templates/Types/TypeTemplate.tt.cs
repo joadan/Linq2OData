@@ -9,9 +9,6 @@ namespace Linq2OData.Generator.Templates.Types
     public partial class TypeTemplate(ODataEntityType entityType, string fullNamspace, IEnumerable<ODataEntityType> derivedTypes, string metadataNamespace)
     {
 
-
-        //public string BaseTypeDerived => string.IsNullOrWhiteSpace(entityType.BaseType) ? "" : $": {entityType.BaseType}";
-
         public string BaseTypeAndInterface
         {
             get
@@ -30,10 +27,26 @@ namespace Linq2OData.Generator.Templates.Types
                     }
                 }
 
+                if (entityType.KeyProperties.Any())
+                {
+                    if (string.IsNullOrWhiteSpace(result))
+                    {
+                        result = $" : {GetKeyInterface()}";
+                    }
+                    else
+                    {
+                        result += $", {GetKeyInterface()}";
+                    }
+                }
+
                 return result;
             }
         }
 
+        private string GetKeyInterface()
+        {
+            return $"I{entityType.Name}Keys";
+        }
 
         private string GetEntitySetAttribute()
         {

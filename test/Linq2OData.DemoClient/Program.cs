@@ -1,7 +1,7 @@
 ﻿
 
-//using DemoClientV2;
-//using DemoClientV4;
+
+
 using DemoClientV4.ODataDemo;
 using System.Text.Json;
 
@@ -14,9 +14,9 @@ internal class Program
     static async Task Main(string[] args)
     {
         Console.WriteLine("Here we go..");
-       // await GenerateDemoClientV2Async();
-       // await GenerateDemoClientV4Async();
-       await TestV4ClientAsync();
+        // await GenerateDemoClientV2Async();
+        //await GenerateDemoClientV4Async();
+        await TestV4ClientAsync();
 
     }
 
@@ -27,37 +27,78 @@ internal class Program
             BaseAddress = new Uri(demoUrlV4)
         };
 
-
-
         var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
 
-
-        //Test raw client
-       // var rawResult = await clientV4.ODataClient.QueryEntitySetAsync<JsonElement>("Products");
-     //   var rawEntity = await clientV4.ODataClient.QueryEntityAsync<JsonElement>("Products", "ID=99999");
-
-        var suppliers  = await clientV4
-              .ODataClient
-              .QueryEntity<Supplier>()
-              .Select()
-              .ExecuteAsync();
-
-        var persons = await clientV4
-              .ODataClient
-              .QueryEntity<Person>()
-              .Select()
-              .ExecuteAsync();
+        var result = await clientV4
+            .For<Person>()
+            .Key(e => e.ID = 1)
+            .Get()
+            .Expand("PersonDetail")
+            .Select()
+            .ExecuteAsync();
 
 
-        var customers = await clientV4
-                  .ODataClient
-                  .QueryEntity<Customer>()
-                  .Select()
-                  .ExecuteAsync();
+        var result2 = await clientV4
+          .For<Person>()
+          .Query()
+          .Expand("PersonDetail")
+          .Select()
+          .ExecuteAsync();
 
-        var t = customers;
+        var t = result;
+
+        //var result = await clientV4
+        //    .For<Person>()
+        //    .Key(e => { e.ID = 2; e.Name = "dff"; })
+        //    .DeleteAsync();
+
+        //var persons = clientV4.For<Person>().Key(e => e.ID = 11);
+
+        //var newPerson = clientV4.For<Person>().CreateAsync(new PersonInput
+        //{
+        //    ID = 11,
+        //    Name = "John Doe"
+        //}
+        //  );
 
     }
+
+
+
+
+    //    var option1 = await clientV4.ODataDemo.DeleteAsync<Person>(e => e.ID = 999);
+    //    var option2 = await clientV4.ODataDemo.DeletePersonAsync(999);
+
+    //    var r = await clientV4.ODataDemo.DeleteAsync<Person>(e => e.ID = 999);
+    //    var key =  clientV4.ODataDemo.Key<Person>(e => e.ID = 999);
+    //}
+
+    //    //Test raw client
+    //   // var rawResult = await clientV4.ODataClient.QueryEntitySetAsync<JsonElement>("Products");
+    // //   var rawEntity = await clientV4.ODataClient.QueryEntityAsync<JsonElement>("Products", "ID=99999");
+
+    //    var suppliers  = await clientV4
+    //          .ODataClient
+    //          .QueryEntity<Supplier>()
+    //          .Select()
+    //          .ExecuteAsync();
+
+    //    var persons = await clientV4
+    //          .ODataClient
+    //          .QueryEntity<Person>()
+    //          .Select()
+    //          .ExecuteAsync();
+
+
+    //    var customers = await clientV4
+    //              .ODataClient
+    //              .QueryEntity<Customer>()
+    //              .Select()
+    //              .ExecuteAsync();
+
+    //    var t = customers;
+
+    //}
 
 
 

@@ -2,11 +2,9 @@
 using Linq2OData.Core.ODataResponse;
 using System.Collections;
 using System.Reflection;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Xml.Linq;
 
 namespace Linq2OData.Core
 {

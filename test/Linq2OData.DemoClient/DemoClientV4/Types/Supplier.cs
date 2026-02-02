@@ -16,7 +16,7 @@ namespace DemoClientV4.ODataDemo;
 
 
 [ODataEntitySet("Suppliers")]
-public partial class Supplier  : IODataEntitySet
+public partial class Supplier  : IODataEntitySet, ISupplierKeys
 {
 
     [ODataMember("ID")]
@@ -26,7 +26,7 @@ public partial class Supplier  : IODataEntitySet
     public string Name { get; set; }
 
     [ODataMember("Address")]
-    public ODataDemo.Address? Address { get; set; }
+    public Address? Address { get; set; }
 
     [ODataMember("Location")]
     public object? Location { get; set; }
@@ -39,5 +39,19 @@ public partial class Supplier  : IODataEntitySet
     [ODataMember("Products")]
     public List<Product>? Products { get; set; }
 
+
+
+ public string __Keys => $"ID={ID}"; 
+
+
+
+}
+
+
+public interface ISupplierKeys
+{
+
+	int ID { get; set; }
+    
 }
 

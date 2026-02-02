@@ -16,7 +16,7 @@ namespace DemoClientV4.ODataDemo;
 
 
 [ODataEntitySet("Categories")]
-public partial class Category  : IODataEntitySet
+public partial class Category  : IODataEntitySet, ICategoryKeys
 {
 
     [ODataMember("ID")]
@@ -30,5 +30,19 @@ public partial class Category  : IODataEntitySet
     [ODataMember("Products")]
     public List<Product>? Products { get; set; }
 
+
+
+ public string __Keys => $"ID={ID}"; 
+
+
+
+}
+
+
+public interface ICategoryKeys
+{
+
+	int ID { get; set; }
+    
 }
 
