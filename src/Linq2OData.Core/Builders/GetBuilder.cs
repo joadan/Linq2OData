@@ -1,4 +1,6 @@
-﻿namespace Linq2OData.Core.Builders;
+﻿using static System.Net.WebRequestMethods;
+
+namespace Linq2OData.Core.Builders;
 
 
 
@@ -24,6 +26,13 @@ public class GetBuilder<T> where T : IODataEntitySet, new()
     internal  string EntityPath => entityPath;
     internal string KeyExpression => keyExpression;
 
+    public async Task<T?> ExecuteAsync(CancellationToken cancellationToken = default)
+    {
+        var result = await odataClient.QueryEntityAsync<T>(EntityPath, keyExpression, select, expand, cancellationToken);
+        if (result == null) { return default; }
+
+        return result.Data;
+    }
 
     public GetBuilder<T> Expand(string? expand = null)
     {

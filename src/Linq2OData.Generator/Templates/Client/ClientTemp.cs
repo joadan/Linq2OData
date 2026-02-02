@@ -72,16 +72,16 @@ namespace Linq2OData.Generator.Templates.Client
             
             #line default
             #line hidden
-            this.Write(@", new() 
-    {
-        return new GetBuilder<T>(odataClient, keySetter);
-    }
-
-    public QueryBuilder<T> Query<T>() where T : IODataDemoEntity, new() 
-    {
-        return new QueryBuilder<T>(odataClient);
-    }
-    public DeleteBuilder<T> Delete<T>(Action<T> keySetter) where T : ");
+            this.Write(", new() \r\n    {\r\n        return new GetBuilder<T>(odataClient, keySetter);\r\n    }" +
+                    "\r\n\r\n    public QueryBuilder<T> Query<T>() where T :  ");
+            
+            #line 29 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(request.InterfaceName));
+            
+            #line default
+            #line hidden
+            this.Write(", new() \r\n    {\r\n        return new QueryBuilder<T>(odataClient);\r\n    }\r\n    pub" +
+                    "lic DeleteBuilder<T> Delete<T>(Action<T> keySetter) where T : ");
             
             #line 33 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.InterfaceName));

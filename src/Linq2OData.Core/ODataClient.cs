@@ -105,7 +105,7 @@ namespace Linq2OData.Core
         }
 
 
-        public async Task<ODataResponse<T>?> QueryEntityAsync<T>(string entitySetName, string keyString, string? expand = null, CancellationToken token = default)
+        public async Task<ODataResponse<T>?> QueryEntityAsync<T>(string entitySetName, string keyString, string? select = null, string? expand = null, CancellationToken token = default)
         {
             var url = GenerateUrl(entitySetName: entitySetName, keyString:keyString, expand: expand);
 

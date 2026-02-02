@@ -26,7 +26,7 @@ public class <#= request.Name #>
         return new GetBuilder<T>(odataClient, keySetter);
     }
 
-    public QueryBuilder<T> Query<T>() where T : IODataDemoEntity, new() 
+    public QueryBuilder<T> Query<T>() where T :  <#= request.InterfaceName #>, new() 
     {
         return new QueryBuilder<T>(odataClient);
     }

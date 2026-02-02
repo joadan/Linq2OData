@@ -12,7 +12,7 @@ namespace Linq2OData.Generator.Models
         public List<string> MetadataList { get; set; } = [];
 
 
-        public string InterfaceName => $"I{Name}EntitySet";
+        public string InterfaceName => $"I{Namespace.Replace(".","_")}EntitySet";
      
 
     }
