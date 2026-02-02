@@ -1,9 +1,8 @@
-﻿using Linq2OData.Generator.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Linq2OData.Generator.Metadata
+namespace Linq2OData.Core.Metadata
 {
     public static class MetadataParser
     {

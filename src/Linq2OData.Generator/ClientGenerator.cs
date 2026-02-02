@@ -1,4 +1,6 @@
-﻿using Linq2OData.Generator.Models;
+﻿using Linq2OData.Core;
+using Linq2OData.Core.Metadata;
+using Linq2OData.Generator.Models;
 using Linq2OData.Generator.Templates.Client;
 using Linq2OData.Generator.Templates.Input;
 using Linq2OData.Generator.Templates.Types;
@@ -26,7 +28,7 @@ public class ClientGenerator(ClientRequest request)
         //Parse Metadata
         foreach (var metadataContent in request.MetadataList)
         {
-            var metadata = Metadata.MetadataParser.Parse(metadataContent);
+            var metadata = MetadataParser.Parse(metadataContent);
             if (version != null && metadata.ODataVersion != version)
             {
                 throw new Exception($"All metadata documents must have the same OData version. Current is {version.ToString()}, trying to add {metadata.Namespace}: {metadata.ODataVersion}");

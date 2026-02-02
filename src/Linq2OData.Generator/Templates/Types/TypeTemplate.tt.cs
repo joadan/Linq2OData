@@ -1,7 +1,4 @@
-﻿using Linq2OData.Generator.Models;
-using System;
-using System.Collections.Generic;
-using System.Security.AccessControl;
+﻿using Linq2OData.Core.Metadata;
 using System.Text;
 
 namespace Linq2OData.Generator.Templates.Types

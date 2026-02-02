@@ -1,7 +1,6 @@
 
 using Linq2OData.Core;
-using Linq2OData.Generator.Metadata;
-using Linq2OData.Generator.Models;
+using Linq2OData.Core.Metadata;
 using Microsoft.AspNetCore.Components;
 using TabBlazor;
 using TabBlazor.Services;

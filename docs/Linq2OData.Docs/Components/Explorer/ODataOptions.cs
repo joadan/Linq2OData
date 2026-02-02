@@ -1,4 +1,4 @@
-﻿using Linq2OData.Generator.Models;
+﻿using Linq2OData.Core.Metadata;
 
 namespace Linq2OData.Docs.Components.Explorer
 {

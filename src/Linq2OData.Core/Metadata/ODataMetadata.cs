@@ -1,6 +1,4 @@
-﻿
-
-namespace Linq2OData.Generator.Models;
+﻿namespace Linq2OData.Core.Metadata;
 
 public class ODataMetadata
 {
@@ -33,12 +31,6 @@ public class ODataMetadata
             SetEntityDerivedPaths(derivedType);
         }
     }
-}
-
-public enum ODataVersion
-{
-    V2,
-    V4
 }
 
 public class ODataEntitySet

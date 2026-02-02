@@ -67,4 +67,9 @@
 		</None>
 	</ItemGroup>
 
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Linq2OData.Core\Linq2OData.Core.csproj" />
+	</ItemGroup>
+
 </Project>

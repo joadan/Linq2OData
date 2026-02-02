@@ -1,9 +1,5 @@
-﻿using Linq2OData.Generator.Models;
-using System;
-using System.Collections.Generic;
+﻿using Linq2OData.Core.Metadata;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
-using System.Xml.Linq;
 
 namespace Linq2OData.Generator;
 
