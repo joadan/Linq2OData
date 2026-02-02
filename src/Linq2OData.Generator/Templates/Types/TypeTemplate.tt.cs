@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Linq2OData.Generator.Templates.Types
 {
-    public partial class TypeTemplate(ODataEntityType entityType, string fullNamspace, IEnumerable<ODataEntityType> derivedTypes, string metadataNamespace)
+    public partial class TypeTemplate(ODataEntityType entityType, string fullNamspace, string etityInterfaceName, IEnumerable<ODataEntityType> derivedTypes, string metadataNamespace)
     {
 
         public string BaseTypeAndInterface
@@ -16,11 +16,11 @@ namespace Linq2OData.Generator.Templates.Types
                 {
                     if (string.IsNullOrWhiteSpace(result))
                     {
-                        result = " : IODataEntitySet";
+                        result = $" : {etityInterfaceName}";
                     }
                     else
                     {
-                        result += ", IODataEntitySet";
+                        result += $", {etityInterfaceName}";
                     }
                 }
 

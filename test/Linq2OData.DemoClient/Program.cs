@@ -3,6 +3,7 @@
 
 
 //using DemoClientV4.ODataDemo;
+using DemoClientV4.ODataDemo;
 using System.Text.Json;
 
 namespace Linq2OData.DemoClient;
@@ -14,147 +15,42 @@ internal class Program
     static async Task Main(string[] args)
     {
         Console.WriteLine("Here we go..");
-        // await GenerateDemoClientV2Async();
-        await GenerateDemoClientV4Async();
-        //await TestV4ClientAsync();
+        //await GenerateDemoClientV2Async();
+        //await GenerateDemoClientV4Async();
+        await TestV4ClientAsync();
 
     }
 
-    //private static async Task TestV4ClientAsync()
-    //{
-    //    var httpClient = new HttpClient
-    //    {
-    //        BaseAddress = new Uri(demoUrlV4)
-    //    };
+    private static async Task TestV4ClientAsync()
+    {
+        var httpClient = new HttpClient
+        {
+            BaseAddress = new Uri(demoUrlV4)
+        };
 
-    //    var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
-
-    //    var result = await clientV4
-    //        .For<Person>()
-    //        .Key(e => e.ID = 1)
-    //        .Get()
-    //        .Expand("PersonDetail")
-    //        .Select()
-    //        .ExecuteAsync();
+        var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
 
 
-    //    var result2 = await clientV4
-    //      .For<Person>()
-    //      .Query()
-    //      .Expand("PersonDetail")
-    //      .Select()
-    //      .ExecuteAsync();
-
-    //    var t = result;
-    //}
-        //var result = await clientV4
-        //    .For<Person>()
-        //    .Key(e => { e.ID = 2; e.Name = "dff"; })
-        //    .DeleteAsync();
-
-        //var persons = clientV4.For<Person>().Key(e => e.ID = 11);
-
-        //var newPerson = clientV4.For<Person>().CreateAsync(new PersonInput
-        //{
-        //    ID = 11,
-        //    Name = "John Doe"
-        //}
-        //  );
-
-    
+        var result2 = await clientV4
+           .Query<Person>()
+           .Expand("PersonDetail")
+           .Filter(e => e.ID > 4)
+           .ExecuteAsync();
 
 
 
-
-    //    var option1 = await clientV4.ODataDemo.DeleteAsync<Person>(e => e.ID = 999);
-    //    var option2 = await clientV4.ODataDemo.DeletePersonAsync(999);
-
-    //    var r = await clientV4.ODataDemo.DeleteAsync<Person>(e => e.ID = 999);
-    //    var key =  clientV4.ODataDemo.Key<Person>(e => e.ID = 999);
-    //}
-
-    //    //Test raw client
-    //   // var rawResult = await clientV4.ODataClient.QueryEntitySetAsync<JsonElement>("Products");
-    // //   var rawEntity = await clientV4.ODataClient.QueryEntityAsync<JsonElement>("Products", "ID=99999");
-
-    //    var suppliers  = await clientV4
-    //          .ODataClient
-    //          .QueryEntity<Supplier>()
-    //          .Select()
-    //          .ExecuteAsync();
-
-    //    var persons = await clientV4
-    //          .ODataClient
-    //          .QueryEntity<Person>()
-    //          .Select()
-    //          .ExecuteAsync();
+        //var t = await clientV4
+        //    .Update<Person>(e => e.ID = 4)
+        //    .ExecuteAsync(new PersonInput { Name = "Test" });
 
 
-    //    var customers = await clientV4
-    //              .ODataClient
-    //              .QueryEntity<Customer>()
-    //              .Select()
-    //              .ExecuteAsync();
+        var result = await clientV4
+            .Get<Person>(e => e.ID = 4)
+           .ExecuteAsync();
 
-    //    var t = customers;
+        var h = result;
 
-    //}
-
-
-
-    //    //Query entities
-    //    var filteredResult = await clientV4
-    //        .ODataDemo
-    //        .Products()
-    //        .Top(30)
-    //        .Filter(e => e.Rating >= 3 || e.ID == 999)
-    //        .Expand("Categories")
-    //        .Select(e => e.Select(f => new { f.Rating, f.ID }))
-    //        .ExecuteAsync();
-
-    //    var rr = filteredResult;
-
-    ////Update an entity
-    //var result = await client
-    //    .ODataDemo
-    //    .ProductsUpdateAsync(1, new ProductInput
-    //    {
-    //        Name = "Test Product__",
-    //    });
-
-    ////Select an entity by key
-    //var product = await client.ODataDemo
-    //        .ProductsByKey(1)
-    //        .Expand("Category")
-    //        .Select()
-    //        .ExecuteAsync();
-
-
-    ////Create a new entity
-    //var newProduct = await client.ODataDemo.ProductsCreateAsync(new ProductInput
-    //{
-    //    ID = 1000,
-    //    Name = "Test Product",
-    //    Description = "This is a my test product",
-    //    Rating = 5,
-    //    Price = 10,
-    //   ReleaseDate = DateTime.Now,
-    //});
-
-
-    //var mm = newProduct;
-
-    ////Delete an entity by key
-    //await client.ODataDemo.ProductsDeleteAsync(1000);
-
-
-
-
-
-
-
-
-    //}
+    }
 
 
     private static async Task GenerateDemoClientV2Async()

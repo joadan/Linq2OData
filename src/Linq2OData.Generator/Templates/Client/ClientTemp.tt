@@ -1,0 +1,48 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+using Linq2OData.Core;
+using Linq2OData.Core.Builders;
+
+namespace <#= request.Namespace #>;
+
+public interface <#= request.InterfaceName #> : IODataEntitySet {}
+
+public class <#= request.Name #> 
+{
+    private Linq2OData.Core.ODataClient odataClient;
+    public Linq2OData.Core.ODataClient ODataClient => odataClient;
+
+    public <#= request.Name #>(HttpClient httpClient) 
+    {
+         odataClient = new Linq2OData.Core.ODataClient(httpClient, <#= GetODataVersionParameter() #>); 
+    }
+
+    public GetBuilder<T> Get<T>(Action<T> keySetter) where T : <#= request.InterfaceName #>, new() 
+    {
+        return new GetBuilder<T>(odataClient, keySetter);
+    }
+
+    public QueryBuilder<T> Query<T>() where T :  <#= request.InterfaceName #>, new() 
+    {
+        return new QueryBuilder<T>(odataClient);
+    }
+    public DeleteBuilder<T> Delete<T>(Action<T> keySetter) where T : <#= request.InterfaceName #>, new() 
+    {
+        return new DeleteBuilder<T>(odataClient, keySetter);
+    }
+
+    public UpdateBuilder<T> Update<T>(Action<T> keySetter) where T : <#= request.InterfaceName #>, new()
+    {
+        return new UpdateBuilder<T>(odataClient, keySetter);
+    }
+
+    public CreateBuilder<T> Create<T>(Action<T> keySetter) where T : <#= request.InterfaceName #>, new()
+    {
+        return new CreateBuilder<T>(odataClient);
+    }
+}
+
