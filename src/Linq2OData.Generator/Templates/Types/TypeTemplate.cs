@@ -137,7 +137,77 @@ namespace Linq2OData.Generator.Templates.Types
             
             #line default
             #line hidden
-            this.Write("\n}\n\n");
+            this.Write("\n\n");
+            
+            #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
+ if (entityType.KeyProperties.Any()) { 
+            
+            #line default
+            #line hidden
+            this.Write("\n public string __Keys => $\"");
+            
+            #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(entityType.KeyResultString));
+            
+            #line default
+            #line hidden
+            this.Write("\"; \n");
+            
+            #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("\n\n\n}\n\n");
+            
+            #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
+ if (entityType.KeyProperties.Any()) { 
+            
+            #line default
+            #line hidden
+            this.Write("\npublic interface ");
+            
+            #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(GetKeyInterface()));
+            
+            #line default
+            #line hidden
+            this.Write("\n{\n");
+            
+            #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
+ foreach (var keyProperty in entityType.KeyProperties) { 
+            
+            #line default
+            #line hidden
+            this.Write("\n\t");
+            
+            #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(keyProperty.CSharpType));
+            
+            #line default
+            #line hidden
+            this.Write(" ");
+            
+            #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(keyProperty.Name));
+            
+            #line default
+            #line hidden
+            this.Write(" { get; set; }\n    ");
+            
+            #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("\n}\n");
+            
+            #line 1 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("\n");
             return this.GenerationEnvironment.ToString();
         }
     }

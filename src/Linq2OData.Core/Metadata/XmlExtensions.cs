@@ -1,10 +1,6 @@
-﻿using Linq2OData.Generator.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
-namespace Linq2OData.Generator.Metadata;
+namespace Linq2OData.Core.Metadata;
 
 internal static class XmlExtensions
 {

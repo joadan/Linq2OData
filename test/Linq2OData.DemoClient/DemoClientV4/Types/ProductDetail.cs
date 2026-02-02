@@ -16,7 +16,7 @@ namespace DemoClientV4.ODataDemo;
 
 
 [ODataEntitySet("ProductDetails")]
-public partial class ProductDetail  : IODataEntitySet
+public partial class ProductDetail  : IODataEntitySet, IProductDetailKeys
 {
 
     [ODataMember("ProductID")]
@@ -30,5 +30,19 @@ public partial class ProductDetail  : IODataEntitySet
     [ODataMember("Product")]
     public Product? Product { get; set; }
 
+
+
+ public string __Keys => $"ProductID={ProductID}"; 
+
+
+
+}
+
+
+public interface IProductDetailKeys
+{
+
+	int ProductID { get; set; }
+    
 }
 

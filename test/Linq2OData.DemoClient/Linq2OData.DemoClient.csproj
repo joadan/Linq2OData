@@ -7,9 +7,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Spatial" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Linq2OData.Core\Linq2OData.Core.csproj" />

@@ -19,7 +19,7 @@ namespace DemoClientV4.ODataDemo;
 [JsonDerivedType(typeof(FeaturedProduct), "#ODataDemo.FeaturedProduct")]
 
 [ODataEntitySet("Products")]
-public partial class Product  : IODataEntitySet
+public partial class Product  : IODataEntitySet, IProductKeys
 {
 
     [ODataMember("ID")]
@@ -54,5 +54,19 @@ public partial class Product  : IODataEntitySet
     [ODataMember("ProductDetail")]
     public ProductDetail? ProductDetail { get; set; }
 
+
+
+ public string __Keys => $"ID={ID}"; 
+
+
+
+}
+
+
+public interface IProductKeys
+{
+
+	int ID { get; set; }
+    
 }
 

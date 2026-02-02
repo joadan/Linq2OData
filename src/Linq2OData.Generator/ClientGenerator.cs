@@ -1,4 +1,6 @@
-﻿using Linq2OData.Generator.Models;
+﻿using Linq2OData.Core;
+using Linq2OData.Core.Metadata;
+using Linq2OData.Generator.Models;
 using Linq2OData.Generator.Templates.Client;
 using Linq2OData.Generator.Templates.Input;
 using Linq2OData.Generator.Templates.Types;
@@ -26,7 +28,7 @@ public class ClientGenerator(ClientRequest request)
         //Parse Metadata
         foreach (var metadataContent in request.MetadataList)
         {
-            var metadata = Metadata.MetadataParser.Parse(metadataContent);
+            var metadata = MetadataParser.Parse(metadataContent);
             if (version != null && metadata.ODataVersion != version)
             {
                 throw new Exception($"All metadata documents must have the same OData version. Current is {version.ToString()}, trying to add {metadata.Namespace}: {metadata.ODataVersion}");
@@ -94,18 +96,8 @@ public class ClientGenerator(ClientRequest request)
     {
         var templateText = new ClientTemplate(request.Name, request.Namespace, metadataCollection, (ODataVersion)version!).TransformText();
         AddFile("Client", request.Name + ".cs", templateText);
-
-
-        //Generate Endpoints
-        foreach (var metadata in metadataCollection)
-        {
-            var fullNamspace = request.Namespace + "." + metadata.Namespace;
-            var contextText = new ClientEndpointTemplate(fullNamspace, metadata).TransformText();
-            AddFile("Client", metadata.EndpointName + ".cs", contextText);
-        }
-
-
     }
+
     private void GenerateTypesCode()
     {
         foreach (var metadata in metadataCollection)

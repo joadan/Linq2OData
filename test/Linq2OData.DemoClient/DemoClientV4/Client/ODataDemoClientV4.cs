@@ -5,6 +5,8 @@
 
 #nullable enable
 
+using Linq2OData.Core;
+using Linq2OData.Core.Builders;
 
 namespace DemoClientV4;
 
@@ -16,9 +18,10 @@ public class ODataDemoClientV4
     public ODataDemoClientV4(HttpClient httpClient) 
     {
          odataClient = new Linq2OData.Core.ODataClient(httpClient, Linq2OData.Core.ODataVersion.V4); 
-              ODataDemo = new ODataDemo.ODataDemoEndpoint(odataClient);
-       
     }
 
-        public ODataDemo.ODataDemoEndpoint ODataDemo { get; set; }
+    public ForBuilder<T> For<T>() where T : IODataEntitySet, new() //TODO: Add Interfaces specific to this service
+    {
+         return new ForBuilder<T>(odataClient);
+    }
 }

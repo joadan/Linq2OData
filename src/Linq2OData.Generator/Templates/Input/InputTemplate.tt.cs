@@ -1,7 +1,5 @@
-﻿using Linq2OData.Generator.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Linq2OData.Core.Metadata;
+
 
 namespace Linq2OData.Generator.Templates.Input
 {

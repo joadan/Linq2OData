@@ -1,7 +1,6 @@
-using Linq2OData.Generator.Models;
 using System.Xml.Linq;
 
-namespace Linq2OData.Generator.Metadata;
+namespace Linq2OData.Core.Metadata;
 
 internal static class MetadataParserVersion4
 {

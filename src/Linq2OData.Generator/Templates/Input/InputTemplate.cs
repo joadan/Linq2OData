@@ -144,7 +144,7 @@ namespace Linq2OData.Generator.Templates.Input
             
             #line default
             #line hidden
-            this.Write("\r\n}");
+            this.Write("\r\n}\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }

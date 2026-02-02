@@ -1,4 +1,6 @@
-﻿using Linq2OData.Generator.Models;
+﻿using Linq2OData.Core;
+using Linq2OData.Core.Metadata;
+using Linq2OData.Generator.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;

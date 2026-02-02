@@ -20,7 +20,7 @@ namespace DemoClientV4.ODataDemo;
 [JsonDerivedType(typeof(Employee), "#ODataDemo.Employee")]
 
 [ODataEntitySet("Persons")]
-public partial class Person  : IODataEntitySet
+public partial class Person  : IODataEntitySet, IPersonKeys
 {
 
     [ODataMember("ID")]
@@ -34,5 +34,19 @@ public partial class Person  : IODataEntitySet
     [ODataMember("PersonDetail")]
     public PersonDetail? PersonDetail { get; set; }
 
+
+
+ public string __Keys => $"ID={ID}"; 
+
+
+
+}
+
+
+public interface IPersonKeys
+{
+
+	int ID { get; set; }
+    
 }
 

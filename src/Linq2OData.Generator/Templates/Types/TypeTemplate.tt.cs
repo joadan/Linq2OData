@@ -1,16 +1,10 @@
-﻿using Linq2OData.Generator.Models;
-using System;
-using System.Collections.Generic;
-using System.Security.AccessControl;
+﻿using Linq2OData.Core.Metadata;
 using System.Text;
 
 namespace Linq2OData.Generator.Templates.Types
 {
     public partial class TypeTemplate(ODataEntityType entityType, string fullNamspace, IEnumerable<ODataEntityType> derivedTypes, string metadataNamespace)
     {
-
-
-        //public string BaseTypeDerived => string.IsNullOrWhiteSpace(entityType.BaseType) ? "" : $": {entityType.BaseType}";
 
         public string BaseTypeAndInterface
         {
@@ -30,10 +24,26 @@ namespace Linq2OData.Generator.Templates.Types
                     }
                 }
 
+                if (entityType.KeyProperties.Any())
+                {
+                    if (string.IsNullOrWhiteSpace(result))
+                    {
+                        result = $" : {GetKeyInterface()}";
+                    }
+                    else
+                    {
+                        result += $", {GetKeyInterface()}";
+                    }
+                }
+
                 return result;
             }
         }
 
+        private string GetKeyInterface()
+        {
+            return $"I{entityType.Name}Keys";
+        }
 
         private string GetEntitySetAttribute()
         {

@@ -25,15 +25,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Update="Templates\Client\ClientEndpointTemplate.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>ClientEndpointTemplate.tt</DependentUpon>
-		</Compile>
 		<Compile Update="Templates\Client\ClientTemplate.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>ClientTemplate.tt</DependentUpon>
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>ClientTemplate.tt</DependentUpon>
 		</Compile>
 		<Compile Update="Templates\Input\InputTemplate.cs">
 			<DesignTime>True</DesignTime>
@@ -54,10 +49,6 @@
 
 
 	<ItemGroup>
-		<None Update="Templates\Client\ClientEndpointTemplate.tt">
-			<Generator>TextTemplatingFilePreprocessor</Generator>
-			<LastGenOutput>ClientEndpointTemplate.cs</LastGenOutput>
-		</None>
 		<None Update="Templates\Client\ClientTemplate.tt">
 			<Generator>TextTemplatingFilePreprocessor</Generator>
 			<LastGenOutput>ClientTemplate.cs</LastGenOutput>
@@ -74,6 +65,11 @@
 			<Generator>TextTemplatingFilePreprocessor</Generator>
 			<LastGenOutput>TypeTemplate.cs</LastGenOutput>
 		</None>
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Linq2OData.Core\Linq2OData.Core.csproj" />
 	</ItemGroup>
 
 </Project>
