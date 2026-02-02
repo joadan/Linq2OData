@@ -7,9 +7,7 @@
     <Project Path="docs/Linq2OData.Docs/Linq2OData.Docs.csproj" Id="02232f73-b15d-4065-8992-04ae4a16a0b7" />
   </Folder>
   <Folder Name="/Tests/">
-    <Project Path="test/Linq2OData.DemoClient/Linq2OData.DemoClient.csproj" Id="ba6dc6ea-ab25-4674-8dc5-c5323088b462">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
+    <Project Path="test/Linq2OData.TestClients/Linq2OData.TestClients.csproj" Id="406d4820-6001-4e03-b932-1f2ad7de031f" />
     <Project Path="test/Linq2OData.Tests/Linq2OData.Tests.csproj" />
   </Folder>
   <Project Path="src/Linq2OData.Core/Linq2OData.Core.csproj" />
