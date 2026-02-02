@@ -31,9 +31,9 @@
 			<DependentUpon>ClientEndpointTemplate.tt</DependentUpon>
 		</Compile>
 		<Compile Update="Templates\Client\ClientTemplate.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>ClientTemplate.tt</DependentUpon>
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>ClientTemplate.tt</DependentUpon>
 		</Compile>
 		<Compile Update="Templates\Input\InputTemplate.cs">
 			<DesignTime>True</DesignTime>

@@ -28,16 +28,16 @@ namespace Linq2OData.Generator.Templates.Client
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("\r\nusing Linq2OData.Core;\r\nusing Linq2OData.Core.Builders;\r\nnamespace ");
+            this.Write("\r\nusing Linq2OData.Core;\r\nusing Linq2OData.Core.Builders;\r\n\r\nnamespace ");
             
-            #line 9 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 10 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientNamespace));
             
             #line default
             #line hidden
             this.Write(";\r\n\r\npublic class ");
             
-            #line 11 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 12 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             
             #line default
@@ -45,7 +45,7 @@ namespace Linq2OData.Generator.Templates.Client
             this.Write(" \r\n{\r\n    private Linq2OData.Core.ODataClient odataClient;\r\n    public Linq2OData" +
                     ".Core.ODataClient ODataClient => odataClient;\r\n\r\n    public ");
             
-            #line 16 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 17 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientName));
             
             #line default
@@ -53,7 +53,7 @@ namespace Linq2OData.Generator.Templates.Client
             this.Write("(HttpClient httpClient) \r\n    {\r\n         odataClient = new Linq2OData.Core.OData" +
                     "Client(httpClient, ");
             
-            #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
+            #line 19 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GetODataVersionParameter()));
             
             #line default

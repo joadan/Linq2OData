@@ -5,6 +5,9 @@
 
 #nullable enable
 
+using Linq2OData.Core;
+using Linq2OData.Core.Builders;
+
 namespace DemoClientV4;
 
 public class ODataDemoClientV4 

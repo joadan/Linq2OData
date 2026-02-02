@@ -6,6 +6,7 @@
 
 using Linq2OData.Core;
 using Linq2OData.Core.Builders;
+
 namespace <#= clientNamespace #>;
 
 public class <#= clientName #> 
