@@ -15,4 +15,13 @@
 		<PackageTags>Linq OData Client</PackageTags>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+			<_Parameter1>Linq2OData.Tests</_Parameter1>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+			<_Parameter1>Linq2OData.TestClients</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+
 </Project>

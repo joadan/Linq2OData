@@ -1,5 +1,7 @@
 ﻿using DemoClientV4.ODataDemo;
 using Linq2OData.Generator.Models;
+using Linq2OData.TestClients.AdHocClient;
+using Swegon.SAP.S4Client.API_SALES_ORDER_SRV;
 
 namespace Linq2OData.TestClients
 {
@@ -17,6 +19,14 @@ namespace Linq2OData.TestClients
             //await GenerateDemoClientV4Async();
 
             await TestV2ClientAsync();
+            TestAddHocClient();
+        
+        }
+
+        private static void TestAddHocClient()
+        {
+            var odataClient = new Linq2OData.Core.ODataClient(new HttpClient(), Core.ODataVersion.V2);
+            var result = odataClient.ProcessQueryResponse<List<A_SalesOrderType>>(SampleData.SalesOrderExpandItems);
         }
 
         private static async Task TestV2ClientAsync()
@@ -30,8 +40,8 @@ namespace Linq2OData.TestClients
 
 
             var queryResult = await clientV2
-               .Query<DemoClientV2.ODataDemo.Product>()
-               .Filter(e => e.ID > 4)
+               .Query<DemoClientV2.ODataDemo.Supplier>()
+               .Expand("Products")
                .ExecuteAsync();
 
         }

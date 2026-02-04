@@ -30,6 +30,10 @@ namespace Linq2OData.Core
                 jsonOptions.Converters.Add(new DecimalStringJsonConverter());
                 jsonOptions.Converters.Add(new Int64StringJsonConverter());
                 jsonOptions.Converters.Add(new NullableInt64StringJsonConverter());
+                // Add the collection converter for handling "results" wrapper in navigation properties
+                jsonOptions.Converters.Add(new ODataCollectionConverterFactory());
+                // Add the navigation property converter for handling "__deferred" wrapper in non-expanded properties
+                jsonOptions.Converters.Add(new ODataNavigationPropertyConverterFactory());
             }
 
 
@@ -180,17 +184,17 @@ namespace Linq2OData.Core
 
 
 
-        private ODataResponse<T>? ProcessQueryResponse<T>(string rawResponse)
+        internal ODataResponse<T>? ProcessQueryResponse<T>(string rawResponse)
         {
             if (string.IsNullOrWhiteSpace(rawResponse))
             {
                 return null;
             }
 
-            if (odataVersion != ODataVersion.V4)
-            {
-                rawResponse = ODataJsonCleanupHelper.Clean(rawResponse);
-            }
+            //if (odataVersion != ODataVersion.V4)
+            //{
+            //    rawResponse = ODataJsonCleanupHelper.Clean(rawResponse);
+            //}
 
             JsonNode? root = JsonNode.Parse(rawResponse);
 
