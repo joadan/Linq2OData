@@ -84,7 +84,7 @@ namespace Linq2OData.Core
         }
 
 
-        public async Task<ODataResponse<List<T>>?> QueryEntitySetAsync<T>(string entitySetName, string? select, string? expand=null, string? filter=null, bool? count = null, int? top = null, int? skip = null, CancellationToken token = default)
+        public async Task<ODataResponse<List<T>>?> QueryEntitySetAsync<T>(string entitySetName, string? select, string? expand = null, string? filter = null, bool? count = null, int? top = null, int? skip = null, CancellationToken token = default)
         {
             var url = GenerateUrl(entitySetName: entitySetName, expand: expand, filter: filter, count: count, top: top, skip: skip);
 
@@ -107,7 +107,7 @@ namespace Linq2OData.Core
 
         public async Task<ODataResponse<T>?> QueryEntityAsync<T>(string entitySetName, string keyString, string? select = null, string? expand = null, CancellationToken token = default)
         {
-            var url = GenerateUrl(entitySetName: entitySetName, keyString:keyString, expand: expand);
+            var url = GenerateUrl(entitySetName: entitySetName, keyString: keyString, expand: expand);
 
             using var response = await httpClient.GetAsync(url, token);
 
@@ -125,7 +125,7 @@ namespace Linq2OData.Core
             return ProcessQueryResponse<T>(rawResponse);
         }
 
-        private string GenerateUrl(string entitySetName, string? keyString=null, string? expand = null, string? filter = null, bool? count= null, int? top = null, int? skip = null)
+        private string GenerateUrl(string entitySetName, string? keyString = null, string? expand = null, string? filter = null, bool? count = null, int? top = null, int? skip = null)
         {
 
             var urlBuilder = new StringBuilder();
@@ -186,6 +186,12 @@ namespace Linq2OData.Core
             {
                 return null;
             }
+
+            if (odataVersion != ODataVersion.V4)
+            {
+                rawResponse = ODataJsonCleanupHelper.Clean(rawResponse);
+            }
+
             JsonNode? root = JsonNode.Parse(rawResponse);
 
             if (root == null)
