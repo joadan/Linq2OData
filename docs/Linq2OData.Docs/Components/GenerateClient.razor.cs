@@ -17,7 +17,7 @@ namespace Linq2OData.Docs.Components
 
         private ClientRequest request = new ClientRequest { Name = "MyClient", Namespace = "MyNamespace" };
 
-        [Inject] private TablerService tablerService { get; set; } =  default!;
+        [Inject] private TablerService tablerService { get; set; } = default!;
         [Inject] private ToastService toastService { get; set; } = default!;
         [Inject] private IModalService modalService { get; set; } = default!;
 
@@ -28,7 +28,7 @@ namespace Linq2OData.Docs.Components
 
         private void Refresh()
         {
-            request = new ClientRequest { Name = "MyClient", Namespace = "MyNamespace", MetadataList = [] };
+            request = new ClientRequest { Name = "MyClient", Namespace = "MyNamespace", Metadata = [] };
         }
 
         private async Task LoadFilesAsync(InputFileChangeEventArgs e)
@@ -39,19 +39,19 @@ namespace Linq2OData.Docs.Components
             foreach (var file in e.GetMultipleFiles(10))
             {
 
-                if(file.Size > maxSize)
+                if (file.Size > maxSize)
                 {
                     await toastService.AddToastAsync(new()
                     {
                         Title = "File Too Large",
                         Message = $"{file.Name} exceeds the [10] MB size limit and will be skipped.",
-                         SubTitle = "Please upload a smaller file."
-                         
+                        SubTitle = "Please upload a smaller file."
+
                     });
                     continue;
                 }
 
-               
+
                 using var stream = file.OpenReadStream(maxSize);
                 using var reader = new StreamReader(stream);
 
@@ -66,10 +66,7 @@ namespace Linq2OData.Docs.Components
                     // optional: keep UI responsive
                     await Task.Yield();
                 }
-
-                //string xml = sb.ToString();
-
-                request.MetadataList.Add(sb.ToString());
+                request.AddMetadata(sb.ToString());
             }
         }
 

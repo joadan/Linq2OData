@@ -1,4 +1,5 @@
 ﻿@page "/generate-client"
+@using Linq2OData.Core.Metadata
 
 
 <h3>Generate OData Client</h3>
@@ -28,18 +29,125 @@
             <InputFile class="mt-3 form-control" OnChange="LoadFilesAsync" multiple accept=".xml" />
 
 
-            <div class="mt-3" />
+            <div class="mt-3 mb-3" />
 
-            @if (request.MetadataList?.Any() == true)
+            @if (request.Metadata?.Any() == true)
             {
                 <Tabs>
-                    @foreach (var metadata in request.MetadataList!)
+                    @foreach (var clientMetadata in request.Metadata)
                     {
-                        <Tab Title="Metadata">
+                        <Tab Title="@(clientMetadata.Metadata.Namespace)">
 
-                            <textarea class="form-control" rows="40">
-                @metadata
-                </textarea>
+                            <DataGrid class="mb-3">
+
+                                <DataGridItem Title="Service Path">
+                                   <InputText class="form-control" @bind-Value="clientMetadata.ServicePath" />
+                                </DataGridItem>
+
+                                <DataGridItem Title="OData Version">
+                                    @clientMetadata.Metadata.ODataVersion
+                                </DataGridItem>
+
+                                <DataGridItem Title="Namespace">
+                                    @clientMetadata.Metadata.Namespace
+                                </DataGridItem>
+                                
+                            </DataGrid>
+
+
+                            <Tabs>
+                                <Tab Title="EntitySets">
+                                    <ChildContent>
+                                        <Table Item="ODataEntitySet" Items="@clientMetadata.Metadata.EntitySets">
+
+                                            <ChildContent>
+
+                                                <Column Item="ODataEntitySet" Property="e => e.Name" Searchable Sortable />
+
+                                                <Column Item="ODataEntitySet" Property="e => e.EntityTypeName" Searchable Sortable />
+
+                                            </ChildContent>
+
+                                        </Table>
+                                    </ChildContent>
+                                </Tab>
+                                <Tab Title="Types">
+                                    <ChildContent>
+                                        <Table Item="ODataEntityType" Items="@clientMetadata.Metadata.EntityTypes">
+
+                                            <ChildContent>
+                                                <Column Item="ODataEntityType" Property="e => e.Name" Searchable Sortable />
+                                                <Column Item="ODataEntityType" Property="e => e.BaseType" Searchable Sortable />
+
+                                                <Column Item="ODataEntityType" Title="Keys">
+
+                                                    <Template>
+                                                        <div class="badge-list">
+                                                            @foreach (var keyProperty in context.KeyProperties)
+                                                            {
+                                                                <Badge BackgroundColor="TablerColor.Primary">@keyProperty.Name</Badge>
+                                                            }
+                                                        </div>
+
+                                                    </Template>
+
+
+                                                </Column>
+
+                                            </ChildContent>
+
+                                        </Table>
+                                    </ChildContent>
+                                </Tab>
+
+                                <Tab Title="Enums">
+                                    <ChildContent>
+                                        <Table Item="ODataEnumType" Items="@clientMetadata.Metadata.EnumTypes">
+
+                                            <ChildContent>
+                                                <Column Item="ODataEnumType" Property="e => e.Name" Searchable Sortable />
+                                                <Column Item="ODataEnumType" Property="e => e.Members.Count" Sortable>
+
+                                                    <Template>
+                                                        <div class="badge-list">
+                                                            @foreach (var member in context.Members)
+                                                            {
+                                                                <Badge BackgroundColor="TablerColor.Primary">@member</Badge>
+                                                            }
+                                                        </div>
+
+                                                    </Template>
+
+
+                                                </Column>
+
+                                            </ChildContent>
+
+                                        </Table>
+                                    </ChildContent>
+                                </Tab>
+
+
+
+                                <Tab Title="Functions">
+                                    <ChildContent>
+                                        <Table Item="ODataFunction" Items="@clientMetadata.Metadata.Functions">
+
+                                            <ChildContent>
+                                                <Column Item="ODataFunction" Property="e => e.Name" Searchable Sortable />
+                                                <Column Item="ODataFunction" Property="e => e.HttpMethod" Searchable Sortable />
+                                                <Column Item="ODataFunction" Property="e => e.ReturnType" Searchable Sortable />
+
+                                            </ChildContent>
+
+                                        </Table>
+                                    </ChildContent>
+                                </Tab>
+                            </Tabs>
+
+
+
+
                         </Tab>
                     }
                 </Tabs>
