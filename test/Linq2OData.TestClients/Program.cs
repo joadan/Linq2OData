@@ -16,7 +16,24 @@ namespace Linq2OData.TestClients
             //await GenerateDemoClientV2Async();
             //await GenerateDemoClientV4Async();
 
-            await TestV4ClientAsync();
+            await TestV2ClientAsync();
+        }
+
+        private static async Task TestV2ClientAsync()
+        {
+            var httpClient = new HttpClient
+            {
+                BaseAddress = new Uri(demoUrlV2)
+            };
+
+            var clientV2 = new DemoClientV2.ODataDemoClientV2(httpClient);
+
+
+            var queryResult = await clientV2
+               .Query<DemoClientV2.ODataDemo.Product>()
+               .Filter(e => e.ID > 4)
+               .ExecuteAsync();
+
         }
 
         private static async Task TestV4ClientAsync()
