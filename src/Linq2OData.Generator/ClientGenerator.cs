@@ -11,7 +11,7 @@ namespace Linq2OData.Generator;
 public class ClientGenerator(ClientRequest request)
 {
     private List<FileEntry> files = [];
-    private List<ODataMetadata> metadataCollection = [];
+    //private List<ODataMetadata> metadataCollection = [];
     private ODataVersion? version = null;
 
     public List<FileEntry> GenerateClient()
@@ -19,27 +19,25 @@ public class ClientGenerator(ClientRequest request)
 
         files.Clear();
 
-        if (request.MetadataList == null || request.MetadataList.Count == 0)
+        if (request.Metadata == null || request.Metadata.Count == 0)
         {
             throw new Exception("At least one metadata document must be provided.");
         }
 
 
-        //Parse Metadata
-        foreach (var metadataContent in request.MetadataList)
+        //Check/Set version Metadata
+        foreach (var requestMetadata in request.Metadata)
         {
-            var metadata = MetadataParser.Parse(metadataContent);
-            if (version != null && metadata.ODataVersion != version)
+          
+            if (version != null && requestMetadata.Metadata.ODataVersion != version)
             {
-                throw new Exception($"All metadata documents must have the same OData version. Current is {version.ToString()}, trying to add {metadata.Namespace}: {metadata.ODataVersion}");
+                throw new Exception($"All metadata documents must have the same OData version. Current is {version.ToString()}, trying to add {requestMetadata.Metadata.Namespace}: {requestMetadata.Metadata.ODataVersion}");
             }
             else
             {
-                version = metadata.ODataVersion;
+                version = requestMetadata.Metadata.ODataVersion;
             }
 
-
-            metadataCollection.Add(metadata);
         }
 
         GenerateTypesCode();
@@ -100,8 +98,9 @@ public class ClientGenerator(ClientRequest request)
 
     private void GenerateTypesCode()
     {
-        foreach (var metadata in metadataCollection)
+        foreach (var clientMetadata in request.Metadata)
         {
+            var metadata = clientMetadata.Metadata;
             var fullNamspace = request.Namespace + "." + metadata.Namespace;
 
             // Generate enums
@@ -114,7 +113,7 @@ public class ClientGenerator(ClientRequest request)
             // Generate entity and complex types
             foreach (var entityType in metadata.EntityTypes)
             {
-                var classText = new TypeTemplate(entityType, fullNamspace, request.InterfaceName, metadata.GetDerivedTypes(entityType.Name), metadata.Namespace).TransformText();
+                var classText = new TypeTemplate(entityType, fullNamspace, clientMetadata.ServicePath, request.InterfaceName, metadata.GetDerivedTypes(entityType.Name), metadata.Namespace).TransformText();
                 AddFile("Types", entityType.Name + ".cs", classText);
             }
         }
@@ -122,8 +121,9 @@ public class ClientGenerator(ClientRequest request)
 
     private void GenerateInputTypesCode()
     {
-        foreach (var metadata in metadataCollection)
+        foreach (var clientMetadata in request.Metadata)
         {
+            var metadata = clientMetadata.Metadata;
             var fullNamspace = request.Namespace + "." + metadata.Namespace;
 
             foreach (var entityType in metadata.EntityTypes)

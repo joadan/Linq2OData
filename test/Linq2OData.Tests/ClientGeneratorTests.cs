@@ -33,8 +33,8 @@ public class ClientGeneratorTests
         {
             Name = "ODataDemoClient",
             Namespace = "MyApp.OData",
-            MetadataList = [odataDemoMetadataV2]
         };
+        request.AddMetadata(odataDemoMetadataV2);
 
         var generator = new ClientGenerator(request);
 
@@ -58,8 +58,8 @@ public class ClientGeneratorTests
         {
             Name = "ODataDemoClient",
             Namespace = "MyApp.OData",
-            MetadataList = [odataDemoMetadataV4]
         };
+        request.AddMetadata(odataDemoMetadataV4);
 
         var generator = new ClientGenerator(request);
 
@@ -83,8 +83,8 @@ public class ClientGeneratorTests
         {
             Name = "ODataLargeClient",
             Namespace = "MyApp.OData",
-            MetadataList = [largeMetadaV4]
         };
+        request.AddMetadata(odataDemoMetadataV4);
 
         var generator = new ClientGenerator(request);
 
@@ -110,8 +110,8 @@ public class ClientGeneratorTests
         {
             Name = "ODataDemoClient",
             Namespace = "MyApp.OData",
-            MetadataList = [odataDemoMetadataV4]
         };
+        request.AddMetadata(odataDemoMetadataV4);
 
         var generator = new ClientGenerator(request);
         var files = generator.GenerateClient();
@@ -147,8 +147,9 @@ public class ClientGeneratorTests
         {
             Name = "ODataDemoClient",
             Namespace = "MyApp.OData",
-            MetadataList = [odataDemoMetadataV2]
         };
+
+        request.AddMetadata(odataDemoMetadataV2);
 
         var generator = new ClientGenerator(request);
         var files = generator.GenerateClient();
@@ -299,8 +300,8 @@ global using System.Threading.Tasks;
         {
             Name = "TrippinClient",
             Namespace = "MyApp.OData",
-            MetadataList = [trippinMetadataV4]
         };
+        request.AddMetadata(trippinMetadataV4);
 
         var generator = new ClientGenerator(request);
 
@@ -337,9 +338,9 @@ global using System.Threading.Tasks;
         var request = new ClientRequest
         {
             Name = "TrippinClient",
-            Namespace = "MyApp.OData",
-            MetadataList = [trippinMetadataV4]
+            Namespace = "MyApp.OData"
         };
+        request.AddMetadata(trippinMetadataV4);
 
         var generator = new ClientGenerator(request);
         var files = generator.GenerateClient();

@@ -1,4 +1,5 @@
 ﻿using DemoClientV4.ODataDemo;
+using Linq2OData.Generator.Models;
 
 namespace Linq2OData.TestClients
 {
@@ -50,13 +51,14 @@ namespace Linq2OData.TestClients
             var httpClient = new HttpClient();
             var metadata = await httpClient.GetStringAsync(demoUrlV2 + "$metadata");
 
-            var generator = new Linq2OData.Generator.ClientGenerator(
-                new Linq2OData.Generator.Models.ClientRequest
-                {
-                    Name = "ODataDemoClientV2",
-                    Namespace = "DemoClientV2",
-                    MetadataList = [metadata]
-                });
+            var request = new Linq2OData.Generator.Models.ClientRequest
+            {
+                Name = "ODataDemoClientV2",
+                Namespace = "DemoClientV2",
+            };
+            request.AddMetadata(metadata);
+
+            var generator = new Linq2OData.Generator.ClientGenerator(request);
 
 
             var projectDirectory = Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName;
@@ -70,13 +72,14 @@ namespace Linq2OData.TestClients
             var httpClient = new HttpClient();
             var metadata = await httpClient.GetStringAsync(demoUrlV4 + "$metadata");
 
-            var generator = new Linq2OData.Generator.ClientGenerator(
-                new Linq2OData.Generator.Models.ClientRequest
-                {
-                    Name = "ODataDemoClientV4",
-                    Namespace = "DemoClientV4",
-                    MetadataList = [metadata]
-                });
+            var request = new Linq2OData.Generator.Models.ClientRequest
+            {
+                Name = "ODataDemoClientV4",
+                Namespace = "DemoClientV4",
+            };
+            request.AddMetadata(metadata);
+
+            var generator = new Linq2OData.Generator.ClientGenerator(request);
 
 
             var projectDirectory = Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName;

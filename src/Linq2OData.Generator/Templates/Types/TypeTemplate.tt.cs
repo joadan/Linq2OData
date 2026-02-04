@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Linq2OData.Generator.Templates.Types
 {
-    public partial class TypeTemplate(ODataEntityType entityType, string fullNamspace, string etityInterfaceName, IEnumerable<ODataEntityType> derivedTypes, string metadataNamespace)
+    public partial class TypeTemplate(ODataEntityType entityType, string fullNamspace, string? servicePath, string etityInterfaceName, IEnumerable<ODataEntityType> derivedTypes, string metadataNamespace)
     {
 
         public string BaseTypeAndInterface
@@ -49,7 +49,13 @@ namespace Linq2OData.Generator.Templates.Types
         {
             if (entityType.IsEntitySet)
             {
-                return $"[ODataEntitySet(\"{entityType.EntityPath}\")]";
+                if (string.IsNullOrWhiteSpace(servicePath))
+                {
+                    return $"[ODataEntitySet(\"{entityType.EntityPath}\")]";
+                }
+
+
+                return $"[ODataEntitySet(\"{servicePath}/{entityType.EntityPath}\")]";
             }
 
             return "";
