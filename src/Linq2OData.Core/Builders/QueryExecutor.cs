@@ -10,7 +10,7 @@ public class QueryExecutor<T, TResult>(QueryBuilder<T> queryBuilder, Expression<
 
     public async Task<ODataResponse<List<T>>?> ExecuteBaseAsync(CancellationToken cancellationToken = default)
     {
-        BaseResult = await queryBuilder.ODataClient.QueryEntitySetAsync<T>(queryBuilder.EntityPath, queryBuilder.select, queryBuilder.expand, queryBuilder.filter, queryBuilder.count, queryBuilder.top, queryBuilder.skip, cancellationToken);
+        BaseResult = await queryBuilder.ODataClient.QueryEntitySetAsync<T>(queryBuilder.EntityPath, queryBuilder.select, queryBuilder.expand, queryBuilder.filter, queryBuilder.count, queryBuilder.top, queryBuilder.skip, queryBuilder.orderby, cancellationToken);
         return BaseResult;
     }
 

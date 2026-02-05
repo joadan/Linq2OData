@@ -8,6 +8,8 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
 
     private ODataClient odataClient;
     private string entityPath;
+    private List<string> expandPaths = new();
+
     public QueryBuilder(ODataClient odataClient)
     {
         this.odataClient = odataClient;
@@ -21,6 +23,7 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
     internal string? select;
     internal string? expand;
     internal string? filter;
+    internal string? orderby;
 
     internal ODataClient ODataClient => odataClient;
     internal string EntityPath => entityPath;
@@ -46,7 +49,41 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
     public QueryBuilder<T> Expand(string? expand = null)
     {
         this.expand = expand;
+        this.expandPaths.Clear(); // Clear the list when using string-based expand
         return this;
+    }
+
+    /// <summary>
+    /// Expands a navigation property using a LINQ expression.
+    /// Supports multiple expands at the same level.
+    /// </summary>
+    /// <typeparam name="TProperty">The type of the property to expand.</typeparam>
+    /// <param name="expression">Expression selecting the property to expand.</param>
+    /// <returns>An ExpandBuilder for chaining nested expands.</returns>
+    public ExpandBuilder<T, TProperty> Expand<TProperty>(Expression<Func<T, TProperty>> expression)
+    {
+        var visitor = new ODataExpandVisitor(odataClient.ODataVersion);
+        var expandPath = visitor.ToExpand<T, TProperty>(expression);
+
+        // Add to the list of expand paths
+        expandPaths.Add(expandPath);
+
+        // Combine all expand paths with commas
+        this.expand = string.Join(",", expandPaths);
+
+        return new ExpandBuilder<T, TProperty>(this, expandPath);
+    }
+
+    /// <summary>
+    /// Internal method to update the last expand path from ExpandBuilder (for nested expands).
+    /// </summary>
+    internal void UpdateLastExpandPath(string updatedPath)
+    {
+        if (expandPaths.Count > 0)
+        {
+            expandPaths[expandPaths.Count - 1] = updatedPath;
+            this.expand = string.Join(",", expandPaths);
+        }
     }
 
     public QueryBuilder<T> Filter(string? filter = null)
@@ -62,9 +99,59 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
         return this;
     }
 
+    /// <summary>
+    /// Orders the results by a property in ascending order using a string.
+    /// </summary>
+    public QueryBuilder<T> Order(string? orderby = null)
+    {
+        this.orderby = orderby;
+        return this;
+    }
+
+    /// <summary>
+    /// Orders the results by a property in ascending order using a LINQ expression.
+    /// </summary>
+    /// <typeparam name="TProperty">The type of the property to order by.</typeparam>
+    /// <param name="expression">Expression selecting the property to order by.</param>
+    /// <returns>An OrderByBuilder for chaining ThenBy operations.</returns>
+    public OrderByBuilder<T> Order<TProperty>(Expression<Func<T, TProperty>> expression)
+    {
+        var visitor = new ODataOrderByVisitor();
+        var propertyName = visitor.ToOrderBy(expression);
+
+        this.orderby = propertyName;
+
+        return new OrderByBuilder<T>(this);
+    }
+
+    /// <summary>
+    /// Orders the results by a property in descending order using a LINQ expression.
+    /// </summary>
+    /// <typeparam name="TProperty">The type of the property to order by.</typeparam>
+    /// <param name="expression">Expression selecting the property to order by descending.</param>
+    /// <returns>An OrderByBuilder for chaining ThenBy operations.</returns>
+    public OrderByBuilder<T> OrderDescending<TProperty>(Expression<Func<T, TProperty>> expression)
+    {
+        var visitor = new ODataOrderByVisitor();
+        var propertyName = visitor.ToOrderBy(expression);
+
+        this.orderby = $"{propertyName} desc";
+
+        return new OrderByBuilder<T>(this);
+    }
+
+    /// <summary>
+    /// Internal method to append orderby clauses from OrderByBuilder.
+    /// </summary>
+    internal void AppendOrderBy(string propertyName, bool descending)
+    {
+        var visitor = new ODataOrderByVisitor();
+        this.orderby = visitor.AppendOrderBy(this.orderby ?? "", propertyName, descending);
+    }
+
     public async Task<List<T>?> ExecuteAsync(CancellationToken cancellationToken = default)
     {
-        var result = await odataClient.QueryEntitySetAsync<T>(EntityPath, select, expand, filter, count, top, skip, cancellationToken);
+        var result = await odataClient.QueryEntitySetAsync<T>(EntityPath, select, expand, filter, count, top, skip, orderby, cancellationToken);
         return result?.Data;
     }
 

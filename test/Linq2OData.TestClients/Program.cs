@@ -18,9 +18,9 @@ namespace Linq2OData.TestClients
             //await GenerateDemoClientV2Async();
             //await GenerateDemoClientV4Async();
 
-          //  await TestV2ClientAsync();
-            TestAddHocClient();
-        
+              await TestV2ClientAsync();
+            //TestAddHocClient();
+
         }
 
         private static void TestAddHocClient()
@@ -41,10 +41,41 @@ namespace Linq2OData.TestClients
 
             var clientV2 = new DemoClientV2.ODataDemoClientV2(httpClient);
 
-
+            // Simple expand with expression
             var queryResult = await clientV2
                .Query<DemoClientV2.ODataDemo.Supplier>()
-               .Expand("Products")
+               .Expand(e => e.Products)
+               .ExecuteAsync();
+
+            // Nested expand on collection using Select() - now supported!
+            var selectResult = await clientV2
+               .Query<DemoClientV2.ODataDemo.Supplier>()
+               .Expand(e => e.Products)
+                   .ThenExpand(p => p!.Select(e => e.Category))
+               .ExecuteAsync();
+
+            // OrderBy with expression
+            var orderedResult = await clientV2
+               .Query<DemoClientV2.ODataDemo.Supplier>()
+               .Order(s => s.Name)
+               .Top(10)
+               .ExecuteAsync();
+
+            // OrderByDescending with ThenBy
+            var complexOrderResult = await clientV2
+               .Query<DemoClientV2.ODataDemo.Supplier>()
+               .Filter(s => s.ID > 5)
+               .OrderDescending(s => s.ID)
+                   .ThenBy(s => s.Name)
+               .Top(10)
+               .ExecuteAsync();
+
+            // Multiple expands
+            var multipleExpandResult = await clientV2
+               .Query<DemoClientV2.ODataDemo.Supplier>()
+               .Order(s => s.Name)
+               .Expand(e => e.Products)
+               .Expand(e => e.Address)
                .ExecuteAsync();
 
         }
@@ -65,7 +96,7 @@ namespace Linq2OData.TestClients
                .Filter(e => e.ID > 4)
                .ExecuteAsync();
 
-            var result = await clientV4
+            var personResult = await clientV4
                .Get<Person>(e => e.ID = 1)
                .ExecuteAsync();
 
@@ -76,7 +107,7 @@ namespace Linq2OData.TestClients
 
 
 
-      private static async Task GenerateDemoClientV2Async()
+        private static async Task GenerateDemoClientV2Async()
         {
             var httpClient = new HttpClient();
             var metadata = await httpClient.GetStringAsync(demoUrlV2 + "$metadata");
