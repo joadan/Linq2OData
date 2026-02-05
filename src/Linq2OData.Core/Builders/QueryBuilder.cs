@@ -95,7 +95,7 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
     public QueryBuilder<T> Filter(Expression<Func<T, bool>> expression)
     {
         var oDataFilterVisitor = new ODataFilterVisitor();
-        this.filter = oDataFilterVisitor.ToFilter(expression);
+        this.filter = oDataFilterVisitor.ToFilter(expression, odataClient.ODataVersion);
         return this;
     }
 
