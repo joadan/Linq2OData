@@ -88,9 +88,9 @@ namespace Linq2OData.Core
         }
 
 
-        public async Task<ODataResponse<List<T>>?> QueryEntitySetAsync<T>(string entitySetName, string? select, string? expand = null, string? filter = null, bool? count = null, int? top = null, int? skip = null, CancellationToken token = default)
+        public async Task<ODataResponse<List<T>>?> QueryEntitySetAsync<T>(string entitySetName, string? select, string? expand = null, string? filter = null, bool? count = null, int? top = null, int? skip = null, string? orderby = null, CancellationToken token = default)
         {
-            var url = GenerateUrl(entitySetName: entitySetName, expand: expand, filter: filter, count: count, top: top, skip: skip);
+            var url = GenerateUrl(entitySetName: entitySetName, expand: expand, filter: filter, count: count, top: top, skip: skip, orderby: orderby);
 
             using var response = await httpClient.GetAsync(url, token);
 
@@ -129,7 +129,7 @@ namespace Linq2OData.Core
             return ProcessQueryResponse<T>(rawResponse);
         }
 
-        private string GenerateUrl(string entitySetName, string? keyString = null, string? expand = null, string? filter = null, bool? count = null, int? top = null, int? skip = null)
+        private string GenerateUrl(string entitySetName, string? keyString = null, string? expand = null, string? filter = null, bool? count = null, int? top = null, int? skip = null, string? orderby = null)
         {
 
             var urlBuilder = new StringBuilder();
@@ -159,6 +159,11 @@ namespace Linq2OData.Core
             if (!string.IsNullOrWhiteSpace(filter))
             {
                 queryParameters.Add($"$filter={filter}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(orderby))
+            {
+                queryParameters.Add($"$orderby={orderby}");
             }
 
             if (count == true)
