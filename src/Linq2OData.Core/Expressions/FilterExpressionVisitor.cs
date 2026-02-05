@@ -16,6 +16,7 @@ namespace Linq2OData.Core.Expressions
     public sealed class ODataFilterVisitor : ExpressionVisitor
     {
         private StringBuilder sb = new();
+        private ODataVersion odataVersion;
 
         #region Constants
         private static class ODataConstants
@@ -57,11 +58,12 @@ namespace Linq2OData.Core.Expressions
         /// <typeparam name="T">Type of the entity to create the filter from.</typeparam>
         /// <param name="expression">Expression to be converted to OData.</param>
         /// <returns>Converted OData.</returns>
-        public string ToFilter<T>(Expression<Func<T, bool>> expression)
+        public string ToFilter<T>(Expression<Func<T, bool>> expression, ODataVersion oDataVersion)
         {
             if (expression == null)
                 throw new ArgumentNullException(nameof(expression));
 
+            this.odataVersion = oDataVersion;
             sb = new StringBuilder();
             Visit(expression);
             return sb.ToString();
@@ -232,22 +234,22 @@ namespace Linq2OData.Core.Expressions
                 }
                 else if (m.Member is PropertyInfo propertyInfo)
                 {
-                    var exp = (MemberExpression)m.Expression;
-                    if (exp != null)
+                    if (m.Expression is MemberExpression exp)
                     {
-                        var constant = (ConstantExpression)exp.Expression;
-                        var fieldInfoValue = ((FieldInfo)exp.Member).GetValue(constant.Value);
+                        if (exp.Expression is ConstantExpression constant && exp.Member is FieldInfo fieldInfo)
+                        {
+                            var fieldInfoValue = fieldInfo.GetValue(constant.Value);
+                            value = propertyInfo.GetValue(fieldInfoValue, null);
+                            AppendByValueType(value, sb);
 
-                        value = propertyInfo.GetValue(fieldInfoValue, null);
-                        sb.Append(value);
-
-                        return m;
+                            return m;
+                        }
                     }
                     else
                     {
                         // static property
                         value = propertyInfo.GetValue(null);
-                        sb.Append(value);
+                        AppendByValueType(value, sb);
 
                         return m;
                     }
@@ -256,7 +258,7 @@ namespace Linq2OData.Core.Expressions
                 {
                     // static field
                     value = fieldInfo.GetValue(null);
-                    sb.Append(value);
+                    AppendByValueType(value, sb);
 
                     return m;
                 }
@@ -266,7 +268,7 @@ namespace Linq2OData.Core.Expressions
         #endregion
 
         #region Helpers
-        private static void AppendByValueType(object value, StringBuilder sb)
+        private void AppendByValueType(object value, StringBuilder sb)
         {
             if (value == null)
             {
@@ -274,7 +276,32 @@ namespace Linq2OData.Core.Expressions
                 return;
             }
 
-            switch (Type.GetTypeCode(value.GetType()))
+            var type = value.GetType();
+            var underlyingType = Nullable.GetUnderlyingType(type);
+
+            // Handle nullable types
+            if (underlyingType != null)
+            {
+                // This shouldn't happen due to boxing, but handle it just in case
+                var hasValueProperty = type.GetProperty("HasValue");
+                var valueProperty = type.GetProperty("Value");
+
+                if (hasValueProperty == null || valueProperty == null)
+                {
+                    throw new NotSupportedException($"Cannot access nullable properties for type '{type.Name}'");
+                }
+
+                var hasValue = (bool)hasValueProperty.GetValue(value)!;
+                if (!hasValue)
+                {
+                    sb.Append(ODataConstants.Null);
+                    return;
+                }
+                value = valueProperty.GetValue(value)!;
+                type = underlyingType;
+            }
+
+            switch (Type.GetTypeCode(type))
             {
                 case TypeCode.Boolean:
                     sb.Append(((bool)value) ? ODataConstants.True : ODataConstants.False);
@@ -285,23 +312,40 @@ namespace Linq2OData.Core.Expressions
                     sb.Append("'");
                     break;
                 case TypeCode.DateTime:
-                    sb.Append("'");
-                    sb.Append(value);
-                    sb.Append("'");
+                    sb.Append(FilterHelper.ToODataFilter((DateTime)value, odataVersion));
                     break;
                 case TypeCode.Object:
-                    throw new NotSupportedException($"The constant for '{value}' is not supported");
+                    if (value is DateTimeOffset dateTimeOffset)
+                    {
+                        sb.Append(FilterHelper.ToODataFilter(dateTimeOffset, odataVersion));
+                    }
+                    else
+                    {
+                        throw new NotSupportedException($"The constant for '{value}' is not supported");
+                    }
+                    break;
                 default:
                     sb.Append(value);
                     break;
             }
         }
 
-        private static object AccessMultipleMembers(object value, IEnumerable<string> memberAccessNames)
+        private static object? AccessMultipleMembers(object value, IEnumerable<string> memberAccessNames)
         {
             foreach (var accessName in memberAccessNames)
             {
-                value = value.GetType().GetProperty(accessName).GetValue(value);
+                var property = value.GetType().GetProperty(accessName);
+                if (property == null)
+                {
+                    throw new NotSupportedException($"Property '{accessName}' not found on type '{value.GetType().Name}'");
+                }
+
+                var nextValue = property.GetValue(value);
+                if (nextValue == null)
+                {
+                    return null;
+                }
+                value = nextValue;
             }
             return value;
         }

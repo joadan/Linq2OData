@@ -41,42 +41,24 @@ namespace Linq2OData.TestClients
 
             var clientV2 = new DemoClientV2.ODataDemoClientV2(httpClient);
 
+            var dateString = DateTime.UtcNow.ToString("O");
+
+            dateString = $"datetime'{dateString}'";
+
+            DateTime dt = DateTime.Now;
+            string odata = $"datetime'{dt:yyyy-MM-ddTHH:mm:ss}'";
+
+            string filter = "DiscontinuedDate lt " + dateString;
+
             // Simple expand with expression
             var queryResult = await clientV2
-               .Query<DemoClientV2.ODataDemo.Supplier>()
-               .Expand(e => e.Products)
+               .Query<DemoClientV2.ODataDemo.Product>()
+               .Filter(e => e.DiscontinuedDate == null)
+             // .Filter(filter)
                .ExecuteAsync();
 
-            // Nested expand on collection using Select() - now supported!
-            var selectResult = await clientV2
-               .Query<DemoClientV2.ODataDemo.Supplier>()
-               .Expand(e => e.Products)
-                   .ThenExpand(p => p!.Select(e => e.Category))
-               .ExecuteAsync();
+            var r = queryResult;
 
-            // OrderBy with expression
-            var orderedResult = await clientV2
-               .Query<DemoClientV2.ODataDemo.Supplier>()
-               .Order(s => s.Name)
-               .Top(10)
-               .ExecuteAsync();
-
-            // OrderByDescending with ThenBy
-            var complexOrderResult = await clientV2
-               .Query<DemoClientV2.ODataDemo.Supplier>()
-               .Filter(s => s.ID > 5)
-               .OrderDescending(s => s.ID)
-                   .ThenBy(s => s.Name)
-               .Top(10)
-               .ExecuteAsync();
-
-            // Multiple expands
-            var multipleExpandResult = await clientV2
-               .Query<DemoClientV2.ODataDemo.Supplier>()
-               .Order(s => s.Name)
-               .Expand(e => e.Products)
-               .Expand(e => e.Address)
-               .ExecuteAsync();
 
         }
 
