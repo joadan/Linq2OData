@@ -40,7 +40,7 @@ public class <#= request.Name #>
         return new UpdateBuilder<T>(odataClient, keySetter);
     }
 
-    public CreateBuilder<T> Create<T>(Action<T> keySetter) where T : <#= request.InterfaceName #>, new()
+    public CreateBuilder<T> Create<T>() where T : <#= request.InterfaceName #>, new()
     {
         return new CreateBuilder<T>(odataClient);
     }

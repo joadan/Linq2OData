@@ -20,7 +20,7 @@ public class OrderByExpressionTests
         public decimal Rating { get; set; }
         public DateTime JoinDate { get; set; }
         public TestAddress? Address { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Addresses")]
@@ -29,7 +29,7 @@ public class OrderByExpressionTests
         public int ID { get; set; }
         public string? City { get; set; }
         public string? Country { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Products")]
@@ -39,7 +39,7 @@ public class OrderByExpressionTests
         public string? Name { get; set; }
         public decimal Price { get; set; }
         public int Stock { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     #region ODataOrderByVisitor Tests

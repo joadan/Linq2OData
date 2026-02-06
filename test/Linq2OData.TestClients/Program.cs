@@ -14,10 +14,10 @@ namespace Linq2OData.TestClients
         {
             Console.WriteLine("Here we go!");
 
-            //await GenerateDemoClientV2Async();
-            //await GenerateDemoClientV4Async();
+            await GenerateDemoClientV2Async();
+            await GenerateDemoClientV4Async();
 
-            await TestV2ClientAsync();
+         //   await TestV2ClientAsync();
             //TestAddHocClient();
 
         }

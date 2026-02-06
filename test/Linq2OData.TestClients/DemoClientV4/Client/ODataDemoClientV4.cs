@@ -41,7 +41,7 @@ public class ODataDemoClientV4
         return new UpdateBuilder<T>(odataClient, keySetter);
     }
 
-    public CreateBuilder<T> Create<T>(Action<T> keySetter) where T : IDemoClientV4EntitySet, new()
+    public CreateBuilder<T> Create<T>() where T : IDemoClientV4EntitySet, new()
     {
         return new CreateBuilder<T>(odataClient);
     }

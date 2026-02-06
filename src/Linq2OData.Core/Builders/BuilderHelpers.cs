@@ -21,7 +21,7 @@ namespace Linq2OData.Core.Builders
             var entity = new T();
             keySetter(entity);
 
-            return entity.__Keys;
+            return entity.__Key;
         }
 
 

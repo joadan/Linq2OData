@@ -72,13 +72,16 @@ namespace Linq2OData.Core.Converters
 
         public override void Write(Utf8JsonWriter writer, List<T> value, JsonSerializerOptions options)
         {
-            // For serialization, just write the array directly
+            // This converter is only used for OData V2/V3, so always wrap in "results"
+            writer.WriteStartObject();
+            writer.WritePropertyName("results");
             writer.WriteStartArray();
             foreach (var item in value)
             {
                 JsonSerializer.Serialize(writer, item, options);
             }
             writer.WriteEndArray();
+            writer.WriteEndObject();
         }
     }
 }

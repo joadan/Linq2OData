@@ -20,7 +20,7 @@ public class ExpandExpressionTests
         public List<TestProduct>? Products { get; set; }
         public TestAddress? Address { get; set; }
         public List<TestLocation>? Locations { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Products")]
@@ -30,7 +30,7 @@ public class ExpandExpressionTests
         public string? Name { get; set; }
         public TestCategory? Category { get; set; }
         public TestManufacturer? Manufacturer { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Categories")]
@@ -38,7 +38,7 @@ public class ExpandExpressionTests
     {
         public int ID { get; set; }
         public string? Name { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Manufacturers")]
@@ -46,7 +46,7 @@ public class ExpandExpressionTests
     {
         public int ID { get; set; }
         public string? Name { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Addresses")]
@@ -56,7 +56,7 @@ public class ExpandExpressionTests
         public string? Street { get; set; }
         public string? City { get; set; }
         public TestCountry? Country { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Countries")]
@@ -64,7 +64,7 @@ public class ExpandExpressionTests
     {
         public int ID { get; set; }
         public string? Name { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Locations")]
@@ -73,7 +73,7 @@ public class ExpandExpressionTests
         public int ID { get; set; }
         public string? Name { get; set; }
         public TestAddress? Address { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Orders")]
@@ -82,7 +82,7 @@ public class ExpandExpressionTests
         public int ID { get; set; }
         public List<TestOrderDetail>? OrderDetails { get; set; }
         public TestCustomer? Customer { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     [ODataEntitySet("OrderDetails")]
@@ -90,7 +90,7 @@ public class ExpandExpressionTests
     {
         public int ID { get; set; }
         public TestProduct? Product { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Customers")]
@@ -99,7 +99,7 @@ public class ExpandExpressionTests
         public int ID { get; set; }
         public string? Name { get; set; }
         public TestAddress? Address { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     #region ODataExpandVisitor Tests

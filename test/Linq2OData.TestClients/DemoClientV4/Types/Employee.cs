@@ -4,11 +4,6 @@
 // </auto-generated>
 
 #nullable enable
-
-
-
-
-
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
 
@@ -18,22 +13,15 @@ namespace DemoClientV4.ODataDemo;
 [ODataEntitySet("Persons/ODataDemo.Employee")]
 public partial class Employee : ODataDemo.Person, IDemoClientV4EntitySet
 {
-
     [ODataMember("EmployeeID")]
     public long EmployeeID { get; set; }
-
     [ODataMember("HireDate")]
     public DateTimeOffset HireDate { get; set; }
-
     [ODataMember("Salary")]
     public float Salary { get; set; }
 
 
 
 
-
-
-
 }
-
 
