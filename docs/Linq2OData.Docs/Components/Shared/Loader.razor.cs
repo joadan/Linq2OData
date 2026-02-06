@@ -6,7 +6,7 @@ namespace Linq2OData.Docs.Components.Shared
     public partial class Loader
     {
 
-     [Parameter]  public string Title  { get; set; }
+        [Parameter] public string Title { get; set; } = "";
 
 
     }
