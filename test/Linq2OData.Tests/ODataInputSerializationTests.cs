@@ -81,7 +81,7 @@ public class ODataInputSerializationTests
 
         // Assert
         Assert.Equal("Test Product", jsonDoc.RootElement.GetProperty("Name").GetString());
-        
+
         // Single navigation property should be a plain object (not wrapped)
         var categoryProperty = jsonDoc.RootElement.GetProperty("Category");
         Assert.Equal(JsonValueKind.Object, categoryProperty.ValueKind);
@@ -164,7 +164,7 @@ public class ODataInputSerializationTests
 
         // Assert
         Assert.Equal("Test Product", jsonDoc.RootElement.GetProperty("Name").GetString());
-        
+
         // In V4, collection should be a plain array (no "results" wrapper)
         var tagsProperty = jsonDoc.RootElement.GetProperty("Tags");
         Assert.Equal(JsonValueKind.Array, tagsProperty.ValueKind);
@@ -197,7 +197,7 @@ public class ODataInputSerializationTests
 
         // Assert
         Assert.Equal("Test Product", jsonDoc.RootElement.GetProperty("Name").GetString());
-        
+
         // Null properties should not be present in the serialized JSON
         // (ODataInputBase.SetValue doesn't add null values)
         Assert.False(jsonDoc.RootElement.TryGetProperty("Category", out _));
@@ -232,6 +232,153 @@ public class ODataInputSerializationTests
         Assert.Equal(0, results.GetArrayLength());
     }
 
+    /// <summary>
+    /// Tests that nested ODataInputBase objects are serialized correctly by calling GetValues() recursively.
+    /// </summary>
+    [Fact]
+    public void ODataV2_SerializeInput_NestedODataInputBase_ShouldCallGetValuesRecursively()
+    {
+        // Arrange
+        var odataClient = new ODataClient(new HttpClient(), ODataVersion.V2);
+        var input = new TestProductInput
+        {
+            Name = "Test Product",
+            Price = 99.99m,
+            CategoryInput = new TestCategoryODataInput // This is also ODataInputBase
+            {
+                CategoryId = 5,
+                CategoryName = "Electronics"
+            }
+        };
+
+        // Act
+        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var jsonDoc = JsonDocument.Parse(json);
+
+        // Assert
+        Assert.Equal("Test Product", jsonDoc.RootElement.GetProperty("Name").GetString());
+
+        // Nested ODataInputBase should be serialized as an object with its properties
+        var categoryProperty = jsonDoc.RootElement.GetProperty("CategoryInput");
+        Assert.Equal(JsonValueKind.Object, categoryProperty.ValueKind);
+        Assert.Equal(5, categoryProperty.GetProperty("CategoryId").GetInt32());
+        Assert.Equal("Electronics", categoryProperty.GetProperty("CategoryName").GetString());
+    }
+
+    /// <summary>
+    /// Tests that deeply nested ODataInputBase objects are serialized correctly for OData V2.
+    /// </summary>
+    [Fact]
+    public void ODataV2_SerializeInput_DeeplyNestedODataInputBase_ShouldSerializeCorrectly()
+    {
+        // Arrange
+        var odataClient = new ODataClient(new HttpClient(), ODataVersion.V2);
+        var input = new TestOrderInput
+        {
+            OrderId = 123,
+            Product = new TestProductInput
+            {
+                Name = "Test Product",
+                Price = 99.99m,
+                CategoryInput = new TestCategoryODataInput
+                {
+                    CategoryId = 5,
+                    CategoryName = "Electronics"
+                }
+            }
+        };
+
+        // Act
+        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var jsonDoc = JsonDocument.Parse(json);
+
+        // Assert
+        Assert.Equal(123, jsonDoc.RootElement.GetProperty("OrderId").GetInt32());
+
+        var productProperty = jsonDoc.RootElement.GetProperty("Product");
+        Assert.Equal(JsonValueKind.Object, productProperty.ValueKind);
+        Assert.Equal("Test Product", productProperty.GetProperty("Name").GetString());
+
+        var categoryProperty = productProperty.GetProperty("CategoryInput");
+        Assert.Equal(JsonValueKind.Object, categoryProperty.ValueKind);
+        Assert.Equal(5, categoryProperty.GetProperty("CategoryId").GetInt32());
+        Assert.Equal("Electronics", categoryProperty.GetProperty("CategoryName").GetString());
+    }
+
+    /// <summary>
+    /// Tests that nested ODataInputBase with collections works correctly for OData V2.
+    /// </summary>
+    [Fact]
+    public void ODataV2_SerializeInput_NestedODataInputBaseWithCollections_ShouldWrapCollections()
+    {
+        // Arrange
+        var odataClient = new ODataClient(new HttpClient(), ODataVersion.V2);
+        var input = new TestOrderInput
+        {
+            OrderId = 123,
+            Product = new TestProductInput
+            {
+                Name = "Test Product",
+                Tags = new List<TestTagInput>
+                {
+                    new TestTagInput { TagId = 1, TagName = "Popular" }
+                }
+            }
+        };
+
+        // Act
+        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var jsonDoc = JsonDocument.Parse(json);
+
+        // Assert
+        var productProperty = jsonDoc.RootElement.GetProperty("Product");
+        var tagsProperty = productProperty.GetProperty("Tags");
+
+        // Collection should be wrapped in "results"
+        Assert.Equal(JsonValueKind.Object, tagsProperty.ValueKind);
+        Assert.True(tagsProperty.TryGetProperty("results", out var results));
+        Assert.Equal(JsonValueKind.Array, results.ValueKind);
+        Assert.Single(results.EnumerateArray());
+    }
+
+    /// <summary>
+    /// Tests that nested ODataInputBase objects work correctly for OData V4 (no wrappers).
+    /// </summary>
+    [Fact]
+    public void ODataV4_SerializeInput_NestedODataInputBase_ShouldSerializeWithoutWrappers()
+    {
+        // Arrange
+        var odataClient = new ODataClient(new HttpClient(), ODataVersion.V4);
+        var input = new TestProductInput
+        {
+            Name = "Test Product",
+            CategoryInput = new TestCategoryODataInput
+            {
+                CategoryId = 5,
+                CategoryName = "Electronics"
+            },
+            Tags = new List<TestTagInput>
+            {
+                new TestTagInput { TagId = 1, TagName = "Popular" }
+            }
+        };
+
+        // Act
+        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var jsonDoc = JsonDocument.Parse(json);
+
+        // Assert
+        // Nested ODataInputBase should be a plain object
+        var categoryProperty = jsonDoc.RootElement.GetProperty("CategoryInput");
+        Assert.Equal(JsonValueKind.Object, categoryProperty.ValueKind);
+        Assert.Equal(5, categoryProperty.GetProperty("CategoryId").GetInt32());
+
+        // Collections should be plain arrays (no "results" wrapper in V4)
+        var tagsProperty = jsonDoc.RootElement.GetProperty("Tags");
+        Assert.Equal(JsonValueKind.Array, tagsProperty.ValueKind);
+        Assert.Single(tagsProperty.EnumerateArray());
+    }
+
     // Test input classes
     private class TestProductInput : ODataInputBase
     {
@@ -258,12 +405,48 @@ public class ODataInputSerializationTests
             get => GetValue<List<TestTagInput>?>(nameof(Tags));
             set => SetValue(nameof(Tags), value);
         }
+
+        public TestCategoryODataInput? CategoryInput
+        {
+            get => GetValue<TestCategoryODataInput?>(nameof(CategoryInput));
+            set => SetValue(nameof(CategoryInput), value);
+        }
+    }
+
+    private class TestOrderInput : ODataInputBase
+    {
+        public int OrderId
+        {
+            get => GetValue<int>(nameof(OrderId));
+            set => SetValue(nameof(OrderId), value);
+        }
+
+        public TestProductInput? Product
+        {
+            get => GetValue<TestProductInput?>(nameof(Product));
+            set => SetValue(nameof(Product), value);
+        }
     }
 
     private class TestCategoryInput
     {
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } = "";
+    }
+
+    private class TestCategoryODataInput : ODataInputBase
+    {
+        public int CategoryId
+        {
+            get => GetValue<int>(nameof(CategoryId));
+            set => SetValue(nameof(CategoryId), value);
+        }
+
+        public string? CategoryName
+        {
+            get => GetValue<string?>(nameof(CategoryName));
+            set => SetValue(nameof(CategoryName), value);
+        }
     }
 
     private class TestTagInput
