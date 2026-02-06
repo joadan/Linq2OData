@@ -176,10 +176,11 @@ public class ODataInputSerializationTests
     }
 
     /// <summary>
-    /// Tests that null navigation properties are handled correctly for OData V2.
+    /// Tests that explicitly set null navigation properties are serialized as null for OData V2.
+    /// This is important for UPDATE operations where you want to clear a value.
     /// </summary>
     [Fact]
-    public void ODataV2_SerializeInput_NullNavigationProperties_ShouldSerializeAsNull()
+    public void ODataV2_SerializeInput_ExplicitlySetNullNavigationProperties_ShouldSerializeAsNull()
     {
         // Arrange
         var odataClient = new ODataClient(new HttpClient(), ODataVersion.V2);
@@ -187,8 +188,8 @@ public class ODataInputSerializationTests
         {
             Name = "Test Product",
             Price = 99.99m,
-            Category = null,
-            Tags = null
+            Category = null,  // Explicitly set to null
+            Tags = null       // Explicitly set to null
         };
 
         // Act
@@ -198,10 +199,42 @@ public class ODataInputSerializationTests
         // Assert
         Assert.Equal("Test Product", jsonDoc.RootElement.GetProperty("Name").GetString());
 
-        // Null properties should not be present in the serialized JSON
-        // (ODataInputBase.SetValue doesn't add null values)
+        // Explicitly set null properties SHOULD be present in the serialized JSON
+        // This is important for UPDATE operations where you want to clear a value
+        Assert.True(jsonDoc.RootElement.TryGetProperty("Category", out var categoryElement));
+        Assert.Equal(JsonValueKind.Null, categoryElement.ValueKind);
+
+        Assert.True(jsonDoc.RootElement.TryGetProperty("Tags", out var tagsElement));
+        Assert.Equal(JsonValueKind.Null, tagsElement.ValueKind);
+    }
+
+    /// <summary>
+    /// Tests that properties that are never set are NOT included in the serialized JSON.
+    /// This demonstrates the difference between "not set" and "explicitly set to null".
+    /// </summary>
+    [Fact]
+    public void ODataV2_SerializeInput_NeverSetProperties_ShouldNotBeInJson()
+    {
+        // Arrange
+        var odataClient = new ODataClient(new HttpClient(), ODataVersion.V2);
+        var input = new TestProductInput
+        {
+            Name = "Test Product",
+            Price = 99.99m
+            // Category and Tags are never set (not even to null)
+        };
+
+        // Act
+        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var jsonDoc = JsonDocument.Parse(json);
+
+        // Assert
+        Assert.Equal("Test Product", jsonDoc.RootElement.GetProperty("Name").GetString());
+
+        // Properties that were never set should NOT be in the JSON at all
         Assert.False(jsonDoc.RootElement.TryGetProperty("Category", out _));
         Assert.False(jsonDoc.RootElement.TryGetProperty("Tags", out _));
+        Assert.False(jsonDoc.RootElement.TryGetProperty("CategoryInput", out _));
     }
 
     /// <summary>

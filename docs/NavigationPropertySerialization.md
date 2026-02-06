@@ -110,6 +110,11 @@ public ODataClient(HttpClient httpClient, ODataVersion odataVersion)
 ```
 
 **Key Points:**
+- `ODataInputBase.SetValue()` **stores all values**, including nulls
+- This allows distinguishing between:
+  - **Property never set**: Not in the dictionary, not in JSON
+  - **Property explicitly set to null**: In the dictionary with null value, appears as `null` in JSON
+- This is crucial for UPDATE operations where you might want to clear a value by setting it to null
 - `ODataInputBaseConverter` is registered for **all** OData versions to handle nested `ODataInputBase` objects
 - Version-specific converters (collection and navigation property converters) are only registered for V2/V3
 - For OData V4, only the `ODataInputBaseConverter` is used, and default JSON serialization applies
