@@ -31,7 +31,7 @@ public class ODataInputSerializationTests
         };
 
         // Act
-        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var json = JsonSerializer.Serialize(input, odataClient.JsonOptions);
         var jsonDoc = JsonDocument.Parse(json);
 
         // Assert
@@ -76,7 +76,7 @@ public class ODataInputSerializationTests
         };
 
         // Act
-        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var json = JsonSerializer.Serialize(input, odataClient.JsonOptions);
         var jsonDoc = JsonDocument.Parse(json);
 
         // Assert
@@ -120,7 +120,7 @@ public class ODataInputSerializationTests
         };
 
         // Act
-        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var json = JsonSerializer.Serialize(input, odataClient.JsonOptions);
         var jsonDoc = JsonDocument.Parse(json);
 
         // Assert
@@ -159,7 +159,7 @@ public class ODataInputSerializationTests
         };
 
         // Act
-        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var json = JsonSerializer.Serialize(input, odataClient.JsonOptions);
         var jsonDoc = JsonDocument.Parse(json);
 
         // Assert
@@ -193,7 +193,7 @@ public class ODataInputSerializationTests
         };
 
         // Act
-        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var json = JsonSerializer.Serialize(input, odataClient.JsonOptions);
         var jsonDoc = JsonDocument.Parse(json);
 
         // Assert
@@ -225,16 +225,21 @@ public class ODataInputSerializationTests
         };
 
         // Act
-        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var json = JsonSerializer.Serialize(input, odataClient.JsonOptions);
         var jsonDoc = JsonDocument.Parse(json);
 
         // Assert
         Assert.Equal("Test Product", jsonDoc.RootElement.GetProperty("Name").GetString());
 
+       
+
+
+
+
         // Properties that were never set should NOT be in the JSON at all
+        Assert.False(jsonDoc.RootElement.TryGetProperty("ProductGroup", out _));
         Assert.False(jsonDoc.RootElement.TryGetProperty("Category", out _));
         Assert.False(jsonDoc.RootElement.TryGetProperty("Tags", out _));
-        Assert.False(jsonDoc.RootElement.TryGetProperty("CategoryInput", out _));
     }
 
     /// <summary>
@@ -253,7 +258,7 @@ public class ODataInputSerializationTests
         };
 
         // Act
-        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var json = JsonSerializer.Serialize(input, odataClient.JsonOptions);
         var jsonDoc = JsonDocument.Parse(json);
 
         // Assert
@@ -277,25 +282,27 @@ public class ODataInputSerializationTests
         {
             Name = "Test Product",
             Price = 99.99m,
-            CategoryInput = new TestCategoryODataInput // This is also ODataInputBase
+            Category = new TestCategoryInput // Nested ODataInputBase
             {
                 CategoryId = 5,
-                CategoryName = "Electronics"
             }
         };
 
         // Act
-        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var json = JsonSerializer.Serialize(input, odataClient.JsonOptions);
         var jsonDoc = JsonDocument.Parse(json);
 
         // Assert
         Assert.Equal("Test Product", jsonDoc.RootElement.GetProperty("Name").GetString());
 
         // Nested ODataInputBase should be serialized as an object with its properties
-        var categoryProperty = jsonDoc.RootElement.GetProperty("CategoryInput");
+        var categoryProperty = jsonDoc.RootElement.GetProperty("Category");
         Assert.Equal(JsonValueKind.Object, categoryProperty.ValueKind);
         Assert.Equal(5, categoryProperty.GetProperty("CategoryId").GetInt32());
-        Assert.Equal("Electronics", categoryProperty.GetProperty("CategoryName").GetString());
+
+
+        Assert.False(categoryProperty.TryGetProperty("CategoryName", out _), "CategoryName should not be in the json");
+
     }
 
     /// <summary>
@@ -313,7 +320,7 @@ public class ODataInputSerializationTests
             {
                 Name = "Test Product",
                 Price = 99.99m,
-                CategoryInput = new TestCategoryODataInput
+                Category = new TestCategoryInput
                 {
                     CategoryId = 5,
                     CategoryName = "Electronics"
@@ -322,7 +329,7 @@ public class ODataInputSerializationTests
         };
 
         // Act
-        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var json = JsonSerializer.Serialize(input, odataClient.JsonOptions);
         var jsonDoc = JsonDocument.Parse(json);
 
         // Assert
@@ -332,7 +339,7 @@ public class ODataInputSerializationTests
         Assert.Equal(JsonValueKind.Object, productProperty.ValueKind);
         Assert.Equal("Test Product", productProperty.GetProperty("Name").GetString());
 
-        var categoryProperty = productProperty.GetProperty("CategoryInput");
+        var categoryProperty = productProperty.GetProperty("Category");
         Assert.Equal(JsonValueKind.Object, categoryProperty.ValueKind);
         Assert.Equal(5, categoryProperty.GetProperty("CategoryId").GetInt32());
         Assert.Equal("Electronics", categoryProperty.GetProperty("CategoryName").GetString());
@@ -360,7 +367,7 @@ public class ODataInputSerializationTests
         };
 
         // Act
-        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var json = JsonSerializer.Serialize(input, odataClient.JsonOptions);
         var jsonDoc = JsonDocument.Parse(json);
 
         // Assert
@@ -385,7 +392,7 @@ public class ODataInputSerializationTests
         var input = new TestProductInput
         {
             Name = "Test Product",
-            CategoryInput = new TestCategoryODataInput
+            Category = new TestCategoryInput
             {
                 CategoryId = 5,
                 CategoryName = "Electronics"
@@ -397,12 +404,12 @@ public class ODataInputSerializationTests
         };
 
         // Act
-        var json = JsonSerializer.Serialize(input.GetValues(), odataClient.JsonOptions);
+        var json = JsonSerializer.Serialize(input, odataClient.JsonOptions);
         var jsonDoc = JsonDocument.Parse(json);
 
         // Assert
         // Nested ODataInputBase should be a plain object
-        var categoryProperty = jsonDoc.RootElement.GetProperty("CategoryInput");
+        var categoryProperty = jsonDoc.RootElement.GetProperty("Category");
         Assert.Equal(JsonValueKind.Object, categoryProperty.ValueKind);
         Assert.Equal(5, categoryProperty.GetProperty("CategoryId").GetInt32());
 
@@ -412,7 +419,7 @@ public class ODataInputSerializationTests
         Assert.Single(tagsProperty.EnumerateArray());
     }
 
-    // Test input classes
+    // Test input classes - all derive from ODataInputBase for consistency
     private class TestProductInput : ODataInputBase
     {
         public string? Name
@@ -427,6 +434,12 @@ public class ODataInputSerializationTests
             set => SetValue(nameof(Price), value);
         }
 
+        public string? ProductGroup
+        {
+            get => GetValue<string?>(nameof(ProductGroup));
+            set => SetValue(nameof(ProductGroup), value);
+        }
+
         public TestCategoryInput? Category
         {
             get => GetValue<TestCategoryInput?>(nameof(Category));
@@ -437,12 +450,6 @@ public class ODataInputSerializationTests
         {
             get => GetValue<List<TestTagInput>?>(nameof(Tags));
             set => SetValue(nameof(Tags), value);
-        }
-
-        public TestCategoryODataInput? CategoryInput
-        {
-            get => GetValue<TestCategoryODataInput?>(nameof(CategoryInput));
-            set => SetValue(nameof(CategoryInput), value);
         }
     }
 
@@ -461,13 +468,7 @@ public class ODataInputSerializationTests
         }
     }
 
-    private class TestCategoryInput
-    {
-        public int CategoryId { get; set; }
-        public string CategoryName { get; set; } = "";
-    }
-
-    private class TestCategoryODataInput : ODataInputBase
+    private class TestCategoryInput : ODataInputBase
     {
         public int CategoryId
         {
@@ -482,9 +483,25 @@ public class ODataInputSerializationTests
         }
     }
 
-    private class TestTagInput
+    private class TestTagInput : ODataInputBase
     {
-        public int TagId { get; set; }
-        public string TagName { get; set; } = "";
+        public int TagId
+        {
+            get => GetValue<int>(nameof(TagId));
+            set => SetValue(nameof(TagId), value);
+        }
+
+        public string? TagName
+        {
+            get => GetValue<string?>(nameof(TagName));
+            set => SetValue(nameof(TagName), value);
+        }
+
+        public string? TagGroup
+        {
+            get => GetValue<string?>(nameof(TagGroup));
+            set => SetValue(nameof(TagGroup), value);
+        }
     }
 }
+
