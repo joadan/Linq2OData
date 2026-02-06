@@ -22,7 +22,10 @@ namespace Linq2OData.Core
             this.odataVersion = odataVersion;
             jsonOptions = new JsonSerializerOptions();
 
-            if (odataVersion < ODataVersion.V4) 
+            // Add ODataInputBase converter for all versions to handle nested Input objects
+            jsonOptions.Converters.Add(new ODataInputBaseConverter());
+
+            if (odataVersion < ODataVersion.V4) //Not really sure about this but I belive it is a good start
             {
                 jsonOptions.Converters.Add(new MicrosoftDateTimeConverter());
                 jsonOptions.Converters.Add(new MicrosoftNullableDateTimeConverter());
@@ -30,7 +33,9 @@ namespace Linq2OData.Core
                 jsonOptions.Converters.Add(new DecimalStringJsonConverter());
                 jsonOptions.Converters.Add(new Int64StringJsonConverter());
                 jsonOptions.Converters.Add(new NullableInt64StringJsonConverter());
+                // Add the collection converter for handling "results" wrapper in navigation properties (read/write)
                 jsonOptions.Converters.Add(new ODataCollectionConverterFactory());
+                // Add the navigation property converter for handling "__deferred" wrapper in non-expanded properties
                 jsonOptions.Converters.Add(new ODataNavigationPropertyConverterFactory());
             }
 
