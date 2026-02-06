@@ -27,8 +27,47 @@ namespace Linq2OData.Core.Converters
             // Get the dictionary representation of the input object
             var values = value.GetValues();
 
-            // Serialize the dictionary, which will recursively handle nested ODataInputBase objects
-            JsonSerializer.Serialize(writer, values, options);
+            // Write the JSON object directly
+            writer.WriteStartObject();
+
+            foreach (var kvp in values)
+            {
+                writer.WritePropertyName(kvp.Key);
+                WriteValue(writer, kvp.Value, options);
+            }
+
+            writer.WriteEndObject();
+        }
+
+        /// <summary>
+        /// Writes a single value, recursively handling ODataInputBase objects and collections.
+        /// </summary>
+        private void WriteValue(Utf8JsonWriter writer, object? value, JsonSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNullValue();
+                return;
+            }
+
+            // If it's an ODataInputBase, recursively write its GetValues()
+            if (value is ODataInputBase inputBase)
+            {
+                Write(writer, inputBase, options);
+                return;
+            }
+
+            // If it's a list/collection, write as array
+            if (value is System.Collections.IEnumerable enumerable && value is not string)
+            {
+                // Use JsonSerializer to handle the collection with registered converters
+                // (like ODataCollectionConverter for wrapping in "results")
+                JsonSerializer.Serialize(writer, value, value.GetType(), options);
+                return;
+            }
+
+            // For all other types, use JsonSerializer
+            JsonSerializer.Serialize(writer, value, value.GetType(), options);
         }
     }
 }

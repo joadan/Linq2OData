@@ -22,8 +22,8 @@ namespace Linq2OData.Core
             this.odataVersion = odataVersion;
             jsonOptions = new JsonSerializerOptions();
 
-            // Add ODataInputBase converter for all versions to handle nested Input objects
-            jsonOptions.Converters.Add(new ODataInputBaseConverter());
+            // Add ODataInputBase converter factory for all versions to handle nested Input objects
+            jsonOptions.Converters.Add(new ODataInputBaseConverterFactory());
 
             if (odataVersion < ODataVersion.V4) //Not really sure about this but I belive it is a good start
             {
@@ -56,7 +56,7 @@ namespace Linq2OData.Core
 
         public async Task<T> CreateEntityAsync<T>(string entitysetName, ODataInputBase input)
         {
-            string json = JsonSerializer.Serialize(input.GetValues(), jsonOptions);
+            string json = JsonSerializer.Serialize(input, jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync($"{entitysetName}", content);
 
@@ -75,7 +75,7 @@ namespace Linq2OData.Core
 
         public async Task<bool> UpdateEntityAsync(string entitysetName, string keyExpression, ODataInputBase input)
         {
-            string json = JsonSerializer.Serialize(input.GetValues(), jsonOptions);
+            string json = JsonSerializer.Serialize(input, jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var request = new HttpRequestMessage(new HttpMethod("MERGE"), $"{entitysetName}({keyExpression})")
             {
