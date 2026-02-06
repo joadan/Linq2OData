@@ -23,7 +23,7 @@ public partial class Category  : IDemoClientV2EntitySet, ICategoryKeys
     public int ID { get; set; }
 
     [ODataMember("Name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
 
 

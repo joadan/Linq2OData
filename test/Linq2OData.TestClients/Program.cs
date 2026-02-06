@@ -1,7 +1,6 @@
 ﻿using DemoClientV4.ODataDemo;
 using Linq2OData.Generator.Models;
 using Linq2OData.TestClients.AdHocClient;
-using Swegon.SAP.S4Client.API_SALES_ORDER_SRV;
 
 namespace Linq2OData.TestClients
 {
@@ -18,7 +17,7 @@ namespace Linq2OData.TestClients
             //await GenerateDemoClientV2Async();
             //await GenerateDemoClientV4Async();
 
-              await TestV2ClientAsync();
+            await TestV2ClientAsync();
             //TestAddHocClient();
 
         }
@@ -26,10 +25,7 @@ namespace Linq2OData.TestClients
         private static void TestAddHocClient()
         {
             var odataClient = new Linq2OData.Core.ODataClient(new HttpClient(), Core.ODataVersion.V2);
-            var result = odataClient.ProcessQueryResponse<List<A_SalesOrderType>>(SampleData.SalesOrderCollection);
-
-            var count = result.Data.Count;
-
+         
         }
 
         private static async Task TestV2ClientAsync()

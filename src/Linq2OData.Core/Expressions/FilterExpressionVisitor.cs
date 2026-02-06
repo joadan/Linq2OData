@@ -145,7 +145,7 @@ namespace Linq2OData.Core.Expressions
 
         protected override Expression VisitConstant(ConstantExpression c)
         {
-            AppendByValueType(c.Value, sb);
+            AppendByValueType(c.Value!, sb);
             return c;
         }
 
@@ -181,7 +181,7 @@ namespace Linq2OData.Core.Expressions
 
                 if (expression is ConstantExpression constantExpression)
                 {
-                    var value = constantExpression.Value;
+                    var value = constantExpression.Value!;
                     value = AccessMultipleMembers(value, memberAccessNames);
                     AppendByValueType(value, sb);
                     return m;
@@ -199,7 +199,7 @@ namespace Linq2OData.Core.Expressions
                     if (memberExpression.Member is FieldInfo fieldInfo && fieldInfo.IsStatic)
                     {
                         // static field
-                        var value = fieldInfo.GetValue(null);
+                        var value = fieldInfo.GetValue(null)!;
                         value = AccessMultipleMembers(value, memberAccessNames.Skip(1));
                         AppendByValueType(value, sb);
                         return m;
@@ -207,7 +207,7 @@ namespace Linq2OData.Core.Expressions
                     else if (memberExpression.Member is PropertyInfo propertyInfo)
                     {
                         // static property
-                        var value = propertyInfo.GetValue(null);
+                        var value = propertyInfo.GetValue(null)!;
                         value = AccessMultipleMembers(value, memberAccessNames.Skip(1));
                         AppendByValueType(value, sb);
                         return m;
@@ -216,7 +216,7 @@ namespace Linq2OData.Core.Expressions
             }
             else
             {
-                object value;
+                object? value;
                 if (m.Expression is ConstantExpression constantExpression)
                 {
                     if (m.Member is FieldInfo fieldInfo)
@@ -238,7 +238,7 @@ namespace Linq2OData.Core.Expressions
                     {
                         if (exp.Expression is ConstantExpression constant && exp.Member is FieldInfo fieldInfo)
                         {
-                            var fieldInfoValue = fieldInfo.GetValue(constant.Value);
+                            var fieldInfoValue = fieldInfo.GetValue(constant.Value)!;
                             value = propertyInfo.GetValue(fieldInfoValue, null);
                             AppendByValueType(value, sb);
 
@@ -248,7 +248,7 @@ namespace Linq2OData.Core.Expressions
                     else
                     {
                         // static property
-                        value = propertyInfo.GetValue(null);
+                        value = propertyInfo.GetValue(null)!;
                         AppendByValueType(value, sb);
 
                         return m;
@@ -257,7 +257,7 @@ namespace Linq2OData.Core.Expressions
                 else if (m.Member is FieldInfo fieldInfo && fieldInfo.IsStatic)
                 {
                     // static field
-                    value = fieldInfo.GetValue(null);
+                    value = fieldInfo.GetValue(null)!;
                     AppendByValueType(value, sb);
 
                     return m;
@@ -268,7 +268,7 @@ namespace Linq2OData.Core.Expressions
         #endregion
 
         #region Helpers
-        private void AppendByValueType(object value, StringBuilder sb)
+        private void AppendByValueType(object? value, StringBuilder sb)
         {
             if (value == null)
             {
@@ -348,20 +348,6 @@ namespace Linq2OData.Core.Expressions
                 value = nextValue;
             }
             return value;
-        }
-
-        private static Expression StripQuotes(Expression e)
-        {
-            while (e.NodeType == ExpressionType.Quote)
-            {
-                e = ((UnaryExpression)e).Operand;
-            }
-            return e;
-        }
-
-        private static bool IsNullConstant(Expression exp)
-        {
-            return exp is ConstantExpression constantExpression && constantExpression.Value == null;
         }
         #endregion
     }
