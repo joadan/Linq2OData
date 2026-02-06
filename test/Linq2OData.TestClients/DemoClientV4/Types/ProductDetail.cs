@@ -23,7 +23,7 @@ public partial class ProductDetail  : IDemoClientV4EntitySet, IProductDetailKeys
     public int ProductID { get; set; }
 
     [ODataMember("Details")]
-    public string Details { get; set; }
+    public string? Details { get; set; }
 
 
 

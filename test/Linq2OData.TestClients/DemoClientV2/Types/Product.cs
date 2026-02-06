@@ -23,10 +23,10 @@ public partial class Product  : IDemoClientV2EntitySet, IProductKeys
     public int ID { get; set; }
 
     [ODataMember("Name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [ODataMember("Description")]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     [ODataMember("ReleaseDate")]
     public DateTime ReleaseDate { get; set; }

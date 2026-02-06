@@ -29,7 +29,7 @@ public partial class PersonDetail  : IDemoClientV4EntitySet, IPersonDetailKeys
     public bool Gender { get; set; }
 
     [ODataMember("Phone")]
-    public string Phone { get; set; }
+    public string? Phone { get; set; }
 
     [ODataMember("Address")]
     public Address? Address { get; set; }

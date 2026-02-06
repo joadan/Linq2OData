@@ -124,14 +124,15 @@ internal static class MetadataExtensions
             }
         }
 
+        internal bool IsPrimitiveType => property.DataType.StartsWith("Edm.") ? true : false;
+
         internal string CSharpType
         {
             get
             {
-
                 var csharpType = property.CSharpTypeRaw;
 
-                if (property.Nullable && csharpType != "string")
+                if (property.Nullable || csharpType == "string" || (!property.IsPrimitiveType && !property.IsEnumType))
                 {
                     return csharpType + "?";
                 }

@@ -23,7 +23,7 @@ public partial class Advertisement  : IDemoClientV4EntitySet, IAdvertisementKeys
     public Guid ID { get; set; }
 
     [ODataMember("Name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [ODataMember("AirDate")]
     public DateTimeOffset AirDate { get; set; }

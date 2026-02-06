@@ -23,10 +23,10 @@ public partial class Supplier  : IDemoClientV2EntitySet, ISupplierKeys
     public int ID { get; set; }
 
     [ODataMember("Name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [ODataMember("Address")]
-    public Address Address { get; set; }
+    public Address? Address { get; set; }
 
     [ODataMember("Concurrency")]
     public int Concurrency { get; set; }

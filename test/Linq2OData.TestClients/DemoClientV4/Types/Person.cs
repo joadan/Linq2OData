@@ -27,7 +27,7 @@ public partial class Person  : IDemoClientV4EntitySet, IPersonKeys
     public int ID { get; set; }
 
     [ODataMember("Name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
 
 
