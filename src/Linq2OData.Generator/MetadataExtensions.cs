@@ -64,7 +64,7 @@ internal static class MetadataExtensions
         {
             get
             {
-                if (DataType.Equals("edm.string", StringComparison.CurrentCultureIgnoreCase))
+                if (property.DataType.Equals("edm.string", StringComparison.InvariantCultureIgnoreCase))
                 {
                     return $"{property.Name}='{{{property.Name}}}'";
                 }

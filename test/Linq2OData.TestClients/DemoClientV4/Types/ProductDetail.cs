@@ -4,11 +4,6 @@
 // </auto-generated>
 
 #nullable enable
-
-
-
-
-
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
 
@@ -18,31 +13,20 @@ namespace DemoClientV4.ODataDemo;
 [ODataEntitySet("ProductDetails")]
 public partial class ProductDetail  : IDemoClientV4EntitySet, IProductDetailKeys
 {
-
     [ODataMember("ProductID")]
     public int ProductID { get; set; }
-
     [ODataMember("Details")]
     public string? Details { get; set; }
-
-
 
     [ODataMember("Product")]
     public Product? Product { get; set; }
 
-
-
- public string __Keys => $"ProductID={ProductID}"; 
-
+ public string __Key => $"ProductID={ProductID}"; 
 
 
 }
-
 
 public interface IProductDetailKeys
 {
-
 	int ProductID { get; set; }
-    
-}
-
+    }

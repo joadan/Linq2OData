@@ -4,11 +4,6 @@
 // </auto-generated>
 
 #nullable enable
-
-
-
-
-
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
 
@@ -19,15 +14,10 @@ namespace DemoClientV4.ODataDemo;
 public partial class FeaturedProduct : ODataDemo.Product, IDemoClientV4EntitySet
 {
 
-
-
     [ODataMember("Advertisement")]
     public Advertisement? Advertisement { get; set; }
 
 
 
-
-
 }
-
 

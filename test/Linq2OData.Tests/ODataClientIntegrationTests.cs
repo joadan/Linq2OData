@@ -143,7 +143,7 @@ public class ODataClientIntegrationTests
         public string SalesOrder { get; set; } = "";
         public string SalesOrderType { get; set; } = "";
         public List<TestSalesOrderItem>? to_Item { get; set; }
-        public string __Keys => $"SalesOrder={SalesOrder}";
+        public string __Key => $"SalesOrder={SalesOrder}";
     }
 
     private class TestSalesOrderItem : IODataEntitySet
@@ -151,6 +151,6 @@ public class ODataClientIntegrationTests
         public string SalesOrder { get; set; } = "";
         public string SalesOrderItem { get; set; } = "";
         public string Material { get; set; } = "";
-        public string __Keys => $"SalesOrder={SalesOrder},SalesOrderItem={SalesOrderItem}";
+        public string __Key => $"SalesOrder={SalesOrder},SalesOrderItem={SalesOrderItem}";
     }
 }

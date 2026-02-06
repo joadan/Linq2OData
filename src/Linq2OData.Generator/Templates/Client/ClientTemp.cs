@@ -97,7 +97,7 @@ namespace Linq2OData.Generator.Templates.Client
             #line default
             #line hidden
             this.Write(", new()\r\n    {\r\n        return new UpdateBuilder<T>(odataClient, keySetter);\r\n   " +
-                    " }\r\n\r\n    public CreateBuilder<T> Create<T>(Action<T> keySetter) where T : ");
+                    " }\r\n\r\n    public CreateBuilder<T> Create<T>() where T : ");
             
             #line 43 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.InterfaceName));

@@ -23,7 +23,7 @@ public class FilterExpressionTests
         public DateTimeOffset LastModified { get; set; }
         public DateTimeOffset? LastChecked { get; set; }
         public TestCategory? Category { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Categories")]
@@ -31,7 +31,7 @@ public class FilterExpressionTests
     {
         public int ID { get; set; }
         public string? Name { get; set; }
-        public string __Keys => $"ID={ID}";
+        public string __Key => $"ID={ID}";
     }
 
     #region Basic Comparison Tests

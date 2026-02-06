@@ -4,11 +4,6 @@
 // </auto-generated>
 
 #nullable enable
-
-
-
-
-
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
 
@@ -18,16 +13,11 @@ namespace DemoClientV4.ODataDemo;
 [ODataEntitySet("Persons/ODataDemo.Customer")]
 public partial class Customer : ODataDemo.Person, IDemoClientV4EntitySet
 {
-
     [ODataMember("TotalExpense")]
     public decimal TotalExpense { get; set; }
 
 
 
 
-
-
-
 }
-
 
