@@ -256,11 +256,33 @@ namespace Linq2OData.Core
             }
             else
             {
+                root = ReorderODataTypeFirst(root);
                 response.Data = root.Deserialize<T>(jsonOptions);
             }
 
             return response;
 
+        }
+
+        private JsonNode ReorderODataTypeFirst(JsonNode node)
+        {
+            if (node is not JsonObject jsonObject) return node;
+
+            var odataType = jsonObject["@odata.type"];
+            if (odataType == null) return node;
+
+            var reordered = new JsonObject();
+            reordered["@odata.type"] = odataType.DeepClone();
+
+            foreach (var property in jsonObject)
+            {
+                if (property.Key != "@odata.type")
+                {
+                    reordered[property.Key] = property.Value?.DeepClone();
+                }
+            }
+
+            return reordered;
         }
 
         private ODataResponse<T>? ProcessQueryResponseV1_3<T>(JsonNode root, bool isCollection)

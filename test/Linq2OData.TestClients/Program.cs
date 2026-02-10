@@ -59,17 +59,11 @@ namespace Linq2OData.TestClients
             var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
 
             var queryResult = await clientV4
-            .Get<Person>(e=> e.ID = 4)
-            //.Select(e => new { e.PersonDetail, e.ID })
+            .Get<Person>(e => e.ID = 4)
+           
             .ExecuteAsync();
 
             var r = queryResult;
-
-
-         
-
-
-
 
         }
 

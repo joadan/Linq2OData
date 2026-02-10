@@ -76,36 +76,36 @@ namespace Linq2OData.Core.Expressions
             var complexChildren = Children.Where(c => c.IsComplex).ToList();
 
             if (oDataVersion == ODataVersion.V4)
-            {
-                // OData v4: supports nested select and expand within parentheses
-                var parts = new List<string>();
-
-                if (!string.IsNullOrEmpty(selectedProps))
                 {
-                    parts.Add(selectedProps);
-                }
+                    // OData v4: supports nested select and expand within parentheses
+                    var parts = new List<string>();
 
-                if (complexChildren.Any())
-                {
-                    var nestedExpands = complexChildren
-                        .Select(c => c.BuildExpand(oDataVersion))
-                        .Where(e => !string.IsNullOrEmpty(e));
-
-                    if (nestedExpands.Any())
+                    if (!string.IsNullOrEmpty(selectedProps))
                     {
-                        parts.Add(string.Join(",", nestedExpands));
+                        parts.Add($"$select={selectedProps}");
+                    }
+
+                    if (complexChildren.Any())
+                    {
+                        var nestedExpands = complexChildren
+                            .Select(c => c.BuildExpand(oDataVersion))
+                            .Where(e => !string.IsNullOrEmpty(e));
+
+                        if (nestedExpands.Any())
+                        {
+                            parts.Add($"$expand={string.Join(",", nestedExpands)}");
+                        }
+                    }
+
+                    if (parts.Any())
+                    {
+                        return $"{Name}({string.Join(";", parts)})";
+                    }
+                    else
+                    {
+                        return Name;
                     }
                 }
-
-                if (parts.Any())
-                {
-                    return $"{Name}({string.Join(";", parts)})";
-                }
-                else
-                {
-                    return Name;
-                }
-            }
             else
             {
                 // OData v2/v3: no nested select, only expand
