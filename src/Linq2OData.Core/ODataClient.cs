@@ -91,7 +91,7 @@ namespace Linq2OData.Core
         }
 
 
-        public async Task<ODataResponse<List<T>>?> QueryEntitySetAsync<T>(string entitySetName, string? select, string? expand = null, string? filter = null, bool? count = null, int? top = null, int? skip = null, string? orderby = null, CancellationToken token = default)
+        public async Task<ODataResponse<List<T>>> QueryEntitySetAsync<T>(string entitySetName, string? select, string? expand = null, string? filter = null, bool? count = null, int? top = null, int? skip = null, string? orderby = null, CancellationToken token = default)
         {
             var url = GenerateUrl(entitySetName: entitySetName, select: select, expand: expand, filter: filter, count: count, top: top, skip: skip, orderby: orderby);
 
@@ -99,10 +99,7 @@ namespace Linq2OData.Core
 
             if (!response.IsSuccessStatusCode)
             {
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                {
-                    return null;
-                }
+               
 
                 await ValidateResponseAsync(response);
             }
@@ -197,34 +194,29 @@ namespace Linq2OData.Core
 
 
 
-        internal ODataResponse<T>? ProcessQueryResponse<T>(string rawResponse)
+        internal ODataResponse<T> ProcessQueryResponse<T>(string rawResponse)
         {
             if (string.IsNullOrWhiteSpace(rawResponse))
             {
-                return null;
+               throw new Exception("Response content is empty.");
             }
 
-            //if (odataVersion != ODataVersion.V4)
-            //{
-            //    rawResponse = ODataJsonCleanupHelper.Clean(rawResponse);
-            //}
 
             JsonNode? root = JsonNode.Parse(rawResponse);
 
             if (root == null)
             {
-                return null;
+                throw new Exception("Response content is not json.");
             }
-
-            var isCollection = IsCollection<T>();
 
             if (odataVersion == ODataVersion.V4)
             {
+                var isCollection = IsCollection<T>();
                 return ProcessQueryResponseV4<T>(root, isCollection);
             }
             else
             {
-                return ProcessQueryResponseV1_3<T>(root, isCollection);
+                return ProcessQueryResponseV1_3<T>(root);
             }
         }
 
@@ -233,7 +225,7 @@ namespace Linq2OData.Core
             return typeof(IEnumerable).IsAssignableFrom(typeof(T));
         }
 
-        private ODataResponse<T>? ProcessQueryResponseV4<T>(JsonNode root, bool isCollection)
+        private ODataResponse<T> ProcessQueryResponseV4<T>(JsonNode root, bool isCollection)
         {
             var response = new ODataResponse<T>();
             if (isCollection)
@@ -242,8 +234,9 @@ namespace Linq2OData.Core
                 var results = root["value"];
                 if (results == null)
                 {
-                    return null;
+                   throw new Exception("Expected 'value' property in OData v4 collection response.");
                 }
+              
                 response.Data = results.Deserialize<T>(jsonOptions);
                 var countNode = root["@odata.count"];
                 if (countNode != null)
@@ -285,10 +278,11 @@ namespace Linq2OData.Core
             return reordered;
         }
 
-        private ODataResponse<T>? ProcessQueryResponseV1_3<T>(JsonNode root, bool isCollection)
+
+        private ODataResponse<T> ProcessQueryResponseV1_3<T>(JsonNode root)
         {
             var d = root["d"];
-            if (d == null) { return null; }
+            if (d == null) {  throw new Exception("json property 'd' not found");  }
 
             JsonNode? results = null;
             if (d.GetValueKind() == JsonValueKind.Object)
@@ -316,6 +310,8 @@ namespace Linq2OData.Core
             }
             return response;
         }
+
+     
 
 
         private async Task ValidateResponseAsync(HttpResponseMessage response)

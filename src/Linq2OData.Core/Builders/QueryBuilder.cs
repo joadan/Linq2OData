@@ -28,6 +28,8 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
     internal ODataClient ODataClient => odataClient;
     internal string EntityPath => entityPath;
 
+    internal QueryNode? queryNode;
+
     public QueryBuilder<T> Top(int? top)
     {
         this.top = top;
@@ -53,15 +55,26 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
         return this;
     }
 
- 
+    internal QueryNode MergeExpression<TResult>(Expression<Func<List<T>, TResult>> selector)
+    {
+        var visitor = new QueryNodeVisitor();
+        var node = visitor.Parse(selector);
+        if (queryNode == null)
+        {
+            queryNode = node;
+        }
+        else
+        {
+            queryNode.AddMergeChildren(node);
+        }
+
+        return queryNode;
+    }
+
 
     public QueryBuilder<T> Expand<TResult>(Expression<Func<List<T>, TResult>> selector)
     {
-
-        var visitor = new QueryNodeVisitor();
-        var node = visitor.Parse(selector);
-        expand = node.GetOnlyExpand(odataClient.ODataVersion);
-
+         expand = MergeExpression(selector).GetOnlyExpand(odataClient.ODataVersion);
         return this;
     }
 
@@ -152,7 +165,7 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
 
     public QueryProjectionBuilder<T, TResult> Select<TResult>(Expression<Func<List<T>, TResult>> selector)
     {
-       
+
         return new QueryProjectionBuilder<T, TResult>(this, selector);
     }
 }

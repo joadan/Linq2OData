@@ -20,8 +20,8 @@ public class GetProjectionBuilder<T, TResult>(GetBuilder<T> getBuilder, Expressi
 
     private void SetProjection()
     {
-        var visitor = new QueryNodeVisitor();
-        var node = visitor.Parse(selector);
+      
+        var node = getBuilder.MergeExpression(selector);
         var projected = node.GetSelectExpand(getBuilder.ODataClient.ODataVersion);
 
         getBuilder.select = projected.select;
@@ -31,7 +31,7 @@ public class GetProjectionBuilder<T, TResult>(GetBuilder<T> getBuilder, Expressi
     public async Task<TResult?> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         await ExecuteBaseAsync(cancellationToken);
-        if (BaseResult == null)
+        if (BaseResult == null || BaseResult.Data == null)
         {
             return default;
         }

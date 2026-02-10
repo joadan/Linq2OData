@@ -17,8 +17,8 @@ namespace Linq2OData.TestClients
             //  await GenerateDemoClientV2Async();
             //  await GenerateDemoClientV4Async();
 
-            // await TestV2ClientAsync();
-            await TestV4ClientAsync();
+             await TestV2ClientAsync();
+           // await TestV4ClientAsync();
             //TestAddHocClient();
 
 
@@ -42,9 +42,9 @@ namespace Linq2OData.TestClients
             var queryResult = await clientV2
                .Query<DemoClientV2.ODataDemo.Product>()
                .Filter(e => e.ID != 1)
-               .Count()
-               .Expand("e => e.Category")
-               .Select(e => e.Select(f => new { f.Name, f.ID, CategoryProducts = f.Category!.Products }))
+            //   .Count()
+               
+             //  .Select(e => e.Select(f => new { f.Name, f.ID, CategoryProducts = f.Category!.Products }))
                .ExecuteAsync();
 
             var r = queryResult;
@@ -62,8 +62,9 @@ namespace Linq2OData.TestClients
             var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
 
             var queryResult = await clientV4
-            .Get<Person>(e => e.ID = 4)
-            .Expand(e => e.PersonDetail!.Person)
+            .Get<Product>(e => e.ID = 4)
+            .Expand(e => e.Categories)
+            .Expand(e => e.Supplier)
             .ExecuteAsync();
 
             var r = queryResult;

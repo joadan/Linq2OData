@@ -20,8 +20,7 @@ public class QueryProjectionBuilder<T, TResult>(QueryBuilder<T> queryBuilder, Ex
 
     private void SetProjection()
     {
-        var visitor = new QueryNodeVisitor();
-        var node = visitor.Parse(selector);
+        var node = queryBuilder.MergeExpression(selector);
         var projected = node.GetSelectExpand(queryBuilder.ODataClient.ODataVersion);
 
         queryBuilder.select = projected.select;

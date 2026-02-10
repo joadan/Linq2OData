@@ -184,8 +184,15 @@ namespace Linq2OData.Core.Expressions
         }
 
 
-       
+        public void AddMergeChildren(QueryNode queryNode)
+        {
+            foreach (var child in queryNode.Children)
+            {
+                AddOrMergeChild(child);
+            }
 
+
+        }
 
 
         public void AddOrMergeChild(QueryNode child)
@@ -199,7 +206,10 @@ namespace Linq2OData.Core.Expressions
             if (existing != null)
             {
                 foreach (var grandChild in child.Children)
+                {
                     existing.AddOrMergeChild(grandChild);
+                }
+
             }
             else
             {
