@@ -41,6 +41,9 @@ namespace Linq2OData.TestClients
 
             var queryResult = await clientV2
                .Query<DemoClientV2.ODataDemo.Product>()
+               .Filter(e => e.ID != 1)
+               .Count()
+               .Expand("e => e.Category")
                .Select(e => e.Select(f => new { f.Name, f.ID, CategoryProducts = f.Category!.Products }))
                .ExecuteAsync();
 
@@ -60,7 +63,7 @@ namespace Linq2OData.TestClients
 
             var queryResult = await clientV4
             .Get<Person>(e => e.ID = 4)
-           
+            .Expand(e => e.PersonDetail!.Person)
             .ExecuteAsync();
 
             var r = queryResult;

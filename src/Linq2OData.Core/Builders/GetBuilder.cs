@@ -1,4 +1,6 @@
-﻿using System.Linq.Expressions;
+﻿using Linq2OData.Core.Expressions;
+using System.Linq.Expressions;
+using System.Reflection.PortableExecutable;
 using static System.Net.WebRequestMethods;
 
 namespace Linq2OData.Core.Builders;
@@ -40,17 +42,21 @@ public class GetBuilder<T> where T : IODataEntitySet, new()
         this.expand = expand;
         return this;
     }
-    public GetExecutor<T, T> Select(string? select = null)
+
+    public GetBuilder<T> Expand<TResult>(Expression<Func<T, TResult>> selector)
     {
-        this.select = select;
-        return new GetExecutor<T, T>(this, null);
+
+        var visitor = new SelectExpressionVisitor();
+        var node = visitor.Parse(selector);
+        expand = node.GetOnlyExpand(odataClient.ODataVersion);
+
+        return this;
     }
+
 
     public GetProjectionBuilder<T, TResult> Select<TResult>(Expression<Func<T, TResult>> selector)
     {
         return new GetProjectionBuilder<T, TResult>(this, selector);
     }   
-
-
 
 }

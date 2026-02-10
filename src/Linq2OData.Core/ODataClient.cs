@@ -324,7 +324,6 @@ namespace Linq2OData.Core
             {
                 return;
             }
-
             var content = await response.Content.ReadAsStringAsync();
 
             ODataError odataError = new ODataError();

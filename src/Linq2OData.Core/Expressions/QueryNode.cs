@@ -33,6 +33,16 @@ namespace Linq2OData.Core.Expressions
 
         private string SelectedProperties => string.Join(",", Children.Where(e => !e.IsComplex).Select(e => e.Name));
 
+
+
+        public string GetOnlyExpand(ODataVersion oDataVersion)
+        {
+            if (!IsRoot)
+                return "";
+
+            return BuildExpandForChildren(oDataVersion, includeSelect: false);
+        }
+
         public (string select, string expand) GetSelectExpand(ODataVersion oDataVersion)
         {
             var select = "";
@@ -49,87 +59,99 @@ namespace Linq2OData.Core.Expressions
                     //In OData v2/v3, we have to explicitly select complex and none at the root level, otherwise they won't be included in the response
                     select = string.Join(",", Children.Select(e => e.Name));
                 }
-               
 
-                // Build expand string for complex children
-                var expandParts = new List<string>();
-                foreach (var child in Children.Where(c => c.IsComplex))
-                {
-                    var childExpand = child.BuildExpand(oDataVersion);
-                    if (!string.IsNullOrEmpty(childExpand))
-                    {
-                        expandParts.Add(childExpand);
-                    }
-                }
-                expand = string.Join(",", expandParts);
+                expand = BuildExpandForChildren(oDataVersion, includeSelect: true);
             }
 
             return (select, expand);
         }
 
-        private string BuildExpand(ODataVersion oDataVersion)
+        private string BuildExpandForChildren(ODataVersion oDataVersion, bool includeSelect)
+        {
+            var expandParts = new List<string>();
+            foreach (var child in Children.Where(c => c.IsComplex))
+            {
+                var childExpand = child.BuildExpand(oDataVersion, includeSelect);
+                if (!string.IsNullOrEmpty(childExpand))
+                {
+                    expandParts.Add(childExpand);
+                }
+            }
+            return string.Join(",", expandParts);
+        }
+
+        private string BuildExpand(ODataVersion oDataVersion, bool includeSelect)
         {
             if (string.IsNullOrEmpty(Name))
                 return "";
 
-            var selectedProps = SelectedProperties;
             var complexChildren = Children.Where(c => c.IsComplex).ToList();
 
             if (oDataVersion == ODataVersion.V4)
-                {
-                    // OData v4: supports nested select and expand within parentheses
-                    var parts = new List<string>();
-
-                    if (!string.IsNullOrEmpty(selectedProps))
-                    {
-                        parts.Add($"$select={selectedProps}");
-                    }
-
-                    if (complexChildren.Any())
-                    {
-                        var nestedExpands = complexChildren
-                            .Select(c => c.BuildExpand(oDataVersion))
-                            .Where(e => !string.IsNullOrEmpty(e));
-
-                        if (nestedExpands.Any())
-                        {
-                            parts.Add($"$expand={string.Join(",", nestedExpands)}");
-                        }
-                    }
-
-                    if (parts.Any())
-                    {
-                        return $"{Name}({string.Join(";", parts)})";
-                    }
-                    else
-                    {
-                        return Name;
-                    }
-                }
+            {
+                return BuildExpandV4(includeSelect, complexChildren);
+            }
             else
             {
-                // OData v2/v3: no nested select, only expand
-                if (complexChildren.Any())
-                {
-                    // Build nested path like "Orders/OrderDetails"
-                    var nestedPaths = new List<string>();
-                    foreach (var child in complexChildren)
-                    {
-                        var childPath = child.BuildExpandPath();
-                        if (!string.IsNullOrEmpty(childPath))
-                        {
-                            nestedPaths.Add($"{Name}/{childPath}");
-                        }
-                    }
+                return BuildExpandV2V3(complexChildren);
+            }
+        }
 
-                    if (nestedPaths.Any())
+        private string BuildExpandV4(bool includeSelect, List<QueryNode> complexChildren)
+        {
+            var parts = new List<string>();
+
+            if (includeSelect)
+            {
+                var selectedProps = SelectedProperties;
+                if (!string.IsNullOrEmpty(selectedProps))
+                {
+                    parts.Add($"$select={selectedProps}");
+                }
+            }
+
+            if (complexChildren.Any())
+            {
+                var nestedExpands = complexChildren
+                    .Select(c => c.BuildExpand(ODataVersion.V4, includeSelect))
+                    .Where(e => !string.IsNullOrEmpty(e));
+
+                if (nestedExpands.Any())
+                {
+                    parts.Add($"$expand={string.Join(",", nestedExpands)}");
+                }
+            }
+
+            if (parts.Any())
+            {
+                return $"{Name}({string.Join(";", parts)})";
+            }
+
+            return Name;
+        }
+
+        private string BuildExpandV2V3(List<QueryNode> complexChildren)
+        {
+            // OData v2/v3: no nested select, only slash-separated expand paths
+            if (complexChildren.Any())
+            {
+                var nestedPaths = new List<string>();
+                foreach (var child in complexChildren)
+                {
+                    var childPath = child.BuildExpandPath();
+                    if (!string.IsNullOrEmpty(childPath))
                     {
-                        return string.Join(",", nestedPaths);
+                        nestedPaths.Add($"{Name}/{childPath}");
                     }
                 }
 
-                return Name;
+                if (nestedPaths.Any())
+                {
+                    return string.Join(",", nestedPaths);
+                }
             }
+
+            return Name;
         }
 
         private string BuildExpandPath()
