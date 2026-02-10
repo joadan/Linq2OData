@@ -82,7 +82,6 @@ var products = await client
 var suppliers = await client
     .Query<Supplier>()
     .Expand(s => s.Products)
-        .ThenExpand(products => products.Select(p => p.Category))
     .Filter(s => s.Country == "USA")
     .ExecuteAsync();
 ```
@@ -108,31 +107,27 @@ var suppliers = await client
 ### Expanding Related Data
 
 ```csharp
-// Simple expand - single navigation property
+// Expand single navigation property
 .Expand(s => s.Address)
 
 // Expand collection navigation property
 .Expand(s => s.Orders)
 
-// Nested expand - chain through single properties
-.Expand(o => o.Customer)
-    .ThenExpand(c => c.Address)
-    .ThenExpand(a => a.Country)
+// Nested expand - chain properties directly
+.Expand(s => s.Customer.Address)
+.Expand(s => s.Customer.Address.Country)
 
-// Nested expand on collections - use Select() for collection navigation
-.Expand(s => s.Products)
-    .ThenExpand(products => products.Select(p => p.Category))
-    .ThenExpand(categories => categories.Select(c => c.Department))
-
-// Multiple expands at root level
+// Multiple root-level expands
 .Expand(s => s.Products)
 .Expand(s => s.Address)
 .Expand(s => s.Orders)
 ```
 
+**Note:** Each `.Expand()` call adds another navigation property to expand. For nested navigation, chain properties using dot notation (e.g., `s.Customer.Address.Country`).
+
 **OData Version Differences (handled automatically):**  
-- **v4**: `$expand=Products($expand=Category)`  
-- **v2/v3**: `$expand=Products/Category`
+- **v4**: `$expand=Customer($expand=Address($expand=Country))`  
+- **v2/v3**: `$expand=Customer/Address/Country`
 
 ### Ordering & Pagination
 
