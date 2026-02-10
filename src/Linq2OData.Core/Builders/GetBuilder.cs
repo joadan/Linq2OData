@@ -1,4 +1,5 @@
-﻿using static System.Net.WebRequestMethods;
+﻿using System.Linq.Expressions;
+using static System.Net.WebRequestMethods;
 
 namespace Linq2OData.Core.Builders;
 
@@ -45,6 +46,10 @@ public class GetBuilder<T> where T : IODataEntitySet, new()
         return new GetExecutor<T, T>(this, null);
     }
 
+    public GetProjectionBuilder<T, TResult> Select<TResult>(Expression<Func<T, TResult>> selector)
+    {
+        return new GetProjectionBuilder<T, TResult>(this, selector);
+    }   
 
 
 

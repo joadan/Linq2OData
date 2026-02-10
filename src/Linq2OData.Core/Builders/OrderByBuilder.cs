@@ -134,20 +134,13 @@ namespace Linq2OData.Core.Builders
         }
 
         /// <summary>
-        /// Configures the select clause without specifying properties (returns all).
-        /// </summary>
-        public ProjectionBuilder<TEntity, List<TEntity>> Select()
-        {
-            return queryBuilder.Select();
-        }
-
-        /// <summary>
         /// Configures the select clause with a custom selector expression.
         /// </summary>
-        public ProjectionBuilder<TEntity, TResult> Select<TResult>(Expression<Func<List<TEntity>, TResult>> selector)
+        public QueryProjectionBuilder<TEntity, TResult> Select<TResult>(Expression<Func<List<TEntity>, TResult>> selector)
         {
             return queryBuilder.Select(selector);
         }
+
 
         /// <summary>
         /// Returns the QueryBuilder to continue building the query.

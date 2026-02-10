@@ -40,12 +40,125 @@ namespace Linq2OData.Core.Expressions
 
             if (IsRoot)
             {
-                select= SelectedProperties;
+                if (oDataVersion == ODataVersion.V4)
+                {
+                    select = SelectedProperties;
+                }
+                else
+                {
+                    //In OData v2/v3, we have to explicitly select complex and none at the root level, otherwise they won't be included in the response
+                    select = string.Join(",", Children.Select(e => e.Name));
+                }
+               
+
+                // Build expand string for complex children
+                var expandParts = new List<string>();
+                foreach (var child in Children.Where(c => c.IsComplex))
+                {
+                    var childExpand = child.BuildExpand(oDataVersion);
+                    if (!string.IsNullOrEmpty(childExpand))
+                    {
+                        expandParts.Add(childExpand);
+                    }
+                }
+                expand = string.Join(",", expandParts);
             }
 
-
-
             return (select, expand);
+        }
+
+        private string BuildExpand(ODataVersion oDataVersion)
+        {
+            if (string.IsNullOrEmpty(Name))
+                return "";
+
+            var selectedProps = SelectedProperties;
+            var complexChildren = Children.Where(c => c.IsComplex).ToList();
+
+            if (oDataVersion == ODataVersion.V4)
+            {
+                // OData v4: supports nested select and expand within parentheses
+                var parts = new List<string>();
+
+                if (!string.IsNullOrEmpty(selectedProps))
+                {
+                    parts.Add(selectedProps);
+                }
+
+                if (complexChildren.Any())
+                {
+                    var nestedExpands = complexChildren
+                        .Select(c => c.BuildExpand(oDataVersion))
+                        .Where(e => !string.IsNullOrEmpty(e));
+
+                    if (nestedExpands.Any())
+                    {
+                        parts.Add(string.Join(",", nestedExpands));
+                    }
+                }
+
+                if (parts.Any())
+                {
+                    return $"{Name}({string.Join(";", parts)})";
+                }
+                else
+                {
+                    return Name;
+                }
+            }
+            else
+            {
+                // OData v2/v3: no nested select, only expand
+                if (complexChildren.Any())
+                {
+                    // Build nested path like "Orders/OrderDetails"
+                    var nestedPaths = new List<string>();
+                    foreach (var child in complexChildren)
+                    {
+                        var childPath = child.BuildExpandPath();
+                        if (!string.IsNullOrEmpty(childPath))
+                        {
+                            nestedPaths.Add($"{Name}/{childPath}");
+                        }
+                    }
+
+                    if (nestedPaths.Any())
+                    {
+                        return string.Join(",", nestedPaths);
+                    }
+                }
+
+                return Name;
+            }
+        }
+
+        private string BuildExpandPath()
+        {
+            if (string.IsNullOrEmpty(Name))
+                return "";
+
+            var complexChildren = Children.Where(c => c.IsComplex).ToList();
+
+            if (complexChildren.Any())
+            {
+                // Build nested paths
+                var paths = new List<string>();
+                foreach (var child in complexChildren)
+                {
+                    var childPath = child.BuildExpandPath();
+                    if (!string.IsNullOrEmpty(childPath))
+                    {
+                        paths.Add($"{Name}/{childPath}");
+                    }
+                }
+
+                if (paths.Any())
+                {
+                    return string.Join(",", paths);
+                }
+            }
+
+            return Name;
         }
 
 

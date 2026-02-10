@@ -158,15 +158,9 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
 
 
 
-    public ProjectionBuilder<T, List<T>> Select()
-    {
-        this.select = null;
-        return new ProjectionBuilder<T, List<T>>(this, null);
-    }
-
-    public ProjectionBuilder<T, TResult> Select<TResult>(Expression<Func<List<T>, TResult>> selector)
+    public QueryProjectionBuilder<T, TResult> Select<TResult>(Expression<Func<List<T>, TResult>> selector)
     {
        
-        return new ProjectionBuilder<T, TResult>(this, selector);
+        return new QueryProjectionBuilder<T, TResult>(this, selector);
     }
 }

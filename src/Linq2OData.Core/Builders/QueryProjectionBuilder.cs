@@ -5,18 +5,14 @@ using System.Linq.Expressions;
 namespace Linq2OData.Core.Builders;
 
 
-public class ProjectionBuilder<T, TResult>(QueryBuilder<T> queryBuilder, Expression<Func<List<T>, TResult>>? selector) where T : IODataEntitySet, new()
+
+public class QueryProjectionBuilder<T, TResult>(QueryBuilder<T> queryBuilder, Expression<Func<List<T>, TResult>> selector) where T : IODataEntitySet, new()
 {
     public ODataResponse<List<T>>? BaseResult { get; set; }
 
     public async Task<ODataResponse<List<T>>?> ExecuteBaseAsync(CancellationToken cancellationToken = default)
     {
-        if (selector != null)
-        {
-            SetProjection();
-        }
-      
-
+        SetProjection();
         BaseResult = await queryBuilder.ODataClient.QueryEntitySetAsync<T>(queryBuilder.EntityPath, queryBuilder.select, queryBuilder.expand, queryBuilder.filter, queryBuilder.count, queryBuilder.top, queryBuilder.skip, queryBuilder.orderby, cancellationToken);
         return BaseResult;
     }
@@ -24,28 +20,21 @@ public class ProjectionBuilder<T, TResult>(QueryBuilder<T> queryBuilder, Express
 
     private void SetProjection()
     {
-        if (selector == null) { return; }
         var visitor = new SelectExpressionVisitor();
         var node = visitor.Parse(selector);
-
         var projected = node.GetSelectExpand(queryBuilder.ODataClient.ODataVersion);
 
         queryBuilder.select = projected.select;
-      //  queryBuilder.expand = projected.select;
-
-
+        queryBuilder.expand = projected.expand;
     }
 
     public async Task<TResult?> ExecuteAsync(CancellationToken cancellationToken = default)
     {
         await ExecuteBaseAsync(cancellationToken);
-
         if (BaseResult?.Data == null)
         {
             return default;
         }
-
-        if (selector == null) { return (TResult?)(object)BaseResult.Data; }
 
         return selector.Compile().Invoke(BaseResult.Data);
 
