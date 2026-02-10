@@ -23,7 +23,16 @@ dotnet add package Linq2OData.Generator
 
 ### 1. Generate Client from Metadata
 
-The typical workflow is to generate a type-safe client from your OData service's `$metadata`:
+The typical workflow is to generate a type-safe client from your OData service's `$metadata`.
+
+**Option A: Use the Web Generator**
+
+Visit **[https://joadan.github.io/Linq2OData/generate-client](https://joadan.github.io/Linq2OData/generate-client)** to:
+- Upload your `$metadata` XML file(s)
+- Configure client name and namespace
+- Download generated client as a ZIP file
+
+**Option B: Programmatic Generation**
 
 ```csharp
 using Linq2OData.Generator;
@@ -45,7 +54,7 @@ var generator = new ClientGenerator(request);
 generator.GenerateClient(outputFolder: "./Generated");
 ```
 
-This generates:
+**What Gets Generated:**
 - **Client class** with typed query builders (`MyODataClient.cs`)
 - **Entity types** in `Types/` folder - all your data models
 - **Input types** in `Inputs/` folder - for create/update operations  
@@ -99,25 +108,31 @@ var suppliers = await client
 ### Expanding Related Data
 
 ```csharp
-// Simple expand
+// Simple expand - single navigation property
+.Expand(s => s.Address)
+
+// Expand collection navigation property
 .Expand(s => s.Orders)
 
-// Nested expands (automatically handles v2/v3 vs v4 syntax)
+// Nested expand - chain through single properties
 .Expand(o => o.Customer)
     .ThenExpand(c => c.Address)
+    .ThenExpand(a => a.Country)
 
-// Collection expands
+// Nested expand on collections - use Select() for collection navigation
 .Expand(s => s.Products)
     .ThenExpand(products => products.Select(p => p.Category))
+    .ThenExpand(categories => categories.Select(c => c.Department))
 
-// Multiple expands
+// Multiple expands at root level
 .Expand(s => s.Products)
 .Expand(s => s.Address)
+.Expand(s => s.Orders)
 ```
 
-**OData v4**: `$expand=Products($expand=Category)`  
-**OData v2/v3**: `$expand=Products/Category`  
-*The library handles this automatically based on your service version*
+**OData Version Differences (handled automatically):**  
+- **v4**: `$expand=Products($expand=Category)`  
+- **v2/v3**: `$expand=Products/Category`
 
 ### Ordering & Pagination
 
