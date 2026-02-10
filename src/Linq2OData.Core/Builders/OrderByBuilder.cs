@@ -117,13 +117,6 @@ namespace Linq2OData.Core.Builders
             return queryBuilder.Expand(expand);
         }
 
-        /// <summary>
-        /// Expands navigation properties using a LINQ expression.
-        /// </summary>
-        public ExpandBuilder<TEntity, TProperty> Expand<TProperty>(Expression<Func<TEntity, TProperty>> expression)
-        {
-            return queryBuilder.Expand(expression);
-        }
 
         /// <summary>
         /// Executes the query and returns the results.
@@ -134,20 +127,13 @@ namespace Linq2OData.Core.Builders
         }
 
         /// <summary>
-        /// Configures the select clause without specifying properties (returns all).
-        /// </summary>
-        public QueryExecutor<TEntity, List<TEntity>> Select()
-        {
-            return queryBuilder.Select();
-        }
-
-        /// <summary>
         /// Configures the select clause with a custom selector expression.
         /// </summary>
-        public QueryExecutor<TEntity, TResult> Select<TResult>(Expression<Func<List<TEntity>, TResult>> selector)
+        public QueryProjectionBuilder<TEntity, TResult> Select<TResult>(Expression<Func<List<TEntity>, TResult>> selector)
         {
             return queryBuilder.Select(selector);
         }
+
 
         /// <summary>
         /// Returns the QueryBuilder to continue building the query.

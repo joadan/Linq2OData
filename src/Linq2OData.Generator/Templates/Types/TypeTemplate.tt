@@ -13,12 +13,15 @@ namespace <#= fullNamspace #>;
 public partial class <#= entityType.Name #> <#= BaseTypeAndInterface #>
 {
 <# foreach (var property in entityType.Properties) { #>
-    [ODataMember("<#= property.Name #>")]
+    <#= property.ODataAttributeString #>
     public <#= property.CSharpType #> <#= property.Name #> { get; set; }
 <# } #>
 
 <# foreach (var navigation in entityType.Navigations) { #>
-    [ODataMember("<#= navigation.Name #>")]
+    [ODataMember("<#= navigation.Name #>", true)]
+<# if (odataVersion < Linq2OData.Core.ODataVersion.V4 && navigation.NavigationType != Linq2OData.Core.Metadata.ODataNavigationType.Many) { #>
+    [JsonConverter(typeof(Linq2OData.Core.Converters.ODataNavigationPropertyConverter<<#= navigation.ToEntity #>>))]
+<# } #>
     public <#= navigation.CSharpProperty #> <#= navigation.Name #> { get; set; }
 <# } #>
 
