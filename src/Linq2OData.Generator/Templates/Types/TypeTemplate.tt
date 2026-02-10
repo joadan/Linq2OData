@@ -19,6 +19,9 @@ public partial class <#= entityType.Name #> <#= BaseTypeAndInterface #>
 
 <# foreach (var navigation in entityType.Navigations) { #>
     [ODataMember("<#= navigation.Name #>", true)]
+<# if (odataVersion < Linq2OData.Core.ODataVersion.V4 && navigation.NavigationType != Linq2OData.Core.Metadata.ODataNavigationType.Many) { #>
+    [JsonConverter(typeof(Linq2OData.Core.Converters.ODataNavigationPropertyConverter<<#= navigation.ToEntity #>>))]
+<# } #>
     public <#= navigation.CSharpProperty #> <#= navigation.Name #> { get; set; }
 <# } #>
 

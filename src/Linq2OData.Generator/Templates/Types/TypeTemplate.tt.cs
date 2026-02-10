@@ -1,9 +1,10 @@
-﻿using Linq2OData.Core.Metadata;
+﻿using Linq2OData.Core;
+using Linq2OData.Core.Metadata;
 using System.Text;
 
 namespace Linq2OData.Generator.Templates.Types
 {
-    public partial class TypeTemplate(ODataEntityType entityType, string fullNamspace, string? servicePath, string etityInterfaceName, IEnumerable<ODataEntityType> derivedTypes, string metadataNamespace)
+    public partial class TypeTemplate(ODataEntityType entityType, string fullNamspace, string? servicePath, string etityInterfaceName, IEnumerable<ODataEntityType> derivedTypes, string metadataNamespace, ODataVersion odataVersion)
     {
 
         public string BaseTypeAndInterface
