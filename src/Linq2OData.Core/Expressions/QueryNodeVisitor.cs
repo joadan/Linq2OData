@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Linq2OData.Core.Expressions
 {
-    public class SelectExpressionVisitor : ExpressionVisitor
+    public class QueryNodeVisitor : ExpressionVisitor
     {
         private readonly Stack<QueryNode> _nodeStack = new();
         private readonly Stack<ParameterExpression> _lambdaParameters = new();
@@ -11,7 +11,7 @@ namespace Linq2OData.Core.Expressions
         private readonly Type _attributeType;
         private bool _insideAnonymousType = false;
 
-        public SelectExpressionVisitor()
+        public QueryNodeVisitor()
         {
             _attributeType = typeof(ODataMemberAttribute);
             _root = new QueryNode();

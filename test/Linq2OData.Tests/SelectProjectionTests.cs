@@ -120,7 +120,7 @@ public class SelectProjectionTests
     public void SelectProjection_SimpleProperties_V4_GeneratesCorrectSelect()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPerson, object>> expression = p => new { p.Name, p.ID };
 
         // Act
@@ -136,7 +136,7 @@ public class SelectProjectionTests
     public void SelectProjection_SimpleProperties_V2_GeneratesCorrectSelect()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPerson, object>> expression = p => new { p.Name, p.ID };
 
         // Act
@@ -152,7 +152,7 @@ public class SelectProjectionTests
     public void SelectProjection_SingleProperty_V4_GeneratesCorrectSelect()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPerson, object>> expression = p => new { p.Name };
 
         // Act
@@ -172,7 +172,7 @@ public class SelectProjectionTests
     public void SelectProjection_SimpleExpand_V4_GeneratesCorrectExpand()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPerson, object>> expression = p => new { p.Name, p.PersonDetail };
 
         // Act
@@ -188,7 +188,7 @@ public class SelectProjectionTests
     public void SelectProjection_SimpleExpand_V2_GeneratesCorrectExpand()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPerson, object>> expression = p => new { p.Name, p.PersonDetail };
 
         // Act
@@ -208,7 +208,7 @@ public class SelectProjectionTests
     public void SelectProjection_NestedExpand_V4_GeneratesCorrectExpandWithPrefix()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPerson, object>> expression = p => new { p.Name, p.ID, PersonDetail = p.PersonDetail!.Person };
 
         // Act
@@ -225,7 +225,7 @@ public class SelectProjectionTests
     public void SelectProjection_NestedExpandWithProperties_V4_GeneratesCorrectSelectAndExpand()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPersonDetail, object>> expression = pd => new { pd.Age, pd.Phone, Address = pd.Address!.City };
 
         // Act
@@ -241,7 +241,7 @@ public class SelectProjectionTests
     public void SelectProjection_NestedExpandMultipleLevels_V4_GeneratesCorrectExpand()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPersonDetail, object>> expression = pd => new { pd.Age, Country = pd.Address!.Country!.Name };
 
         // Act
@@ -257,7 +257,7 @@ public class SelectProjectionTests
     public void SelectProjection_MultipleNestedExpands_V4_GeneratesCorrectExpand()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPersonDetail, object>> expression = pd => new 
         { 
             pd.Age, 
@@ -278,7 +278,7 @@ public class SelectProjectionTests
     public void SelectProjection_NestedExpand_V2_GeneratesCorrectSlashNotation()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPerson, object>> expression = p => new { p.Name, PersonDetail = p.PersonDetail!.Person };
 
         // Act
@@ -299,7 +299,7 @@ public class SelectProjectionTests
     public void SelectProjection_MixedPropertiesAndExpands_V4_GeneratesCorrectQuery()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestProduct, object>> expression = p => new 
         { 
             p.Name, 
@@ -321,7 +321,7 @@ public class SelectProjectionTests
     public void SelectProjection_OnlyNestedExpand_V4_NoSelectGenerated()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPerson, object>> expression = p => new { PersonDetail = p.PersonDetail!.Person };
 
         // Act
@@ -337,7 +337,7 @@ public class SelectProjectionTests
     public void SelectProjection_DeepNesting_V4_GeneratesCorrectNestedExpand()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPerson, object>> expression = p => new 
         { 
             p.Name,
@@ -357,7 +357,7 @@ public class SelectProjectionTests
     public void SelectProjection_NullForgivingOperator_V4_HandledCorrectly()
     {
         // Arrange - Test the null-forgiving operator (!) doesn't break query generation
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPerson, object>> expression = p => new 
         { 
             p.Name, 
@@ -382,7 +382,7 @@ public class SelectProjectionTests
     public void SelectProjection_EmptyProjection_ReturnsEmptyStrings()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPerson, object>> expression = p => new { };
 
         // Act
@@ -398,7 +398,7 @@ public class SelectProjectionTests
     public void SelectProjection_OnlyComplexProperty_V4_OnlyExpandGenerated()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPerson, object>> expression = p => new { p.PersonDetail };
 
         // Act
@@ -414,7 +414,7 @@ public class SelectProjectionTests
     public void SelectProjection_OnlyComplexProperty_V2_BothSelectAndExpandGenerated()
     {
         // Arrange
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         Expression<Func<TestPerson, object>> expression = p => new { p.PersonDetail };
 
         // Act

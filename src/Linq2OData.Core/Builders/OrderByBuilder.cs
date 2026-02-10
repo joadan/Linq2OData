@@ -117,13 +117,6 @@ namespace Linq2OData.Core.Builders
             return queryBuilder.Expand(expand);
         }
 
-        /// <summary>
-        /// Expands navigation properties using a LINQ expression.
-        /// </summary>
-        public ExpandBuilder<TEntity, TProperty> Expand<TProperty>(Expression<Func<TEntity, TProperty>> expression)
-        {
-            return queryBuilder.Expand(expression);
-        }
 
         /// <summary>
         /// Executes the query and returns the results.

@@ -53,27 +53,19 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
         return this;
     }
 
+ 
 
-    /// <summary>
-    /// Expands a navigation property using a LINQ expression.
-    /// Supports multiple expands at the same level.
-    /// </summary>
-    /// <typeparam name="TProperty">The type of the property to expand.</typeparam>
-    /// <param name="expression">Expression selecting the property to expand.</param>
-    /// <returns>An ExpandBuilder for chaining nested expands.</returns>
-    public ExpandBuilder<T, TProperty> Expand<TProperty>(Expression<Func<T, TProperty>> expression)
+    public QueryBuilder<T> Expand<TResult>(Expression<Func<List<T>, TResult>> selector)
     {
-        var visitor = new ODataExpandVisitor(odataClient.ODataVersion);
-        var expandPath = visitor.ToExpand<T, TProperty>(expression);
 
-        // Add to the list of expand paths
-        expandPaths.Add(expandPath);
+        var visitor = new QueryNodeVisitor();
+        var node = visitor.Parse(selector);
+        expand = node.GetOnlyExpand(odataClient.ODataVersion);
 
-        // Combine all expand paths with commas
-        this.expand = string.Join(",", expandPaths);
-
-        return new ExpandBuilder<T, TProperty>(this, expandPath);
+        return this;
     }
+
+
 
     /// <summary>
     /// Internal method to update the last expand path from ExpandBuilder (for nested expands).

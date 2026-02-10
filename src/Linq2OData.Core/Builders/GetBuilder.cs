@@ -46,7 +46,7 @@ public class GetBuilder<T> where T : IODataEntitySet, new()
     public GetBuilder<T> Expand<TResult>(Expression<Func<T, TResult>> selector)
     {
 
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         var node = visitor.Parse(selector);
         expand = node.GetOnlyExpand(odataClient.ODataVersion);
 

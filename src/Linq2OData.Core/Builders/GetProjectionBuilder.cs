@@ -20,7 +20,7 @@ public class GetProjectionBuilder<T, TResult>(GetBuilder<T> getBuilder, Expressi
 
     private void SetProjection()
     {
-        var visitor = new SelectExpressionVisitor();
+        var visitor = new QueryNodeVisitor();
         var node = visitor.Parse(selector);
         var projected = node.GetSelectExpand(getBuilder.ODataClient.ODataVersion);
 
