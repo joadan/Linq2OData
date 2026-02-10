@@ -14,10 +14,10 @@ namespace Linq2OData.TestClients
         {
             Console.WriteLine("Here we go!");
 
-            await GenerateDemoClientV2Async();
-            await GenerateDemoClientV4Async();
+            //  await GenerateDemoClientV2Async();
+            //  await GenerateDemoClientV4Async();
 
-         //   await TestV2ClientAsync();
+            await TestV2ClientAsync();
             //TestAddHocClient();
 
         }
@@ -25,7 +25,7 @@ namespace Linq2OData.TestClients
         private static void TestAddHocClient()
         {
             var odataClient = new Linq2OData.Core.ODataClient(new HttpClient(), Core.ODataVersion.V2);
-         
+
         }
 
         private static async Task TestV2ClientAsync()
@@ -37,20 +37,9 @@ namespace Linq2OData.TestClients
 
             var clientV2 = new DemoClientV2.ODataDemoClientV2(httpClient);
 
-            var dateString = DateTime.UtcNow.ToString("O");
-
-            dateString = $"datetime'{dateString}'";
-
-            DateTime dt = DateTime.Now;
-            string odata = $"datetime'{dt:yyyy-MM-ddTHH:mm:ss}'";
-
-            string filter = "DiscontinuedDate lt " + dateString;
-
-            // Simple expand with expression
             var queryResult = await clientV2
                .Query<DemoClientV2.ODataDemo.Product>()
-               .Filter(e => e.DiscontinuedDate == null)
-             // .Filter(filter)
+               .Select(e => e.Select(f => new { f.Name, f.ID, f.Category }))
                .ExecuteAsync();
 
             var r = queryResult;

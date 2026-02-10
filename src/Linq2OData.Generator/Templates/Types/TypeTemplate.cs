@@ -70,14 +70,14 @@ namespace Linq2OData.Generator.Templates.Types
             
             #line default
             #line hidden
-            this.Write("    [ODataMember(\"");
+            this.Write("    ");
             
             #line 16 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(property.Name));
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.ODataAttributeString));
             
             #line default
             #line hidden
-            this.Write("\")]\r\n    public ");
+            this.Write("\r\n    public ");
             
             #line 17 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.CSharpType));
@@ -112,7 +112,7 @@ namespace Linq2OData.Generator.Templates.Types
             
             #line default
             #line hidden
-            this.Write("\")]\r\n    public ");
+            this.Write("\", true)]\r\n    public ");
             
             #line 22 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(navigation.CSharpProperty));

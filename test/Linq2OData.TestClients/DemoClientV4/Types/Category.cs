@@ -18,7 +18,7 @@ public partial class Category  : IDemoClientV4EntitySet, ICategoryKeys
     [ODataMember("Name")]
     public string? Name { get; set; }
 
-    [ODataMember("Products")]
+    [ODataMember("Products", true)]
     public List<Product>? Products { get; set; }
 
  public string __Key => $"ID={ID}"; 

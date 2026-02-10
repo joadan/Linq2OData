@@ -18,7 +18,7 @@ public partial class ProductDetail  : IDemoClientV4EntitySet, IProductDetailKeys
     [ODataMember("Details")]
     public string? Details { get; set; }
 
-    [ODataMember("Product")]
+    [ODataMember("Product", true)]
     public Product? Product { get; set; }
 
  public string __Key => $"ProductID={ProductID}"; 

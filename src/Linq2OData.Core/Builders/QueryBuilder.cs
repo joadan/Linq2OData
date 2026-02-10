@@ -53,6 +53,7 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
         return this;
     }
 
+
     /// <summary>
     /// Expands a navigation property using a LINQ expression.
     /// Supports multiple expands at the same level.
@@ -157,15 +158,15 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
 
 
 
-    public QueryExecutor<T, List<T>> Select()
+    public ProjectionBuilder<T, List<T>> Select()
     {
         this.select = null;
-        return new QueryExecutor<T, List<T>>(this, null);
+        return new ProjectionBuilder<T, List<T>>(this, null);
     }
 
-    public QueryExecutor<T, TResult> Select<TResult>(Expression<Func<List<T>, TResult>> selector)
+    public ProjectionBuilder<T, TResult> Select<TResult>(Expression<Func<List<T>, TResult>> selector)
     {
-        //ParseExpression(selector);
-        return new QueryExecutor<T, TResult>(this, selector);
+       
+        return new ProjectionBuilder<T, TResult>(this, selector);
     }
 }
