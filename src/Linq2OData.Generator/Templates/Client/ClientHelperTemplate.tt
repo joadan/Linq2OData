@@ -1,0 +1,63 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+
+namespace <#= request.Namespace #>;
+
+public static class  <#= request.InterfaceName #>Helper
+{
+
+<# foreach (var clientMetadata in request.Metadata) { #>
+   public static ODataService <#= clientMetadata.ServiceName #>()
+    {
+        return new ODataService { Namespace = "<#= clientMetadata.Metadata.Namespace #>", ServicePath="<#= clientMetadata.ServicePath #>", Metadata = JsonSerializer.Deserialize<ODataMetadata>(<#= clientMetadata.HelperName #>)! };
+    }
+<# } #>
+
+public static List<ODataService> MyNameSpace_Services()
+    {
+        return [
+        <# foreach (var clientMetadata in request.Metadata) { #>
+        <#= clientMetadata.ServiceName #>(),
+        <# } #>
+        ];
+    }
+
+
+
+
+<# foreach (var clientMetadata in request.Metadata) { #>
+    public static string <#= clientMetadata.HelperName #> = @"<#= clientMetadata.Metadata #>";
+<# } #>
+
+
+
+
+
+    public static List<ODataService> MyNameSpace_Services()
+    {
+        return [MyNameSpace1_Service(), MyNameSpace2_Service()];
+    }
+
+
+    public static ODataService MyNameSpace1_Service()
+    {
+        return new ODataService { Namespace = "MyNameSpace1", ServicePath="", Metadata = JsonSerializer.Deserialize<ODataMetadata>(MyNameSpace1_Metadata)! };
+    }
+
+
+    public static ODataService MyNameSpace2_Service()
+    {
+
+        return new ODataService { Namespace = "MyNameSpace2", ServicePath = "", Metadata = JsonSerializer.Deserialize<ODataMetadata>(MyNameSpace2_Metadata)! };
+
+
+    }
+
+
+    public static string MyNameSpace1_Metadata = @"";
+    public static string MyNameSpace2_Metadata = @"";
+}

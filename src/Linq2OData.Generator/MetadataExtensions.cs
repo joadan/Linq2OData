@@ -1,4 +1,5 @@
 ﻿using Linq2OData.Core.Metadata;
+using Linq2OData.Generator.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Linq2OData.Generator;
@@ -7,7 +8,14 @@ namespace Linq2OData.Generator;
 internal static class MetadataExtensions
 {
 
-    extension(ODataNavigation navigation)
+    extension(ClientMetadata navigation)
+    {
+        internal string HelperName => $"{navigation.Metadata.Namespace}_Helper";
+        internal string ServiceName => $"{navigation.Metadata.Namespace}_Service";
+    }
+
+
+        extension(ODataNavigation navigation)
     {
         internal string CSharpProperty
         {
