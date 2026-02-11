@@ -1,6 +1,7 @@
 ﻿using Linq2OData.Core.Metadata;
 using Linq2OData.Generator.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Xml.Linq;
 
 namespace Linq2OData.Generator;
 
@@ -8,10 +9,21 @@ namespace Linq2OData.Generator;
 internal static class MetadataExtensions
 {
 
+    extension(ClientRequest clientRequest)
+    {
+        internal string NamespaceName => $"{clientRequest.Namespace.Replace(".", "_")}";
+        internal string InterfaceName => $"I{clientRequest.NamespaceName}EntitySet";
+        internal string ServicesName => $"{clientRequest.NamespaceName}Services";
+    }
+
     extension(ClientMetadata navigation)
     {
+        internal string JsonName => $"{navigation.Metadata.Namespace}_Json";
         internal string HelperName => $"{navigation.Metadata.Namespace}_Helper";
         internal string ServiceName => $"{navigation.Metadata.Namespace}_Service";
+
+        internal string MetadataAsJson => System.Text.Json.JsonSerializer.Serialize(navigation.Metadata);
+
     }
 
 

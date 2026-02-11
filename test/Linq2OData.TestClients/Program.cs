@@ -14,8 +14,8 @@ namespace Linq2OData.TestClients
         {
             Console.WriteLine("Here we go!");
 
-     //       await GenerateDemoClientV2Async();
-     //        await GenerateDemoClientV4Async();
+           // await GenerateDemoClientV2Async();
+             //await GenerateDemoClientV4Async();
 
             await TestV2ClientAsync();
            // await TestV4ClientAsync();
@@ -32,7 +32,7 @@ namespace Linq2OData.TestClients
 
         private static async Task TestV2ClientAsync()
         {
-      
+
             var httpClient = new HttpClient
             {
                 BaseAddress = new Uri(demoUrlV2)
@@ -40,12 +40,14 @@ namespace Linq2OData.TestClients
 
             var clientV2 = new DemoClientV2.ODataDemoClientV2(httpClient);
 
+            var kalle = clientV2.Services;
+            
             var queryResult = await clientV2
                .Query<DemoClientV2.ODataDemo.Product>()
                .Filter(e => e.ID != 1)
                .ExecuteAsync();
 
-      
+
             var r = queryResult;
 
 
@@ -87,11 +89,9 @@ namespace Linq2OData.TestClients
 
             var generator = new Linq2OData.Generator.ClientGenerator(request);
 
-            // Get the path to the test project directory
-            var currentDir = Directory.GetCurrentDirectory();
-            var testProjectDir = Path.Combine(currentDir, "test", "Linq2OData.TestClients");
-
-            var files = generator.GenerateClient(Path.Combine(testProjectDir, "DemoClientV2"));
+            var projectDirectory = Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName;
+            if (projectDirectory == null) { throw new Exception("Unable to get project directory"); }
+            var files = generator.GenerateClient(Path.Combine(projectDirectory, "DemoClientV2"));
         }
 
         private static async Task GenerateDemoClientV4Async()
@@ -111,8 +111,7 @@ namespace Linq2OData.TestClients
 
             var projectDirectory = Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName;
             if (projectDirectory == null) { throw new Exception("Unable to get project directory"); }
-
-            var files = generator.GenerateClient(projectDirectory + "/DemoClientV4");
+            var files = generator.GenerateClient(Path.Combine(projectDirectory, "DemoClientV4"));
         }
 
     }

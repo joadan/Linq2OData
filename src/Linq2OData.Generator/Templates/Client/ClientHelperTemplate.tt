@@ -3,21 +3,23 @@
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
-
+using Linq2OData.Core;
+using Linq2OData.Core.Metadata;
+using System.Text.Json;
 
 namespace <#= request.Namespace #>;
 
-public static class  <#= request.InterfaceName #>Helper
+public static class <#= request.ServicesName #>
 {
 
 <# foreach (var clientMetadata in request.Metadata) { #>
    public static ODataService <#= clientMetadata.ServiceName #>()
     {
-        return new ODataService { Namespace = "<#= clientMetadata.Metadata.Namespace #>", ServicePath="<#= clientMetadata.ServicePath #>", Metadata = JsonSerializer.Deserialize<ODataMetadata>(<#= clientMetadata.HelperName #>)! };
+        return new ODataService { Namespace = "<#= clientMetadata.Metadata.Namespace #>", ServicePath="<#= clientMetadata.ServicePath ?? "" #>", Metadata = JsonSerializer.Deserialize<ODataMetadata>(<#= clientMetadata.JsonName #>)! };
     }
 <# } #>
 
-public static List<ODataService> MyNameSpace_Services()
+public static List<ODataService> Services()
     {
         return [
         <# foreach (var clientMetadata in request.Metadata) { #>
@@ -27,37 +29,8 @@ public static List<ODataService> MyNameSpace_Services()
     }
 
 
-
-
 <# foreach (var clientMetadata in request.Metadata) { #>
-    public static string <#= clientMetadata.HelperName #> = @"<#= clientMetadata.Metadata #>";
+    public static string <#= clientMetadata.JsonName #> = """"<#= clientMetadata.MetadataAsJson #>"""";
 <# } #>
 
-
-
-
-
-    public static List<ODataService> MyNameSpace_Services()
-    {
-        return [MyNameSpace1_Service(), MyNameSpace2_Service()];
-    }
-
-
-    public static ODataService MyNameSpace1_Service()
-    {
-        return new ODataService { Namespace = "MyNameSpace1", ServicePath="", Metadata = JsonSerializer.Deserialize<ODataMetadata>(MyNameSpace1_Metadata)! };
-    }
-
-
-    public static ODataService MyNameSpace2_Service()
-    {
-
-        return new ODataService { Namespace = "MyNameSpace2", ServicePath = "", Metadata = JsonSerializer.Deserialize<ODataMetadata>(MyNameSpace2_Metadata)! };
-
-
-    }
-
-
-    public static string MyNameSpace1_Metadata = @"";
-    public static string MyNameSpace2_Metadata = @"";
 }

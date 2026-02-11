@@ -21,6 +21,8 @@ public class <#= request.Name #>
          odataClient = new Linq2OData.Core.ODataClient(httpClient, <#= GetODataVersionParameter() #>); 
     }
 
+    public List<ODataService> Services => <#= request.ServicesName #>.Services();
+
     public GetBuilder<T> Get<T>(Action<T> keySetter) where T : <#= request.InterfaceName #>, new() 
     {
         return new GetBuilder<T>(odataClient, keySetter);

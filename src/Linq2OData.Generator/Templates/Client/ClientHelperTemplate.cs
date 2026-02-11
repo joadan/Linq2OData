@@ -28,85 +28,85 @@ namespace Linq2OData.Generator.Templates.Client
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("\r\n\r\nnamespace ");
+            this.Write("using Linq2OData.Core;\r\nusing Linq2OData.Core.Metadata;\r\nusing System.Text.Json;\r" +
+                    "\n\r\nnamespace ");
             
-            #line 8 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
+            #line 10 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.Namespace));
             
             #line default
             #line hidden
-            this.Write(";\r\n\r\npublic static class  ");
+            this.Write(";\r\n\r\npublic static class ");
             
-            #line 10 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(request.InterfaceName));
+            #line 12 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(request.ServicesName));
             
             #line default
             #line hidden
-            this.Write("Helper\r\n{\r\n\r\n");
+            this.Write("\r\n{\r\n\r\n");
             
-            #line 13 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
+            #line 15 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
  foreach (var clientMetadata in request.Metadata) { 
             
             #line default
             #line hidden
             this.Write("   public static ODataService ");
             
-            #line 14 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
+            #line 16 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientMetadata.ServiceName));
             
             #line default
             #line hidden
             this.Write("()\r\n    {\r\n        return new ODataService { Namespace = \"");
             
-            #line 16 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
+            #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientMetadata.Metadata.Namespace));
             
             #line default
             #line hidden
             this.Write("\", ServicePath=\"");
             
-            #line 16 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(clientMetadata.ServicePath));
+            #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(clientMetadata.ServicePath ?? ""));
             
             #line default
             #line hidden
             this.Write("\", Metadata = JsonSerializer.Deserialize<ODataMetadata>(");
             
-            #line 16 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(clientMetadata.HelperName));
+            #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(clientMetadata.JsonName));
             
             #line default
             #line hidden
             this.Write(")! };\r\n    }\r\n");
             
-            #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
+            #line 20 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
  } 
             
             #line default
             #line hidden
-            this.Write("\r\npublic static List<ODataService> MyNameSpace_Services()\r\n    {\r\n        return " +
-                    "[\r\n        ");
+            this.Write("\r\npublic static List<ODataService> Services()\r\n    {\r\n        return [\r\n        ");
             
-            #line 23 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
+            #line 25 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
  foreach (var clientMetadata in request.Metadata) { 
             
             #line default
             #line hidden
             this.Write("        ");
             
-            #line 24 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
+            #line 26 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(clientMetadata.ServiceName));
             
             #line default
             #line hidden
             this.Write("(),\r\n        ");
             
-            #line 25 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
+            #line 27 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
  } 
             
             #line default
             #line hidden
-            this.Write("        ];\r\n    }\r\n\r\n\r\n\r\n\r\n");
+            this.Write("        ];\r\n    }\r\n\r\n\r\n");
             
             #line 32 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
  foreach (var clientMetadata in request.Metadata) { 
@@ -116,53 +116,25 @@ namespace Linq2OData.Generator.Templates.Client
             this.Write("    public static string ");
             
             #line 33 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(clientMetadata.HelperName));
+            this.Write(this.ToStringHelper.ToStringWithCulture(clientMetadata.JsonName));
             
             #line default
             #line hidden
-            this.Write(" = @\"");
+            this.Write(" = \"\"\"\"");
             
             #line 33 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(clientMetadata.Metadata));
+            this.Write(this.ToStringHelper.ToStringWithCulture(clientMetadata.MetadataAsJson));
             
             #line default
             #line hidden
-            this.Write("\";\r\n");
+            this.Write("\"\"\"\";\r\n");
             
             #line 34 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
  } 
             
             #line default
             #line hidden
-            this.Write(@"
-
-
-
-
-    public static List<ODataService> MyNameSpace_Services()
-    {
-        return [MyNameSpace1_Service(), MyNameSpace2_Service()];
-    }
-
-
-    public static ODataService MyNameSpace1_Service()
-    {
-        return new ODataService { Namespace = ""MyNameSpace1"", ServicePath="""", Metadata = JsonSerializer.Deserialize<ODataMetadata>(MyNameSpace1_Metadata)! };
-    }
-
-
-    public static ODataService MyNameSpace2_Service()
-    {
-
-        return new ODataService { Namespace = ""MyNameSpace2"", ServicePath = """", Metadata = JsonSerializer.Deserialize<ODataMetadata>(MyNameSpace2_Metadata)! };
-
-
-    }
-
-
-    public static string MyNameSpace1_Metadata = @"""";
-    public static string MyNameSpace2_Metadata = @"""";
-}");
+            this.Write("\r\n}");
             return this.GenerationEnvironment.ToString();
         }
     }
