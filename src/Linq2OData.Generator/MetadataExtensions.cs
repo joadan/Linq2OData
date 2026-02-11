@@ -68,6 +68,21 @@ internal static class MetadataExtensions
     extension(ODataProperty property)
     {
 
+        internal string ODataAttributeString
+        {
+            get
+            {
+                if (!property.IsPrimitiveType)
+                {
+                    return $"[ODataMember(\"{property.Name}\", true)]";
+                }
+
+                // For primitive types, we can omit the "isComplex" parameter since it defaults to false
+                return $"[ODataMember(\"{property.Name}\")]";
+
+            }
+        }
+
         internal string KeyResult
         {
             get

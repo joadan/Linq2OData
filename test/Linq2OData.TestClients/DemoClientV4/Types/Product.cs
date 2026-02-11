@@ -31,11 +31,11 @@ public partial class Product  : IDemoClientV4EntitySet, IProductKeys
     [ODataMember("Price")]
     public double Price { get; set; }
 
-    [ODataMember("Categories")]
+    [ODataMember("Categories", true)]
     public List<Category>? Categories { get; set; }
-    [ODataMember("Supplier")]
+    [ODataMember("Supplier", true)]
     public Supplier? Supplier { get; set; }
-    [ODataMember("ProductDetail")]
+    [ODataMember("ProductDetail", true)]
     public ProductDetail? ProductDetail { get; set; }
 
  public string __Key => $"ID={ID}"; 

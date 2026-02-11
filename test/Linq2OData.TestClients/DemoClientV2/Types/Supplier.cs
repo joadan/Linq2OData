@@ -17,12 +17,12 @@ public partial class Supplier  : IDemoClientV2EntitySet, ISupplierKeys
     public int ID { get; set; }
     [ODataMember("Name")]
     public string? Name { get; set; }
-    [ODataMember("Address")]
+    [ODataMember("Address", true)]
     public Address? Address { get; set; }
     [ODataMember("Concurrency")]
     public int Concurrency { get; set; }
 
-    [ODataMember("Products")]
+    [ODataMember("Products", true)]
     public List<Product>? Products { get; set; }
 
  public string __Key => $"ID={ID}"; 

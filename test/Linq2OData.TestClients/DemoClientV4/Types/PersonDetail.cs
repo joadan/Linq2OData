@@ -21,12 +21,12 @@ public partial class PersonDetail  : IDemoClientV4EntitySet, IPersonDetailKeys
     public bool Gender { get; set; }
     [ODataMember("Phone")]
     public string? Phone { get; set; }
-    [ODataMember("Address")]
+    [ODataMember("Address", true)]
     public Address? Address { get; set; }
     [ODataMember("Photo")]
     public object Photo { get; set; }
 
-    [ODataMember("Person")]
+    [ODataMember("Person", true)]
     public Person? Person { get; set; }
 
  public string __Key => $"PersonID={PersonID}"; 

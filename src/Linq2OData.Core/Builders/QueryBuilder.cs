@@ -28,6 +28,8 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
     internal ODataClient ODataClient => odataClient;
     internal string EntityPath => entityPath;
 
+    internal QueryNode? queryNode;
+
     public QueryBuilder<T> Top(int? top)
     {
         this.top = top;
@@ -53,26 +55,30 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
         return this;
     }
 
-    /// <summary>
-    /// Expands a navigation property using a LINQ expression.
-    /// Supports multiple expands at the same level.
-    /// </summary>
-    /// <typeparam name="TProperty">The type of the property to expand.</typeparam>
-    /// <param name="expression">Expression selecting the property to expand.</param>
-    /// <returns>An ExpandBuilder for chaining nested expands.</returns>
-    public ExpandBuilder<T, TProperty> Expand<TProperty>(Expression<Func<T, TProperty>> expression)
+    internal QueryNode MergeExpression<TResult>(Expression<Func<List<T>, TResult>> selector)
     {
-        var visitor = new ODataExpandVisitor(odataClient.ODataVersion);
-        var expandPath = visitor.ToExpand<T, TProperty>(expression);
+        var visitor = new QueryNodeVisitor();
+        var node = visitor.Parse(selector);
+        if (queryNode == null)
+        {
+            queryNode = node;
+        }
+        else
+        {
+            queryNode.AddMergeChildren(node);
+        }
 
-        // Add to the list of expand paths
-        expandPaths.Add(expandPath);
-
-        // Combine all expand paths with commas
-        this.expand = string.Join(",", expandPaths);
-
-        return new ExpandBuilder<T, TProperty>(this, expandPath);
+        return queryNode;
     }
+
+
+    public QueryBuilder<T> Expand<TResult>(Expression<Func<List<T>, TResult>> selector)
+    {
+         expand = MergeExpression(selector).GetOnlyExpand(odataClient.ODataVersion);
+        return this;
+    }
+
+
 
     /// <summary>
     /// Internal method to update the last expand path from ExpandBuilder (for nested expands).
@@ -157,15 +163,9 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
 
 
 
-    public QueryExecutor<T, List<T>> Select()
+    public QueryProjectionBuilder<T, TResult> Select<TResult>(Expression<Func<List<T>, TResult>> selector)
     {
-        this.select = null;
-        return new QueryExecutor<T, List<T>>(this, null);
-    }
 
-    public QueryExecutor<T, TResult> Select<TResult>(Expression<Func<List<T>, TResult>> selector)
-    {
-        //ParseExpression(selector);
-        return new QueryExecutor<T, TResult>(this, selector);
+        return new QueryProjectionBuilder<T, TResult>(this, selector);
     }
 }

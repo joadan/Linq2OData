@@ -14,7 +14,7 @@ namespace DemoClientV4.ODataDemo;
 public partial class FeaturedProduct : ODataDemo.Product, IDemoClientV4EntitySet
 {
 
-    [ODataMember("Advertisement")]
+    [ODataMember("Advertisement", true)]
     public Advertisement? Advertisement { get; set; }
 
 

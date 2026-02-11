@@ -20,7 +20,7 @@ public partial class Advertisement  : IDemoClientV4EntitySet, IAdvertisementKeys
     [ODataMember("AirDate")]
     public DateTimeOffset AirDate { get; set; }
 
-    [ODataMember("FeaturedProduct")]
+    [ODataMember("FeaturedProduct", true)]
     public FeaturedProduct? FeaturedProduct { get; set; }
 
  public string __Key => $"ID={ID}"; 

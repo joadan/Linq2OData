@@ -28,9 +28,11 @@ public partial class Product  : IDemoClientV2EntitySet, IProductKeys
     [ODataMember("Price")]
     public decimal Price { get; set; }
 
-    [ODataMember("Category")]
+    [ODataMember("Category", true)]
+    [JsonConverter(typeof(Linq2OData.Core.Converters.ODataNavigationPropertyConverter<Category>))]
     public Category? Category { get; set; }
-    [ODataMember("Supplier")]
+    [ODataMember("Supplier", true)]
+    [JsonConverter(typeof(Linq2OData.Core.Converters.ODataNavigationPropertyConverter<Supplier>))]
     public Supplier? Supplier { get; set; }
 
  public string __Key => $"ID={ID}"; 

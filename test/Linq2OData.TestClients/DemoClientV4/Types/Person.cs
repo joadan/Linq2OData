@@ -22,7 +22,7 @@ public partial class Person  : IDemoClientV4EntitySet, IPersonKeys
     [ODataMember("Name")]
     public string? Name { get; set; }
 
-    [ODataMember("PersonDetail")]
+    [ODataMember("PersonDetail", true)]
     public PersonDetail? PersonDetail { get; set; }
 
  public string __Key => $"ID={ID}"; 

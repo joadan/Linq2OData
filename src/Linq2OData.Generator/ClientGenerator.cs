@@ -113,7 +113,7 @@ public class ClientGenerator(ClientRequest request)
             // Generate entity and complex types
             foreach (var entityType in metadata.EntityTypes)
             {
-                var classText = new TypeTemplate(entityType, fullNamspace, clientMetadata.ServicePath, request.InterfaceName, metadata.GetDerivedTypes(entityType.Name), metadata.Namespace).TransformText();
+                var classText = new TypeTemplate(entityType, fullNamspace, clientMetadata.ServicePath, request.InterfaceName, metadata.GetDerivedTypes(entityType.Name), metadata.Namespace, (ODataVersion)version!).TransformText();
                 AddFile("Types", entityType.Name + ".cs", classText);
             }
         }
@@ -146,7 +146,6 @@ public class ClientGenerator(ClientRequest request)
 ";
 
         content = infoText + content;
-
 
         files.Add(new FileEntry
         {
