@@ -25,6 +25,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Update="Templates\Client\ClientHelperTemplate.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>ClientHelperTemplate.tt</DependentUpon>
+		</Compile>
 		<Compile Update="Templates\Client\ClientTemp.cs">
 		  <DesignTime>True</DesignTime>
 		  <AutoGen>True</AutoGen>
@@ -49,6 +54,10 @@
 
 
 	<ItemGroup>
+		<None Update="Templates\Client\ClientHelperTemplate.tt">
+		  <Generator>TextTemplatingFilePreprocessor</Generator>
+		  <LastGenOutput>ClientHelperTemplate.cs</LastGenOutput>
+		</None>
 		<None Update="Templates\Client\ClientTemp.tt">
 		  <Generator>TextTemplatingFilePreprocessor</Generator>
 		  <LastGenOutput>ClientTemp.cs</LastGenOutput>

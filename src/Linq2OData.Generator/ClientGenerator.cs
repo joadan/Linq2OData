@@ -28,7 +28,7 @@ public class ClientGenerator(ClientRequest request)
         //Check/Set version Metadata
         foreach (var requestMetadata in request.Metadata)
         {
-          
+
             if (version != null && requestMetadata.Metadata.ODataVersion != version)
             {
                 throw new Exception($"All metadata documents must have the same OData version. Current is {version.ToString()}, trying to add {requestMetadata.Metadata.Namespace}: {requestMetadata.Metadata.ODataVersion}");
@@ -94,6 +94,10 @@ public class ClientGenerator(ClientRequest request)
     {
         var templateText = new ClientTemp(request, (ODataVersion)version!).TransformText();
         AddFile("Client", request.Name + ".cs", templateText);
+
+        var templateHelperText = new ClientHelperTemplate(request).TransformText();
+        AddFile("Client", request.Name + "Helpers.cs", templateHelperText);
+
     }
 
     private void GenerateTypesCode()
@@ -154,6 +158,4 @@ public class ClientGenerator(ClientRequest request)
             Content = content
         });
     }
-
-
 }

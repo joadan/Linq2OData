@@ -22,6 +22,8 @@ public class ODataDemoClientV2
          odataClient = new Linq2OData.Core.ODataClient(httpClient, Linq2OData.Core.ODataVersion.V2); 
     }
 
+    public List<ODataService> Services => DemoClientV2Services.Services();
+
     public GetBuilder<T> Get<T>(Action<T> keySetter) where T : IDemoClientV2EntitySet, new() 
     {
         return new GetBuilder<T>(odataClient, keySetter);

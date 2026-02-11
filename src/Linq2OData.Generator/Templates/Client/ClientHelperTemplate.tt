@@ -1,0 +1,36 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+using Linq2OData.Core;
+using Linq2OData.Core.Metadata;
+using System.Text.Json;
+
+namespace <#= request.Namespace #>;
+
+public static class <#= request.ServicesName #>
+{
+
+<# foreach (var clientMetadata in request.Metadata) { #>
+   public static ODataService <#= clientMetadata.ServiceName #>()
+    {
+        return new ODataService { Namespace = "<#= clientMetadata.Metadata.Namespace #>", ServicePath="<#= clientMetadata.ServicePath ?? "" #>", Metadata = JsonSerializer.Deserialize<ODataMetadata>(<#= clientMetadata.JsonName #>)! };
+    }
+<# } #>
+
+public static List<ODataService> Services()
+    {
+        return [
+        <# foreach (var clientMetadata in request.Metadata) { #>
+        <#= clientMetadata.ServiceName #>(),
+        <# } #>
+        ];
+    }
+
+
+<# foreach (var clientMetadata in request.Metadata) { #>
+    public static string <#= clientMetadata.JsonName #> = """"<#= clientMetadata.MetadataAsJson #>"""";
+<# } #>
+
+}

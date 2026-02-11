@@ -11,8 +11,6 @@ public class ClientRequest
 
     public List<ClientMetadata> Metadata { get; set; } = [];
 
-    public string InterfaceName => $"I{Namespace.Replace(".", "_")}EntitySet";
-
 
     public ClientMetadata AddMetadata(string metadata,  string? path = null)
     {
