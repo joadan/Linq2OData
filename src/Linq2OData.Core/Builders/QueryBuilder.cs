@@ -108,7 +108,7 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
     /// <summary>
     /// Orders the results by a property in ascending order using a string.
     /// </summary>
-    public QueryBuilder<T> Order(string? orderby = null)
+    public QueryBuilder<T> OrderBy(string? orderby = null)
     {
         this.orderby = orderby;
         return this;
@@ -120,7 +120,7 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
     /// <typeparam name="TProperty">The type of the property to order by.</typeparam>
     /// <param name="expression">Expression selecting the property to order by.</param>
     /// <returns>An OrderByBuilder for chaining ThenBy operations.</returns>
-    public OrderByBuilder<T> Order<TProperty>(Expression<Func<T, TProperty>> expression)
+    public OrderByBuilder<T> OrderBy<TProperty>(Expression<Func<T, TProperty>> expression)
     {
         var visitor = new ODataOrderByVisitor();
         var propertyName = visitor.ToOrderBy(expression);
@@ -136,7 +136,7 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
     /// <typeparam name="TProperty">The type of the property to order by.</typeparam>
     /// <param name="expression">Expression selecting the property to order by descending.</param>
     /// <returns>An OrderByBuilder for chaining ThenBy operations.</returns>
-    public OrderByBuilder<T> OrderDescending<TProperty>(Expression<Func<T, TProperty>> expression)
+    public OrderByBuilder<T> OrderByDescending<TProperty>(Expression<Func<T, TProperty>> expression)
     {
         var visitor = new ODataOrderByVisitor();
         var propertyName = visitor.ToOrderBy(expression);

@@ -118,7 +118,7 @@ public class OrderByExpressionTests
     #region QueryBuilder Order Tests
 
     [Fact]
-    public void QueryBuilder_Order_SimpleProperty_SetsOrderByString()
+    public void QueryBuilder_OrderBy_SimpleProperty_SetsOrderByString()
     {
         // Arrange
         var httpClient = new HttpClient { BaseAddress = new Uri("https://test.com") };
@@ -126,14 +126,14 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act
-        var orderByBuilder = queryBuilder.Order(s => s.Name!);
+        var orderByBuilder = queryBuilder.OrderBy(s => s.Name!);
 
         // Assert
         Assert.Equal("Name", queryBuilder.orderby);
     }
 
     [Fact]
-    public void QueryBuilder_OrderDescending_SimpleProperty_SetsOrderByStringWithDesc()
+    public void QueryBuilder_OrderByDescending_SimpleProperty_SetsOrderByStringWithDesc()
     {
         // Arrange
         var httpClient = new HttpClient { BaseAddress = new Uri("https://test.com") };
@@ -141,14 +141,14 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act
-        var orderByBuilder = queryBuilder.OrderDescending(s => s.Rating);
+        var orderByBuilder = queryBuilder.OrderByDescending(s => s.Rating);
 
         // Assert
         Assert.Equal("Rating desc", queryBuilder.orderby);
     }
 
     [Fact]
-    public void QueryBuilder_Order_StringOverload_SetsOrderByString()
+    public void QueryBuilder_OrderBy_StringOverload_SetsOrderByString()
     {
         // Arrange
         var httpClient = new HttpClient { BaseAddress = new Uri("https://test.com") };
@@ -156,7 +156,7 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act
-        queryBuilder.Order("Name,Price desc");
+        queryBuilder.OrderBy("Name,Price desc");
 
         // Assert
         Assert.Equal("Name,Price desc", queryBuilder.orderby);
@@ -175,7 +175,7 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act
-        queryBuilder.Order(s => s.Country!)
+        queryBuilder.OrderBy(s => s.Country!)
                    .ThenBy(s => s.Name!);
 
         // Assert
@@ -191,7 +191,7 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act
-        queryBuilder.Order(s => s.Country!)
+        queryBuilder.OrderBy(s => s.Country!)
                    .ThenByDescending(s => s.Rating);
 
         // Assert
@@ -207,7 +207,7 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act
-        queryBuilder.Order(s => s.Country!)
+        queryBuilder.OrderBy(s => s.Country!)
                    .ThenBy(s => s.Rating)
                    .ThenByDescending(s => s.JoinDate)
                    .ThenBy(s => s.Name!);
@@ -217,7 +217,7 @@ public class OrderByExpressionTests
     }
 
     [Fact]
-    public void OrderByBuilder_OrderDescending_WithThenBy_GeneratesCorrectString()
+    public void OrderByBuilder_OrderByDescending_WithThenBy_GeneratesCorrectString()
     {
         // Arrange
         var httpClient = new HttpClient { BaseAddress = new Uri("https://test.com") };
@@ -225,7 +225,7 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act
-        queryBuilder.OrderDescending(s => s.Rating)
+        queryBuilder.OrderByDescending(s => s.Rating)
                    .ThenBy(s => s.Name!);
 
         // Assert
@@ -245,7 +245,7 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act
-        var result = queryBuilder.Order(s => s.Name!)
+        var result = queryBuilder.OrderBy(s => s.Name!)
                                  .Filter(s => s.Country == "USA");
 
         // Assert
@@ -261,7 +261,7 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act
-        var result = queryBuilder.Order(s => s.Name!)
+        var result = queryBuilder.OrderBy(s => s.Name!)
                                  .Top(10);
 
         // Assert
@@ -277,7 +277,7 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act
-        var result = queryBuilder.Order(s => s.Name!)
+        var result = queryBuilder.OrderBy(s => s.Name!)
                                  .Skip(5);
 
         // Assert
@@ -293,7 +293,7 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act
-        var result = queryBuilder.Order(s => s.Name!)
+        var result = queryBuilder.OrderBy(s => s.Name!)
                                  .Count(true);
 
         // Assert
@@ -309,7 +309,7 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act - implicit conversion when assigned to QueryBuilder
-        QueryBuilder<TestSupplier> result = queryBuilder.Order(s => s.Name!);
+        QueryBuilder<TestSupplier> result = queryBuilder.OrderBy(s => s.Name!);
 
         // Assert
         Assert.NotNull(result);
@@ -321,7 +321,7 @@ public class OrderByExpressionTests
     #region Nested Property Order Tests
 
     [Fact]
-    public void QueryBuilder_Order_NestedProperty_GeneratesPathSyntax()
+    public void QueryBuilder_OrderBy_NestedProperty_GeneratesPathSyntax()
     {
         // Arrange
         var httpClient = new HttpClient { BaseAddress = new Uri("https://test.com") };
@@ -329,14 +329,14 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act
-        queryBuilder.Order(s => s.Address!.City!);
+        queryBuilder.OrderBy(s => s.Address!.City!);
 
         // Assert
         Assert.Equal("Address/City", queryBuilder.orderby);
     }
 
     [Fact]
-    public void QueryBuilder_Order_MultipleNestedProperties_GeneratesCorrectString()
+    public void QueryBuilder_OrderBy_MultipleNestedProperties_GeneratesCorrectString()
     {
         // Arrange
         var httpClient = new HttpClient { BaseAddress = new Uri("https://test.com") };
@@ -344,7 +344,7 @@ public class OrderByExpressionTests
         var queryBuilder = new QueryBuilder<TestSupplier>(odataClient);
 
         // Act
-        queryBuilder.Order(s => s.Address!.Country!)
+        queryBuilder.OrderBy(s => s.Address!.Country!)
                    .ThenBy(s => s.Address!.City!)
                    .ThenByDescending(s => s.Rating);
 
@@ -357,7 +357,7 @@ public class OrderByExpressionTests
     #region Integration Tests
 
     [Fact]
-    public void QueryBuilder_OrderWithFilterAndTop_GeneratesCorrectQuery()
+    public void QueryBuilder_OrderByWithFilterAndTop_GeneratesCorrectQuery()
     {
         // Arrange
         var httpClient = new HttpClient { BaseAddress = new Uri("https://test.com") };
@@ -366,7 +366,7 @@ public class OrderByExpressionTests
 
         // Act
         queryBuilder.Filter(s => s.Country == "USA")
-                   .Order(s => s.Rating)
+                   .OrderBy(s => s.Rating)
                        .ThenByDescending(s => s.JoinDate)
                    .Top(20);
 
@@ -377,7 +377,7 @@ public class OrderByExpressionTests
     }
 
     [Fact]
-    public void QueryBuilder_ComplexQueryWithOrder_SetsAllProperties()
+    public void QueryBuilder_ComplexQueryWithOrderBy_SetsAllProperties()
     {
         // Arrange
         var httpClient = new HttpClient { BaseAddress = new Uri("https://test.com") };
@@ -386,7 +386,7 @@ public class OrderByExpressionTests
 
         // Act
         queryBuilder.Filter(s => s.Rating > 4)
-                   .OrderDescending(s => s.JoinDate)
+                   .OrderByDescending(s => s.JoinDate)
                        .ThenBy(s => s.Name!)
                    .Skip(10)
                    .Top(20)

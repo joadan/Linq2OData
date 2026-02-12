@@ -21,9 +21,9 @@ Added LINQ expression-based support for OData `$orderby` queries, similar to the
 
 3. **QueryBuilder Updates**
    - Added `orderby` field
-   - Added `Order<TProperty>(Expression)` - returns OrderByBuilder
-   - Added `OrderDescending<TProperty>(Expression)` - returns OrderByBuilder
-   - Added `Order(string)` - string-based overload
+   - Added `OrderBy<TProperty>(Expression)` - returns OrderByBuilder
+   - Added `OrderByDescending<TProperty>(Expression)` - returns OrderByBuilder
+   - Added `OrderBy(string)` - string-based overload
    - Added `AppendOrderBy()` internal method
 
 4. **ODataClient Updates**
@@ -37,16 +37,16 @@ Added LINQ expression-based support for OData `$orderby` queries, similar to the
 ```csharp
 var result = await client
     .Query<Supplier>()
-    .Order(s => s.Name)
+    .OrderBy(s => s.Name)
     .ExecuteAsync();
 // Generates: $orderby=Name
 ```
 
-### OrderDescending
+### OrderByDescending
 ```csharp
 var result = await client
     .Query<Supplier>()
-    .OrderDescending(s => s.Rating)
+    .OrderByDescending(s => s.Rating)
     .ExecuteAsync();
 // Generates: $orderby=Rating desc
 ```
@@ -55,7 +55,7 @@ var result = await client
 ```csharp
 var result = await client
     .Query<Supplier>()
-    .Order(s => s.Country)
+    .OrderBy(s => s.Country)
         .ThenBy(s => s.Rating)
         .ThenByDescending(s => s.JoinDate)
     .ExecuteAsync();
@@ -66,7 +66,7 @@ var result = await client
 ```csharp
 var result = await client
     .Query<Supplier>()
-    .Order(s => s.Address.City)
+    .OrderBy(s => s.Address.City)
         .ThenBy(s => s.Name)
     .ExecuteAsync();
 // Generates: $orderby=Address/City,Name
@@ -77,7 +77,7 @@ var result = await client
 var result = await client
     .Query<Supplier>()
     .Filter(s => s.IsActive)
-    .OrderDescending(s => s.Rating)
+    .OrderByDescending(s => s.Rating)
         .ThenBy(s => s.Name)
     .Expand(s => s.Products)
     .Top(20)
@@ -90,11 +90,11 @@ var result = await client
 
 | Usage | OData Query |
 |-------|-------------|
-| `.Order(s => s.Name)` | `$orderby=Name` |
-| `.OrderDescending(s => s.Price)` | `$orderby=Price desc` |
-| `.Order(s => s.Country).ThenBy(s => s.Name)` | `$orderby=Country,Name` |
-| `.Order(s => s.Rating).ThenByDescending(s => s.Date)` | `$orderby=Rating,Date desc` |
-| `.Order(s => s.Address.City)` | `$orderby=Address/City` |
+| `.OrderBy(s => s.Name)` | `$orderby=Name` |
+| `.OrderByDescending(s => s.Price)` | `$orderby=Price desc` |
+| `.OrderBy(s => s.Country).ThenBy(s => s.Name)` | `$orderby=Country,Name` |
+| `.OrderBy(s => s.Rating).ThenByDescending(s => s.Date)` | `$orderby=Rating,Date desc` |
+| `.OrderBy(s => s.Address.City)` | `$orderby=Address/City` |
 
 ## Tests
 
@@ -106,9 +106,9 @@ Created comprehensive test suite with **21 passing tests** covering:
 - ✅ AppendOrderBy ascending/descending
 - ✅ Multiple properties with comma separation
 
-### QueryBuilder Order Tests (3 tests)
-- ✅ Order sets orderby string
-- ✅ OrderDescending adds " desc"
+### QueryBuilder OrderBy Tests (3 tests)
+- ✅ OrderBy sets orderby string
+- ✅ OrderByDescending adds " desc"
 - ✅ String overload support
 
 ### OrderByBuilder ThenBy Tests (4 tests)
@@ -146,8 +146,8 @@ Created comprehensive test suite with **21 passing tests** covering:
 
 ## Naming Convention
 
-Following the established OData-centric API pattern:
-- `Order()` instead of `OrderBy()` - consistent with `Filter`, `Expand`, `Top`
+Following the standard LINQ and OData naming conventions:
+- `OrderBy()` and `OrderByDescending()` - consistent with LINQ's `IQueryable<T>` methods and OData `$orderby` parameter
 - `OrderDescending()` instead of `OrderByDescending()`
 - `ThenBy()` and `ThenByDescending()` - kept for LINQ familiarity
 

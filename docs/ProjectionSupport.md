@@ -13,7 +13,7 @@ var products = await client.Query<Product>().ExecuteAsync();
 // With projection - retrieves only Name and Price
 var products = await client
     .Query<Product>()
-    .Select(p => new { p.Name, p.Price })
+    .Select(list => list.Select(p => new { p.Name, p.Price }))
     .ExecuteAsync();
 ```
 
@@ -60,9 +60,11 @@ When you use `.Select()`, Linq2OData analyzes your projection expression and gen
 
 | Your LINQ Expression | Generated OData Query |
 |---------------------|----------------------|
-| `new { p.Name, p.Price }` | `$select=Name,Price` |
-| `new { p.Name, p.Category }` | `$select=Name&$expand=Category` |
-| `new { p.Name, CategoryName = p.Category.Name }` | `$select=Name&$expand=Category($select=Name)` |
+| `.Select(list => list.Select(p => new { p.Name, p.Price }))` | `$select=Name,Price` |
+| `.Select(list => list.Select(p => new { p.Name, p.Category }))` | `$select=Name&$expand=Category` |
+| `.Select(list => list.Select(p => new { p.Name, CategoryName = p.Category.Name }))` | `$select=Name&$expand=Category($select=Name)` |
+
+> **Note:** When using `.Query()`, the selector operates on `List<T>`, so you write `.Select(list => list.Select(p => ...))`. For `.Get()`, it operates on a single entity: `.Select(p => ...)`.
 
 ## Basic Usage
 
@@ -73,7 +75,7 @@ Select specific scalar properties from your entity:
 ```csharp
 var products = await client
     .Query<Product>()
-    .Select(p => new { p.Name, p.Price, p.StockQuantity })
+    .Select(list => list.Select(p => new { p.Name, p.Price, p.StockQuantity }))
     .ExecuteAsync();
 
 // Generates: $select=Name,Price,StockQuantity
@@ -86,7 +88,7 @@ You can select just one property:
 ```csharp
 var productNames = await client
     .Query<Product>()
-    .Select(p => new { p.Name })
+    .Select(list => list.Select(p => new { p.Name }))
     .ExecuteAsync();
 
 // Generates: $select=Name
