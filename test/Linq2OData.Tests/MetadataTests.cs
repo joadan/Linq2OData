@@ -649,20 +649,20 @@ namespace Linq2OData.Tests
             var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
             Assert.NotNull(personEntity);
 
-            // Verify collection properties have IsCollection = true
+            // Verify collection properties have IsCollection = true and DataType contains inner type
             var emailsProperty = personEntity.Properties.FirstOrDefault(p => p.Name == "Emails");
             Assert.NotNull(emailsProperty);
-            Assert.Equal("Collection(Edm.String)", emailsProperty.DataType);
+            Assert.Equal("Edm.String", emailsProperty.DataType); // Now stores inner type
             Assert.True(emailsProperty.IsCollection);
 
             var addressInfoProperty = personEntity.Properties.FirstOrDefault(p => p.Name == "AddressInfo");
             Assert.NotNull(addressInfoProperty);
-            Assert.Equal("Collection(Trippin.Location)", addressInfoProperty.DataType);
+            Assert.Equal("Trippin.Location", addressInfoProperty.DataType); // Now stores inner type
             Assert.True(addressInfoProperty.IsCollection);
 
             var featuresProperty = personEntity.Properties.FirstOrDefault(p => p.Name == "Features");
             Assert.NotNull(featuresProperty);
-            Assert.Equal("Collection(Trippin.Feature)", featuresProperty.DataType);
+            Assert.Equal("Trippin.Feature", featuresProperty.DataType); // Now stores inner type
             Assert.True(featuresProperty.IsCollection);
             Assert.True(featuresProperty.IsEnumType); // Should also be marked as enum type
 
