@@ -13,6 +13,7 @@ A modern, type-safe .NET library for building OData queries using LINQ expressio
 
 - **Type-Safe LINQ Queries** - Write strongly-typed C# expressions, not error-prone strings
 - **Auto Client Generation** - Generate typed client from OData `$metadata` 
+- **Smart Projections** - Use `.Select()` to retrieve only the fields you need with deep nesting support
 - **Multi-Version Support** - Works with OData v2, v3, and v4 seamlessly
 - **Full OData Support** - `$filter`, `$expand`, `$orderby`, `$top`, `$skip`, `$count`, `$select`
 
@@ -133,6 +134,191 @@ var suppliers = await client
 - **v4**: `$expand=Customer($expand=Address($expand=Country))`  
 - **v2/v3**: `$expand=Customer/Address/Country`
 
+### Projections (Select Specific Fields)
+
+Use `.Select()` to retrieve only the fields you need, reducing payload size and improving performance. This generates the OData `$select` and `$expand` query parameters.
+
+> [!IMPORTANT]
+> **Server vs Client Evaluation:** Only `$select` and `$expand` are sent to the OData server. Any filtering, ordering, or computed properties within the `.Select()` expression are evaluated **client-side** after the data is retrieved.
+
+#### Basic Property Selection
+
+```csharp
+// Select specific properties
+var products = await client
+    .Query<Product>()
+    .Select(p => new { p.Name, p.Price })
+    .ExecuteAsync();
+// Generates: $select=Name,Price
+```
+
+#### Selecting with Navigation Properties
+
+```csharp
+// Include a navigation property alongside simple properties
+var products = await client
+    .Query<Product>()
+    .Select(p => new 
+    { 
+        p.Name, 
+        p.Price, 
+        p.Category  // Full Category object included
+    })
+    .ExecuteAsync();
+// Generates: $select=Name,Price&$expand=Category
+```
+
+#### Nested Property Access
+
+```csharp
+// Access properties from nested navigation objects
+var products = await client
+    .Query<Product>()
+    .Select(p => new 
+    { 
+        p.Name, 
+        p.Price,
+        CategoryName = p.Category.Name  // Only Category.Name
+    })
+    .ExecuteAsync();
+// Generates: $select=Name,Price&$expand=Category($select=Name)
+```
+
+#### Deep Nesting
+
+```csharp
+// Access deeply nested properties
+var orders = await client
+    .Query<Order>()
+    .Select(o => new 
+    { 
+        o.OrderNumber,
+        CustomerCountry = o.Customer.Address.Country.Name
+    })
+    .ExecuteAsync();
+// OData v4: $select=OrderNumber&$expand=Customer($expand=Address($expand=Country($select=Name)))
+// OData v2/v3: $select=OrderNumber,Customer&$expand=Customer/Address/Country
+```
+
+#### Complex Projections
+
+```csharp
+// Mix simple properties, nested properties, and full objects
+var suppliers = await client
+    .Query<Supplier>()
+    .Select(s => new 
+    { 
+        s.Name,
+        s.Email,
+        PrimaryContactName = s.PrimaryContact.FullName,
+        PrimaryContactPhone = s.PrimaryContact.Phone,
+        AllProducts = s.Products  // Full collection
+    })
+    .ExecuteAsync();
+// Generates: $select=Name,Email
+//           &$expand=PrimaryContact($select=FullName,Phone);Products
+```
+
+#### Use with Single Entity Retrieval
+
+```csharp
+// Project when getting a single entity
+var person = await client
+    .Get<Person>(p => p.ID = 5)
+    .Select(p => new 
+    { 
+        p.Name, 
+        p.Email,
+        DetailPerson = p.PersonDetail.Person  // Nested navigation
+    })
+    .ExecuteAsync();
+// Generates: Persons(ID=5)?$select=Name,Email&$expand=PersonDetail($expand=Person)
+```
+
+**Benefits of Projections:**
+- 🚀 **Performance** - Retrieve only needed data, reducing bandwidth
+- 📦 **Smaller Payloads** - Less data transferred over the network
+- 🎯 **Type-Safe** - Compile-time checking of property names
+- 🔄 **Version Agnostic** - Library handles OData v2/v3/v4 differences automatically
+
+**Note:** The null-forgiving operator (`!`) is supported for nullable navigation properties:
+```csharp
+.Select(p => new { Name = p.Category!.Name })  // Works correctly
+```
+
+#### Projecting to Custom Types (DTOs)
+
+You can project to your own classes instead of anonymous types:
+
+```csharp
+// Define a DTO/view model
+public class ProductSummaryDto
+{
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+    public string CategoryName { get; set; }
+    public decimal DiscountPrice { get; set; }
+}
+
+// Project to the custom type
+var products = await client
+    .Query<Product>()
+    .Filter(p => p.Price > 100)
+    .Select(p => new ProductSummaryDto
+    {
+        Name = p.Name,                           // ✅ Server sends
+        Price = p.Price,                         // ✅ Server sends
+        CategoryName = p.Category.Name,          // ✅ Server sends via $expand
+        DiscountPrice = p.Price * 0.9m           // ⚠️ Computed client-side
+    })
+    .ExecuteAsync();
+// Returns List<ProductSummaryDto> - perfect for APIs, serialization, etc.
+```
+
+#### Server-Side vs Client-Side Operations
+
+```csharp
+// ✅ OPTIMAL - Filter, order, paginate, then project
+var products = await client
+    .Query<Product>()
+    .Filter(p => p.Price > 100)           // ✅ Server-side filter
+    .Order(p => p.Name)                   // ✅ Server-side ordering
+    .Top(50)                              // ✅ Server-side limit
+    .Skip(10)                             // ✅ Server-side pagination
+    .Select(p => new { p.Name, p.Price }) // ✅ Server-side projection
+    .ExecuteAsync();
+// URL: Products?$filter=Price gt 100&$orderby=Name&$top=50&$skip=10&$select=Name,Price
+
+// ⚠️ NOTE - Computed properties are evaluated client-side
+var products = await client
+    .Query<Product>()
+    .Select(p => new 
+    { 
+        FullName = p.FirstName + " " + p.LastName,  // ⚠️ Client-side computation
+        DiscountPrice = p.Price * 0.9m              // ⚠️ Client-side computation
+    })
+    .ExecuteAsync();
+// URL: Products (fetches ALL products, ALL fields, then computes client-side)
+// Use case: When you need computations that OData doesn't support server-side
+
+// ✅ BEST OF BOTH WORLDS - Server projects minimal fields, computations done client-side
+var result = await client
+    .Query<Product>()
+    .Filter(p => p.Price > 100)                  // ✅ Server filters
+    .Select(p => new 
+    { 
+        p.FirstName,                             // ✅ Server sends this field
+        p.LastName,                              // ✅ Server sends this field
+        p.Price,                                 // ✅ Server sends this field
+        FullName = p.FirstName + " " + p.LastName,  // ⚠️ Computed client-side
+        DiscountPrice = p.Price * 0.9m           // ⚠️ Computed client-side
+    })
+    .ExecuteAsync();
+// Server sends only: FirstName, LastName, Price
+// Client computes: FullName, DiscountPrice
+// You get everything in one result!
+```
+
 ### Ordering & Pagination
 
 ```csharp
@@ -200,6 +386,7 @@ All handled transparently by the library.
 For detailed documentation and examples:
 
 - **[Project Website](https://joadan.github.io/Linq2OData/)** - Interactive examples
+- **[Projection Support](docs/ProjectionSupport.md)** - Complete guide to using Select projections
 - **[OData Version Support](docs/ODataVersionSupport.md)** - Version-specific features
 - **[API Naming Convention](docs/NamingConvention.md)** - Design philosophy
 - **[More Examples](docs/)** - Expand, OrderBy, and advanced scenarios
