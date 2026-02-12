@@ -83,6 +83,7 @@ public class ODataProperty
     public bool Filterable { get; set; }
 
     public bool IsEnumType { get; set; } = false;
+    public bool IsCollection { get; set; } = false;
 
 
 }

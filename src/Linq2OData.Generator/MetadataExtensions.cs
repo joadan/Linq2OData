@@ -116,7 +116,7 @@ internal static class MetadataExtensions
             get
             {
                 // Handle Collection types
-                if (property.DataType.StartsWith("Collection(") && property.DataType.EndsWith(")"))
+                if (property.IsCollection)
                 {
                     var innerType = property.DataType.Substring("Collection(".Length, property.DataType.Length - "Collection(".Length - 1);
 
@@ -182,7 +182,7 @@ internal static class MetadataExtensions
             get
             {
                 // Handle Collection types
-                if (property.DataType.StartsWith("Collection(") && property.DataType.EndsWith(")"))
+                if (property.IsCollection)
                 {
                     var innerType = property.DataType.Substring("Collection(".Length, property.DataType.Length - "Collection(".Length - 1);
 

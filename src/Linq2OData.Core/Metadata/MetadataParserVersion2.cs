@@ -212,7 +212,8 @@ internal static class MetadataParserVersion2
             DataType = type,
             Nullable = prop.Attribute("Nullable")?.Value?.ToLower() != "false",
             Label = prop.Attribute(sap + "label")?.Value,
-            Description = prop.Attribute(sap + "quickinfo")?.Value
+            Description = prop.Attribute(sap + "quickinfo")?.Value,
+            IsCollection = type.StartsWith("Collection(") && type.EndsWith(")")
         };
 
         // Parse MaxLength
