@@ -55,7 +55,7 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
         return this;
     }
 
-    internal QueryNode MergeExpression<TResult>(Expression<Func<List<T>, TResult>> selector)
+    internal QueryNode MergeExpression(Expression selector)
     {
         var visitor = new QueryNodeVisitor();
         var node = visitor.Parse(selector);
@@ -72,7 +72,7 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
     }
 
 
-    public QueryBuilder<T> Expand<TResult>(Expression<Func<List<T>, TResult>> selector)
+    public QueryBuilder<T> Expand<TResult>(Expression<Func<T, TResult>> selector)
     {
          expand = MergeExpression(selector).GetOnlyExpand(odataClient.ODataVersion);
         return this;
