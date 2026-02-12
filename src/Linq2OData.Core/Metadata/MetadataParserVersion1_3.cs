@@ -3,26 +3,50 @@
 
 namespace Linq2OData.Core.Metadata;
 
-internal static class MetadataParserVersion2
+internal static class MetadataParserVersion1_3
 {
     internal static ODataMetadata Parse(XDocument doc)
     {
-        
+        // Determine OData version from DataServiceVersion attribute
+        var dataServicesElement = doc.Root?.Descendants()
+            .FirstOrDefault(e => e.Name.LocalName == "DataServices");
+
+        var version = ODataVersion.V2; // Default to V2
+        if (dataServicesElement != null)
+        {
+            var dataServiceVersionAttr = dataServicesElement.Attributes()
+                .FirstOrDefault(a => a.Name.LocalName == "DataServiceVersion");
+
+            if (dataServiceVersionAttr != null)
+            {
+                if (dataServiceVersionAttr.Value.StartsWith("3"))
+                {
+                    version = ODataVersion.V3;
+                }
+                else if (dataServiceVersionAttr.Value.StartsWith("2"))
+                {
+                    version = ODataVersion.V2;
+                }
+            }
+        }
+
         var metadata = new ODataMetadata
         {
-            ODataVersion = ODataVersion.V2
+            ODataVersion = version
         };
 
         // Define namespaces
         XNamespace edmx = "http://schemas.microsoft.com/ado/2007/06/edmx";
         XNamespace edm = "http://schemas.microsoft.com/ado/2008/09/edm";
         XNamespace edm2007 = "http://schemas.microsoft.com/ado/2007/05/edm";
+        XNamespace edm2009 = "http://schemas.microsoft.com/ado/2009/11/edm";
         XNamespace sap = "http://www.sap.com/Protocols/SAPData";
         XNamespace m = "http://schemas.microsoft.com/ado/2007/08/dataservices/metadata";
 
-        // Get the schema element (try both EDM namespaces for V2 compatibility)
+        // Get the schema element (try both EDM namespaces for V2 and V3 compatibility)
         var schema = doc.Descendants(edm + "Schema").FirstOrDefault()
-                     ?? doc.Descendants(edm2007 + "Schema").FirstOrDefault();
+                     ?? doc.Descendants(edm2007 + "Schema").FirstOrDefault()
+                     ?? doc.Descendants(edm2009 + "Schema").FirstOrDefault();
 
         if (schema == null)
             return metadata;
@@ -142,7 +166,8 @@ internal static class MetadataParserVersion2
             var entity = new ODataEntityType
             {
                 Name = name,
-                Label = entityType.Attribute(sap + "label")?.Value
+                Label = entityType.Attribute(sap + "label")?.Value,
+                BaseType = entityType.Attribute("BaseType")?.Value
             };
 
         

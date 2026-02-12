@@ -29,24 +29,25 @@ namespace Linq2OData.Core.Metadata
                 }
             }
             
-            // For OData v2, the Edmx Version is "1.0" and DataServiceVersion is "2.0"
+            // For OData v2/v3, the Edmx Version is "1.0" and DataServiceVersion is "2.0" or "3.0"
             // Check DataServiceVersion as a fallback
             var dataServicesElement = xDocument.Root.Descendants()
                 .FirstOrDefault(e => e.Name.LocalName == "DataServices");
-                
+
             if (dataServicesElement != null)
             {
                 var dataServiceVersionAttribute = dataServicesElement.Attributes()
                     .FirstOrDefault(a => a.Name.LocalName == "DataServiceVersion");
-                    
-                if (dataServiceVersionAttribute != null && dataServiceVersionAttribute.Value.StartsWith("2"))
+
+                if (dataServiceVersionAttribute != null && 
+                    (dataServiceVersionAttribute.Value.StartsWith("2") || dataServiceVersionAttribute.Value.StartsWith("3")))
                 {
-                    return MetadataParserVersion2.Parse(xDocument);
+                    return MetadataParserVersion1_3.Parse(xDocument);
                 }
             }
 
             // Default to OData 2.0 parser for backward compatibility
-            return MetadataParserVersion2.Parse(xDocument);
+            return MetadataParserVersion1_3.Parse(xDocument);
         }
 
     }
