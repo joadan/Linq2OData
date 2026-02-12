@@ -414,7 +414,7 @@ internal static class MetadataParserVersion4
                     property.IsEnumType = true;
                 }
                 // Check if it's a collection of enums
-                else if (property.DataType.StartsWith("Collection(") && property.DataType.EndsWith(")"))
+                else if (property.IsCollection)
                 {
                     var innerType = property.DataType.Substring("Collection(".Length, 
                         property.DataType.Length - "Collection(".Length - 1);
