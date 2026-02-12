@@ -1,3 +1,7 @@
+> [!WARNING]
+> Under development!
+> API is frequently updated, documentation may not be correct.
+
 # Linq2OData
 
 [![.NET](https://img.shields.io/badge/.NET-10.0-blue.svg)](https://dotnet.microsoft.com/)
