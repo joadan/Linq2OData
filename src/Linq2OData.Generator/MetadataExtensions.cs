@@ -8,6 +8,41 @@ namespace Linq2OData.Generator;
 
 internal static class MetadataExtensions
 {
+    // Shared Edm type to C# type mapping
+    private static readonly Dictionary<string, string> EdmTypeToCSharpMapping = new()
+    {
+        // Common for v2 & v4
+        { "Edm.String", "string" },
+        { "Edm.Boolean", "bool" },
+        { "Edm.Byte", "byte" },
+        { "Edm.SByte", "sbyte" },
+        { "Edm.Int16", "short" },
+        { "Edm.Int32", "int" },
+        { "Edm.Int64", "long" },
+        { "Edm.Decimal", "decimal" },
+        { "Edm.Single", "float" },
+        { "Edm.Double", "double" },
+        { "Edm.Guid", "Guid" },
+        { "Edm.Binary", "byte[]" },
+        // OData v2 only
+        { "Edm.DateTime", "DateTime" },
+        { "Edm.Time", "TimeSpan" },
+        // OData v4 only
+        { "Edm.Date", "DateOnly" },
+        { "Edm.DateTimeOffset", "DateTimeOffset" },
+        { "Edm.TimeOfDay", "TimeSpan" },
+        { "Edm.GeographyPoint", "object" },
+        { "Edm.GeometryPoint", "object" },
+        { "Edm.Stream", "object" }
+    };
+
+    // Helper method to strip namespace from type names
+    private static string StripNamespace(string typeName)
+        => typeName.Contains('.') ? typeName.Split('.').Last() : typeName;
+
+    // Helper method to map Edm types to C# types
+    private static string MapEdmTypeToCSharp(string edmType)
+        => EdmTypeToCSharpMapping.TryGetValue(edmType, out var csharpType) ? csharpType : "object";
 
     extension(ClientRequest clientRequest)
     {
@@ -191,77 +226,25 @@ internal static class MetadataExtensions
                     // Check if it's an Edm type
                     if (innerType.StartsWith("Edm."))
                     {
-                        var elementType = innerType switch
-                        {
-                            "Edm.String" => "string",
-                            "Edm.Boolean" => "bool",
-                            "Edm.Byte" => "byte",
-                            "Edm.SByte" => "sbyte",
-                            "Edm.Int16" => "short",
-                            "Edm.Int32" => "int",
-                            "Edm.Int64" => "long",
-                            "Edm.Decimal" => "decimal",
-                            "Edm.Single" => "float",
-                            "Edm.Double" => "double",
-                            "Edm.Guid" => "Guid",
-                            "Edm.Binary" => "byte[]",
-                            "Edm.DateTime" => "DateTime",
-                            "Edm.Time" => "TimeSpan",
-                            "Edm.Date" => "DateOnly",
-                            "Edm.DateTimeOffset" => "DateTimeOffset",
-                            "Edm.TimeOfDay" => "TimeSpan",
-                            _ => "object"
-                        };
+                        var elementType = MapEdmTypeToCSharp(innerType);
                         return $"List<{elementType}>";
                     }
                     else
                     {
                         // Custom type (complex type or enum) - strip namespace
-                        var typeName = innerType.Contains('.') ? innerType.Split('.').Last() : innerType;
+                        var typeName = StripNamespace(innerType);
                         return $"List<{typeName}>";
                     }
                 }
 
+                // For custom types (complex types or enums), strip namespace prefix
                 if (!property.DataType.StartsWith("Edm."))
                 {
-                    // For custom types (complex types or enums), strip namespace prefix
-                    return property.DataType.Contains('.') ? property.DataType.Split('.').Last() : property.DataType;
+                    return StripNamespace(property.DataType);
                 }
 
-
-                var csharpType = property.DataType switch
-                {
-                    // Common for v2 & v4
-                    "Edm.String" => "string",
-                    "Edm.Boolean" => "bool",
-                    "Edm.Byte" => "byte",
-                    "Edm.SByte" => "sbyte",
-                    "Edm.Int16" => "short",
-                    "Edm.Int32" => "int",
-                    "Edm.Int64" => "long",
-                    "Edm.Decimal" => "decimal",
-                    "Edm.Single" => "float",
-                    "Edm.Double" => "double",
-                    "Edm.Guid" => "Guid",
-                    "Edm.Binary" => "byte[]",
-
-                    // OData v2 only
-                    "Edm.DateTime" => "DateTime",
-                    "Edm.Time" => "TimeSpan",
-
-                    // OData v4 only
-                    "Edm.Date" => "DateOnly",          // or DateTime or DateOnly in .NET 6+
-                    "Edm.DateTimeOffset" => "DateTimeOffset",
-                    "Edm.TimeOfDay" => "TimeSpan",
-                    "Edm.GeographyPoint" => "object", // "Microsoft.Spatial.GeographyPoint", //This would make a dependancy to Microsoft.Spatial JsonConverter is needed..
-                    "Edm.GeometryPoint" => "object", // "Microsoft.Spatial.GeometryPoint",  //This would make a dependancy to Microsoft.Spatial 
-                    "Edm.Stream" => "object", //For now we use object not sure if we should handle this
-
-                    // Fallback
-                    _ => "object"
-                };
-
-                return csharpType;
+                // For Edm primitive types, map to C# types
+                return MapEdmTypeToCSharp(property.DataType);
             }
 
         }
