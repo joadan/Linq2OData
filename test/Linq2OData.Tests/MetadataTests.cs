@@ -7,6 +7,7 @@ namespace Linq2OData.Tests
     {
         private string odataDemoMetadataV2;
         private string sapSalesQuotationMetadataV2;
+        private string odataDemoMetadataV3;
         private string odataDemoMetadataV4;
         private string trippinMetadataV4;
 
@@ -15,6 +16,7 @@ namespace Linq2OData.Tests
 
             odataDemoMetadataV2 =  File.ReadAllText(Path.Combine("SampleData", "Metadata", "V2", "ODataDemo.xml"));
             sapSalesQuotationMetadataV2 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V2", "SapSalesQuotation.xml"));
+            odataDemoMetadataV3 =  File.ReadAllText(Path.Combine("SampleData", "Metadata", "V3", "ODataDemo.xml"));
             odataDemoMetadataV4 =  File.ReadAllText(Path.Combine("SampleData", "Metadata", "V4", "ODataDemo.xml"));
             trippinMetadataV4 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V4", "Trippin.xml"));
         }
@@ -326,6 +328,481 @@ namespace Linq2OData.Tests
             Assert.NotNull(productsNav);
             Assert.Equal(ODataNavigationType.Many, productsNav.NavigationType);
         }
+
+        #region OData V3 Tests
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParseVersionCorrectly()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert
+            Assert.NotNull(metadata);
+            Assert.Equal(ODataVersion.V3, metadata.ODataVersion);
+            Assert.Equal("ODataDemo", metadata.Namespace);
+        }
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParseEntityTypes()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert
+            Assert.NotNull(metadata.EntityTypes);
+            Assert.NotEmpty(metadata.EntityTypes);
+
+            // Verify Product entity exists
+            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            Assert.NotNull(productEntity);
+
+            // Verify key
+            Assert.Single(productEntity.KeyProperties);
+            Assert.Contains("ID", productEntity.KeyProperties.Select(e => e.Name));
+
+            // Verify properties with V3-specific types
+            Assert.NotEmpty(productEntity.Properties);
+
+            var idProperty = productEntity.Properties.FirstOrDefault(p => p.Name == "ID");
+            Assert.NotNull(idProperty);
+            Assert.Equal("Edm.Int32", idProperty.DataType);
+            Assert.False(idProperty.Nullable);
+
+            var nameProperty = productEntity.Properties.FirstOrDefault(p => p.Name == "Name");
+            Assert.NotNull(nameProperty);
+            Assert.Equal("Edm.String", nameProperty.DataType);
+
+            var releaseDateProperty = productEntity.Properties.FirstOrDefault(p => p.Name == "ReleaseDate");
+            Assert.NotNull(releaseDateProperty);
+            Assert.Equal("Edm.DateTime", releaseDateProperty.DataType);
+            Assert.False(releaseDateProperty.Nullable);
+
+            var priceProperty = productEntity.Properties.FirstOrDefault(p => p.Name == "Price");
+            Assert.NotNull(priceProperty);
+            Assert.Equal("Edm.Double", priceProperty.DataType);
+            Assert.False(priceProperty.Nullable);
+
+            var ratingProperty = productEntity.Properties.FirstOrDefault(p => p.Name == "Rating");
+            Assert.NotNull(ratingProperty);
+            Assert.Equal("Edm.Int16", ratingProperty.DataType);
+            Assert.False(ratingProperty.Nullable);
+        }
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParseEntityInheritance()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert
+
+            // Verify base type - Product
+            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            Assert.NotNull(productEntity);
+            Assert.Null(productEntity.BaseType);
+
+            // Verify derived type - FeaturedProduct
+            var featuredProductEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "FeaturedProduct");
+            Assert.NotNull(featuredProductEntity);
+            Assert.Equal("ODataDemo.Product", featuredProductEntity.BaseType);
+
+            // Verify FeaturedProduct has its own navigation property
+            var advertisementNav = featuredProductEntity.Navigations.FirstOrDefault(n => n.Name == "Advertisement");
+            Assert.NotNull(advertisementNav);
+            Assert.Equal("Advertisement", advertisementNav.ToEntity);
+            Assert.Equal(ODataNavigationType.ZeroOrOne, advertisementNav.NavigationType);
+
+            // Verify Person base type
+            var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
+            Assert.NotNull(personEntity);
+            Assert.Null(personEntity.BaseType);
+
+            // Verify Customer derives from Person
+            var customerEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Customer");
+            Assert.NotNull(customerEntity);
+            Assert.Equal("ODataDemo.Person", customerEntity.BaseType);
+
+            var totalExpenseProperty = customerEntity.Properties.FirstOrDefault(p => p.Name == "TotalExpense");
+            Assert.NotNull(totalExpenseProperty);
+            Assert.Equal("Edm.Decimal", totalExpenseProperty.DataType);
+            Assert.False(totalExpenseProperty.Nullable);
+
+            // Verify Employee derives from Person
+            var employeeEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Employee");
+            Assert.NotNull(employeeEntity);
+            Assert.Equal("ODataDemo.Person", employeeEntity.BaseType);
+
+            var employeeIdProperty = employeeEntity.Properties.FirstOrDefault(p => p.Name == "EmployeeID");
+            Assert.NotNull(employeeIdProperty);
+            Assert.Equal("Edm.Int64", employeeIdProperty.DataType);
+            Assert.False(employeeIdProperty.Nullable);
+
+            var salaryProperty = employeeEntity.Properties.FirstOrDefault(p => p.Name == "Salary");
+            Assert.NotNull(salaryProperty);
+            Assert.Equal("Edm.Single", salaryProperty.DataType);
+            Assert.False(salaryProperty.Nullable);
+        }
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParseNavigationProperties()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert
+            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            Assert.NotNull(productEntity);
+
+            // Verify Product has multiple navigation properties
+            Assert.Equal(3, productEntity.Navigations.Count);
+
+            // Verify Categories navigation (Many)
+            var categoriesNav = productEntity.Navigations.FirstOrDefault(n => n.Name == "Categories");
+            Assert.NotNull(categoriesNav);
+            Assert.Equal("Category", categoriesNav.ToEntity);
+            Assert.Equal(ODataNavigationType.Many, categoriesNav.NavigationType);
+
+            // Verify Supplier navigation (ZeroOrOne)
+            var supplierNav = productEntity.Navigations.FirstOrDefault(n => n.Name == "Supplier");
+            Assert.NotNull(supplierNav);
+            Assert.Equal("Supplier", supplierNav.ToEntity);
+            Assert.Equal(ODataNavigationType.ZeroOrOne, supplierNav.NavigationType);
+
+            // Verify ProductDetail navigation (ZeroOrOne)
+            var productDetailNav = productEntity.Navigations.FirstOrDefault(n => n.Name == "ProductDetail");
+            Assert.NotNull(productDetailNav);
+            Assert.Equal("ProductDetail", productDetailNav.ToEntity);
+            Assert.Equal(ODataNavigationType.ZeroOrOne, productDetailNav.NavigationType);
+        }
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParseComplexTypes()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert
+            var addressType = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Address");
+            Assert.NotNull(addressType);
+
+            // Verify Address complex type properties
+            Assert.Equal(5, addressType.Properties.Count);
+
+            var streetProperty = addressType.Properties.FirstOrDefault(p => p.Name == "Street");
+            Assert.NotNull(streetProperty);
+            Assert.Equal("Edm.String", streetProperty.DataType);
+
+            var cityProperty = addressType.Properties.FirstOrDefault(p => p.Name == "City");
+            Assert.NotNull(cityProperty);
+            Assert.Equal("Edm.String", cityProperty.DataType);
+
+            var stateProperty = addressType.Properties.FirstOrDefault(p => p.Name == "State");
+            Assert.NotNull(stateProperty);
+            Assert.Equal("Edm.String", stateProperty.DataType);
+
+            var zipCodeProperty = addressType.Properties.FirstOrDefault(p => p.Name == "ZipCode");
+            Assert.NotNull(zipCodeProperty);
+            Assert.Equal("Edm.String", zipCodeProperty.DataType);
+
+            var countryProperty = addressType.Properties.FirstOrDefault(p => p.Name == "Country");
+            Assert.NotNull(countryProperty);
+            Assert.Equal("Edm.String", countryProperty.DataType);
+        }
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParseSupplierWithGeography()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert
+            var supplierEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Supplier");
+            Assert.NotNull(supplierEntity);
+
+            // Verify Supplier has Location property with GeographyPoint type
+            var locationProperty = supplierEntity.Properties.FirstOrDefault(p => p.Name == "Location");
+            Assert.NotNull(locationProperty);
+            Assert.Equal("Edm.GeographyPoint", locationProperty.DataType);
+
+            // Verify Address complex type property
+            var addressProperty = supplierEntity.Properties.FirstOrDefault(p => p.Name == "Address");
+            Assert.NotNull(addressProperty);
+            Assert.Equal("ODataDemo.Address", addressProperty.DataType);
+
+            // Verify Concurrency property
+            var concurrencyProperty = supplierEntity.Properties.FirstOrDefault(p => p.Name == "Concurrency");
+            Assert.NotNull(concurrencyProperty);
+            Assert.Equal("Edm.Int32", concurrencyProperty.DataType);
+            Assert.False(concurrencyProperty.Nullable);
+        }
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParseCategoryWithOpenType()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert
+            var categoryEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Category");
+            Assert.NotNull(categoryEntity);
+
+            // Verify key
+            Assert.Single(categoryEntity.KeyProperties);
+            Assert.Contains("ID", categoryEntity.KeyProperties.Select(e => e.Name));
+
+            // Verify properties
+            var idProperty = categoryEntity.Properties.FirstOrDefault(p => p.Name == "ID");
+            Assert.NotNull(idProperty);
+            Assert.Equal("Edm.Int32", idProperty.DataType);
+            Assert.False(idProperty.Nullable);
+
+            var nameProperty = categoryEntity.Properties.FirstOrDefault(p => p.Name == "Name");
+            Assert.NotNull(nameProperty);
+            Assert.Equal("Edm.String", nameProperty.DataType);
+
+            // Verify navigation to Products
+            var productsNav = categoryEntity.Navigations.FirstOrDefault(n => n.Name == "Products");
+            Assert.NotNull(productsNav);
+            Assert.Equal("Product", productsNav.ToEntity);
+            Assert.Equal(ODataNavigationType.Many, productsNav.NavigationType);
+        }
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParsePersonDetail()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert
+            var personDetailEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "PersonDetail");
+            Assert.NotNull(personDetailEntity);
+
+            // Verify key
+            Assert.Single(personDetailEntity.KeyProperties);
+            Assert.Contains("PersonID", personDetailEntity.KeyProperties.Select(e => e.Name));
+
+            // Verify properties including diverse types
+            var personIdProperty = personDetailEntity.Properties.FirstOrDefault(p => p.Name == "PersonID");
+            Assert.NotNull(personIdProperty);
+            Assert.Equal("Edm.Int32", personIdProperty.DataType);
+            Assert.False(personIdProperty.Nullable);
+
+            var ageProperty = personDetailEntity.Properties.FirstOrDefault(p => p.Name == "Age");
+            Assert.NotNull(ageProperty);
+            Assert.Equal("Edm.Byte", ageProperty.DataType);
+            Assert.False(ageProperty.Nullable);
+
+            var genderProperty = personDetailEntity.Properties.FirstOrDefault(p => p.Name == "Gender");
+            Assert.NotNull(genderProperty);
+            Assert.Equal("Edm.Boolean", genderProperty.DataType);
+            Assert.False(genderProperty.Nullable);
+
+            var phoneProperty = personDetailEntity.Properties.FirstOrDefault(p => p.Name == "Phone");
+            Assert.NotNull(phoneProperty);
+            Assert.Equal("Edm.String", phoneProperty.DataType);
+
+            var photoProperty = personDetailEntity.Properties.FirstOrDefault(p => p.Name == "Photo");
+            Assert.NotNull(photoProperty);
+            Assert.Equal("Edm.Stream", photoProperty.DataType);
+            Assert.False(photoProperty.Nullable);
+
+            var addressProperty = personDetailEntity.Properties.FirstOrDefault(p => p.Name == "Address");
+            Assert.NotNull(addressProperty);
+            Assert.Equal("ODataDemo.Address", addressProperty.DataType);
+        }
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParseAdvertisementWithMediaLink()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert
+            var advertisementEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Advertisement");
+            Assert.NotNull(advertisementEntity);
+
+            // Verify key is GUID
+            Assert.Single(advertisementEntity.KeyProperties);
+            Assert.Contains("ID", advertisementEntity.KeyProperties.Select(e => e.Name));
+
+            var idProperty = advertisementEntity.Properties.FirstOrDefault(p => p.Name == "ID");
+            Assert.NotNull(idProperty);
+            Assert.Equal("Edm.Guid", idProperty.DataType);
+            Assert.False(idProperty.Nullable);
+
+            var nameProperty = advertisementEntity.Properties.FirstOrDefault(p => p.Name == "Name");
+            Assert.NotNull(nameProperty);
+            Assert.Equal("Edm.String", nameProperty.DataType);
+
+            var airDateProperty = advertisementEntity.Properties.FirstOrDefault(p => p.Name == "AirDate");
+            Assert.NotNull(airDateProperty);
+            Assert.Equal("Edm.DateTime", airDateProperty.DataType);
+            Assert.False(airDateProperty.Nullable);
+
+            // Verify navigation to FeaturedProduct
+            var featuredProductNav = advertisementEntity.Navigations.FirstOrDefault(n => n.Name == "FeaturedProduct");
+            Assert.NotNull(featuredProductNav);
+            Assert.Equal("FeaturedProduct", featuredProductNav.ToEntity);
+            Assert.Equal(ODataNavigationType.ZeroOrOne, featuredProductNav.NavigationType);
+        }
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParseEntitySets()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert
+            Assert.NotNull(metadata.EntitySets);
+            Assert.Equal(7, metadata.EntitySets.Count);
+
+            // Verify Products entity set
+            var productsSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Products");
+            Assert.NotNull(productsSet);
+            Assert.Equal("Product", productsSet.EntityTypeName);
+            Assert.NotNull(productsSet.EntityType);
+
+            // Verify ProductDetails entity set
+            var productDetailsSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "ProductDetails");
+            Assert.NotNull(productDetailsSet);
+            Assert.Equal("ProductDetail", productDetailsSet.EntityTypeName);
+
+            // Verify Categories entity set
+            var categoriesSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Categories");
+            Assert.NotNull(categoriesSet);
+            Assert.Equal("Category", categoriesSet.EntityTypeName);
+
+            // Verify Suppliers entity set
+            var suppliersSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Suppliers");
+            Assert.NotNull(suppliersSet);
+            Assert.Equal("Supplier", suppliersSet.EntityTypeName);
+
+            // Verify Persons entity set
+            var personsSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Persons");
+            Assert.NotNull(personsSet);
+            Assert.Equal("Person", personsSet.EntityTypeName);
+
+            // Verify PersonDetails entity set
+            var personDetailsSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "PersonDetails");
+            Assert.NotNull(personDetailsSet);
+            Assert.Equal("PersonDetail", personDetailsSet.EntityTypeName);
+
+            // Verify Advertisements entity set
+            var advertisementsSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Advertisements");
+            Assert.NotNull(advertisementsSet);
+            Assert.Equal("Advertisement", advertisementsSet.EntityTypeName);
+        }
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParseFunctionImport()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert
+            Assert.NotNull(metadata.Functions);
+            Assert.Single(metadata.Functions);
+
+            var getProductsByRatingFunc = metadata.Functions.FirstOrDefault(f => f.Name == "GetProductsByRating");
+            Assert.NotNull(getProductsByRatingFunc);
+            Assert.Equal("Collection(ODataDemo.Product)", getProductsByRatingFunc.ReturnType);
+            Assert.Equal("GET", getProductsByRatingFunc.HttpMethod);
+
+            // Verify function parameter
+            Assert.Single(getProductsByRatingFunc.Parameters);
+            var ratingParam = getProductsByRatingFunc.Parameters.FirstOrDefault(p => p.Name == "rating");
+            Assert.NotNull(ratingParam);
+            Assert.Equal("Edm.Int16", ratingParam.DataType);
+        }
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParseProductDetailEntity()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert
+            var productDetailEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "ProductDetail");
+            Assert.NotNull(productDetailEntity);
+
+            // Verify key
+            Assert.Single(productDetailEntity.KeyProperties);
+            Assert.Contains("ProductID", productDetailEntity.KeyProperties.Select(e => e.Name));
+
+            // Verify properties
+            var productIdProperty = productDetailEntity.Properties.FirstOrDefault(p => p.Name == "ProductID");
+            Assert.NotNull(productIdProperty);
+            Assert.Equal("Edm.Int32", productIdProperty.DataType);
+            Assert.False(productIdProperty.Nullable);
+
+            var detailsProperty = productDetailEntity.Properties.FirstOrDefault(p => p.Name == "Details");
+            Assert.NotNull(detailsProperty);
+            Assert.Equal("Edm.String", detailsProperty.DataType);
+
+            // Verify navigation to Product
+            var productNav = productDetailEntity.Navigations.FirstOrDefault(n => n.Name == "Product");
+            Assert.NotNull(productNav);
+            Assert.Equal("Product", productNav.ToEntity);
+            Assert.Equal(ODataNavigationType.ZeroOrOne, productNav.NavigationType);
+        }
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParseAllEntityTypesCount()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert - V3 has more entity types due to inheritance
+            Assert.NotNull(metadata.EntityTypes);
+
+            // Count base types: Product, Category, Supplier, Person, ProductDetail, PersonDetail, Advertisement, Address
+            // Count derived types: FeaturedProduct, Customer, Employee
+            // Total should be 11 (8 base + 3 derived)
+            Assert.True(metadata.EntityTypes.Count >= 11, $"Expected at least 11 entity types, but found {metadata.EntityTypes.Count}");
+
+            // Verify specific entity types exist
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "FeaturedProduct"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Category"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Supplier"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Customer"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Employee"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "ProductDetail"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "PersonDetail"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Advertisement"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Address"));
+        }
+
+        [Fact]
+        public void ParseODataDemoV3Metadata_ShouldParseAssociations()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV3);
+
+            // Assert - Verify associations are correctly parsed through navigation properties
+            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            Assert.NotNull(productEntity);
+
+            // Product has associations: Product_Categories, Product_Supplier, Product_ProductDetail
+            Assert.Equal(3, productEntity.Navigations.Count);
+
+            // Verify the association results in correct navigation properties
+            var categoriesNav = productEntity.Navigations.FirstOrDefault(n => n.Name == "Categories");
+            Assert.NotNull(categoriesNav);
+            Assert.Equal("Category", categoriesNav.ToEntity);
+
+            var supplierNav = productEntity.Navigations.FirstOrDefault(n => n.Name == "Supplier");
+            Assert.NotNull(supplierNav);
+            Assert.Equal("Supplier", supplierNav.ToEntity);
+
+            var productDetailNav = productEntity.Navigations.FirstOrDefault(n => n.Name == "ProductDetail");
+            Assert.NotNull(productDetailNav);
+            Assert.Equal("ProductDetail", productDetailNav.ToEntity);
+        }
+
+        #endregion
 
         #region OData V4 Tests
 
