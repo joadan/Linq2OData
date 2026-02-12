@@ -206,13 +206,24 @@ internal static class MetadataParserVersion2
         if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(type))
             return null;
 
+        // Check if it's a collection type and extract the inner type
+        bool isCollection = type.StartsWith("Collection(") && type.EndsWith(")");
+        string dataType = type;
+        
+        if (isCollection)
+        {
+            // Extract inner type from Collection(InnerType)
+            dataType = type.Substring("Collection(".Length, type.Length - "Collection(".Length - 1);
+        }
+
         var property = new ODataProperty
         {
             Name = name,
-            DataType = type,
+            DataType = dataType,
             Nullable = prop.Attribute("Nullable")?.Value?.ToLower() != "false",
             Label = prop.Attribute(sap + "label")?.Value,
-            Description = prop.Attribute(sap + "quickinfo")?.Value
+            Description = prop.Attribute(sap + "quickinfo")?.Value,
+            IsCollection = isCollection
         };
 
         // Parse MaxLength
@@ -389,20 +400,11 @@ internal static class MetadataParserVersion2
         {
             foreach (var property in entityType.Properties)
             {
-                // Check if it's a direct enum reference
+                // Since DataType now contains the inner type directly for both
+                // collection and non-collection properties, we just check it directly
                 if (enumTypeNames.Contains(property.DataType))
                 {
                     property.IsEnumType = true;
-                }
-                // Check if it's a collection of enums
-                else if (property.DataType.StartsWith("Collection(") && property.DataType.EndsWith(")"))
-                {
-                    var innerType = property.DataType.Substring("Collection(".Length, 
-                        property.DataType.Length - "Collection(".Length - 1);
-                    if (enumTypeNames.Contains(innerType))
-                    {
-                        property.IsEnumType = true;
-                    }
                 }
             }
         }

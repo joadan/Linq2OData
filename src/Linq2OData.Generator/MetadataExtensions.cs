@@ -116,9 +116,10 @@ internal static class MetadataExtensions
             get
             {
                 // Handle Collection types
-                if (property.DataType.StartsWith("Collection(") && property.DataType.EndsWith(")"))
+                if (property.IsCollection)
                 {
-                    var innerType = property.DataType.Substring("Collection(".Length, property.DataType.Length - "Collection(".Length - 1);
+                    // DataType now contains the inner type directly
+                    var innerType = property.DataType;
 
                     // Check if it's an Edm type
                     if (innerType.StartsWith("Edm."))
@@ -182,9 +183,10 @@ internal static class MetadataExtensions
             get
             {
                 // Handle Collection types
-                if (property.DataType.StartsWith("Collection(") && property.DataType.EndsWith(")"))
+                if (property.IsCollection)
                 {
-                    var innerType = property.DataType.Substring("Collection(".Length, property.DataType.Length - "Collection(".Length - 1);
+                    // DataType now contains the inner type directly
+                    var innerType = property.DataType;
 
                     // Check if it's an Edm type
                     if (innerType.StartsWith("Edm."))

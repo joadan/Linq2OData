@@ -636,5 +636,77 @@ namespace Linq2OData.Tests
         }
 
         #endregion
+
+        #region IsCollection Property Tests
+
+        [Fact]
+        public void ParseTrippinMetadata_ShouldSetIsCollectionCorrectly()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(trippinMetadataV4);
+
+            // Assert
+            var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
+            Assert.NotNull(personEntity);
+
+            // Verify collection properties have IsCollection = true and DataType contains inner type
+            var emailsProperty = personEntity.Properties.FirstOrDefault(p => p.Name == "Emails");
+            Assert.NotNull(emailsProperty);
+            Assert.Equal("Edm.String", emailsProperty.DataType); // Now stores inner type
+            Assert.True(emailsProperty.IsCollection);
+
+            var addressInfoProperty = personEntity.Properties.FirstOrDefault(p => p.Name == "AddressInfo");
+            Assert.NotNull(addressInfoProperty);
+            Assert.Equal("Trippin.Location", addressInfoProperty.DataType); // Now stores inner type
+            Assert.True(addressInfoProperty.IsCollection);
+
+            var featuresProperty = personEntity.Properties.FirstOrDefault(p => p.Name == "Features");
+            Assert.NotNull(featuresProperty);
+            Assert.Equal("Trippin.Feature", featuresProperty.DataType); // Now stores inner type
+            Assert.True(featuresProperty.IsCollection);
+            Assert.True(featuresProperty.IsEnumType); // Should also be marked as enum type
+
+            // Verify non-collection properties have IsCollection = false
+            var userNameProperty = personEntity.Properties.FirstOrDefault(p => p.Name == "UserName");
+            Assert.NotNull(userNameProperty);
+            Assert.Equal("Edm.String", userNameProperty.DataType);
+            Assert.False(userNameProperty.IsCollection);
+
+            var genderProperty = personEntity.Properties.FirstOrDefault(p => p.Name == "Gender");
+            Assert.NotNull(genderProperty);
+            Assert.Equal("Trippin.PersonGender", genderProperty.DataType);
+            Assert.False(genderProperty.IsCollection);
+            Assert.True(genderProperty.IsEnumType); // Non-collection enum
+        }
+
+        [Fact]
+        public void ParseODataDemoV2Metadata_ShouldSetIsCollectionCorrectly()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV2);
+
+            // Assert
+            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            Assert.NotNull(productEntity);
+
+            // Verify all properties are non-collection (ODataDemo V2 has no collection properties)
+            foreach (var property in productEntity.Properties)
+            {
+                Assert.False(property.IsCollection, $"Property {property.Name} should not be a collection");
+            }
+
+            // Spot check a few specific properties
+            var idProperty = productEntity.Properties.FirstOrDefault(p => p.Name == "ID");
+            Assert.NotNull(idProperty);
+            Assert.Equal("Edm.Int32", idProperty.DataType);
+            Assert.False(idProperty.IsCollection);
+
+            var nameProperty = productEntity.Properties.FirstOrDefault(p => p.Name == "Name");
+            Assert.NotNull(nameProperty);
+            Assert.Equal("Edm.String", nameProperty.DataType);
+            Assert.False(nameProperty.IsCollection);
+        }
+
+        #endregion
     }
 }
