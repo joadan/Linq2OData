@@ -53,9 +53,9 @@ namespace Linq2OData.Core.Builders
         /// <typeparam name="TProperty">The type of the property to order by.</typeparam>
         /// <param name="expression">Expression selecting the property to order by.</param>
         /// <returns>A new OrderByBuilder.</returns>
-        public OrderByBuilder<TEntity> Order<TProperty>(Expression<Func<TEntity, TProperty>> expression)
+        public OrderByBuilder<TEntity> OrderBy<TProperty>(Expression<Func<TEntity, TProperty>> expression)
         {
-            return queryBuilder.Order(expression);
+            return queryBuilder.OrderBy(expression);
         }
 
         /// <summary>
@@ -64,9 +64,9 @@ namespace Linq2OData.Core.Builders
         /// <typeparam name="TProperty">The type of the property to order by.</typeparam>
         /// <param name="expression">Expression selecting the property to order by descending.</param>
         /// <returns>A new OrderByBuilder.</returns>
-        public OrderByBuilder<TEntity> OrderDescending<TProperty>(Expression<Func<TEntity, TProperty>> expression)
+        public OrderByBuilder<TEntity> OrderByDescending<TProperty>(Expression<Func<TEntity, TProperty>> expression)
         {
-            return queryBuilder.OrderDescending(expression);
+            return queryBuilder.OrderByDescending(expression);
         }
 
         /// <summary>

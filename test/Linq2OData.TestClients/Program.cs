@@ -45,6 +45,7 @@ namespace Linq2OData.TestClients
             var queryResult = await clientV2
                .Query<DemoClientV2.ODataDemo.Product>()
                .Filter(e => e.ID != 1)
+               .Expand(expand => expand.Category!.Products)
                .ExecuteAsync();
 
 

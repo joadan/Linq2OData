@@ -1,20 +1,20 @@
-// LINQ Expression-Based Order Usage Examples
+// LINQ Expression-Based OrderBy Usage Examples
 
 // Example 1: Simple ascending order
 var result = await queryBuilder
-    .Order(s => s.Name)
+    .OrderBy(s => s.Name)
     .ExecuteAsync();
 // Generates: $orderby=Name
 
 // Example 2: Simple descending order
 var result = await queryBuilder
-    .OrderDescending(s => s.Price)
+    .OrderByDescending(s => s.Price)
     .ExecuteAsync();
 // Generates: $orderby=Price desc
 
 // Example 3: Multiple orderby with ThenBy
 var result = await queryBuilder
-    .Order(s => s.Country)
+    .OrderBy(s => s.Country)
         .ThenBy(s => s.Name)
         .ThenBy(s => s.ID)
     .ExecuteAsync();
@@ -22,7 +22,7 @@ var result = await queryBuilder
 
 // Example 4: Mixed ascending and descending with ThenByDescending
 var result = await queryBuilder
-    .Order(s => s.Country)
+    .OrderBy(s => s.Country)
         .ThenByDescending(s => s.Rating)
         .ThenBy(s => s.Name)
     .ExecuteAsync();
@@ -30,13 +30,13 @@ var result = await queryBuilder
 
 // Example 5: Order with nested property paths
 var result = await queryBuilder
-    .Order(s => s.Address.City)
+    .OrderBy(s => s.Address.City)
     .ExecuteAsync();
 // Generates: $orderby=Address/City
 
 // Example 6: Complex ordering with nested properties
 var result = await queryBuilder
-    .Order(s => s.Address.Country)
+    .OrderBy(s => s.Address.Country)
         .ThenBy(s => s.Address.City)
         .ThenByDescending(s => s.CreatedDate)
     .ExecuteAsync();
@@ -45,7 +45,7 @@ var result = await queryBuilder
 // Example 7: Order combined with Filter and Top
 var result = await queryBuilder
     .Filter(s => s.IsActive)
-    .Order(s => s.Name)
+    .OrderBy(s => s.Name)
     .Top(20)
     .ExecuteAsync();
 // Generates: $filter=(IsActive eq true)&$orderby=Name&$top=20
@@ -54,7 +54,7 @@ var result = await queryBuilder
 var result = await queryBuilder
     .Expand(s => s.Products)
     .Filter(s => s.Country == "USA")
-    .Order(s => s.Rating)
+    .OrderBy(s => s.Rating)
         .ThenByDescending(s => s.Name)
     .Top(50)
     .ExecuteAsync();
@@ -64,7 +64,7 @@ var result = await queryBuilder
 var result = await queryBuilder
     .Expand(s => s.Products)
         .ThenExpand(products => products.Select(p => p.Category))
-    .OrderDescending(s => s.CreatedDate)
+    .OrderByDescending(s => s.CreatedDate)
         .ThenBy(s => s.Name)
     .ExecuteAsync();
 // Generates: $expand=Products($expand=Category)&$orderby=CreatedDate desc,Name
@@ -73,7 +73,7 @@ var result = await queryBuilder
 var suppliers = await clientV2
     .Query<Supplier>()
     .Filter(s => s.IsActive && s.Country == "USA")
-    .Order(s => s.Rating)
+    .OrderBy(s => s.Rating)
         .ThenByDescending(s => s.JoinDate)
         .ThenBy(s => s.Name)
     .Skip(20)
@@ -86,7 +86,7 @@ var activeProducts = await client
     .Expand(p => p.Category)
     .Expand(p => p.Manufacturer)
     .Filter(p => p.InStock && p.Price > 10)
-    .Order(p => p.Category.Name)
+    .OrderBy(p => p.Category.Name)
         .ThenBy(p => p.Name)
     .Top(100)
     .ExecuteAsync();
@@ -95,7 +95,7 @@ var activeProducts = await client
 var salesReport = await client
     .Query<Order>()
     .Filter(o => o.OrderDate > DateTime.Now.AddMonths(-3))
-    .OrderDescending(o => o.OrderDate)
+    .OrderByDescending(o => o.OrderDate)
         .ThenBy(o => o.Customer.Name)
         .ThenBy(o => o.OrderNumber)
     .Count(true)
@@ -103,13 +103,13 @@ var salesReport = await client
 
 // Example 13: String-based orderby (legacy support)
 var result = await queryBuilder
-    .Order("Name,Price desc")
+    .OrderBy("Name,Price desc")
     .ExecuteAsync();
 // Generates: $orderby=Name,Price desc
 
 // Example 14: Order with Select projection
 var projected = await queryBuilder
-    .Order(s => s.Rating)
+    .OrderBy(s => s.Rating)
         .ThenBy(s => s.Name)
     .Select()
     .ExecuteAsync();

@@ -18,12 +18,17 @@ namespace Linq2OData.Core.Expressions
             _nodeStack.Push(_root);
         }
 
-
-        public QueryNode Parse<T, TResult>(Expression<Func<T, TResult>> expression)
+        public QueryNode Parse(Expression expression)
         {
             Visit(expression);
             return _root;
         }
+
+        //public QueryNode Parse<T, TResult>(Expression<Func<T, TResult>> expression)
+        //{
+        //    Visit(expression);
+        //    return _root;
+        //}
 
         protected override Expression VisitMember(MemberExpression node)
         {
