@@ -543,4 +543,217 @@ public class FilterExpressionTests
     }
 
     #endregion
+
+    #region String Method Tests - OData V2
+
+    [Fact]
+    public void ODataFilterVisitor_StringContains_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Contains("Widget");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        // OData V2 uses substringof with reversed parameters
+        Assert.Equal("substringof('Widget', Name)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringContainsWithVariable_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var searchTerm = "Phone";
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Contains(searchTerm);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("substringof('Phone', Name)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringStartsWith_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.StartsWith("Apple");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("startswith(Name, 'Apple')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringEndsWith_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.EndsWith("Pro");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("endswith(Name, 'Pro')", result);
+    }
+
+    #endregion
+
+    #region String Method Tests - OData V3
+
+    [Fact]
+    public void ODataFilterVisitor_StringContains_V3_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Contains("Widget");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V3);
+
+        // Assert
+        // OData V3 uses substringof with reversed parameters
+        Assert.Equal("substringof('Widget', Name)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringStartsWith_V3_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.StartsWith("Apple");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V3);
+
+        // Assert
+        Assert.Equal("startswith(Name, 'Apple')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringEndsWith_V3_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.EndsWith("Pro");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V3);
+
+        // Assert
+        Assert.Equal("endswith(Name, 'Pro')", result);
+    }
+
+    #endregion
+
+    #region String Method Tests - OData V4
+
+    [Fact]
+    public void ODataFilterVisitor_StringContains_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Contains("Widget");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        // OData V4 uses contains with normal parameter order
+        Assert.Equal("contains(Name, 'Widget')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringContainsWithVariable_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var searchTerm = "Phone";
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Contains(searchTerm);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("contains(Name, 'Phone')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringStartsWith_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.StartsWith("Apple");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("startswith(Name, 'Apple')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringEndsWith_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.EndsWith("Pro");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("endswith(Name, 'Pro')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringMethodsInComplexExpression_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Contains("Phone") && p.Price > 500;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(contains(Name, 'Phone') and (Price gt 500))", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_MultipleStringMethods_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.StartsWith("Apple") || p.Name.EndsWith("Pro");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(startswith(Name, 'Apple') or endswith(Name, 'Pro'))", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringContainsOnNestedProperty_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Category!.Name!.Contains("Electro");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("contains(Category/Name, 'Electro')", result);
+    }
+
+    #endregion
 }

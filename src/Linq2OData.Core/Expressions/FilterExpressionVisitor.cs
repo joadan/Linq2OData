@@ -73,15 +73,58 @@ namespace Linq2OData.Core.Expressions
         #region Override        
         protected override Expression VisitMethodCall(MethodCallExpression m)
         {
-            // Example of how to implement methods call in the future if needed.
-            // if (m.Method.Name == "METHOD_NAME")
-            // {
-            //     // handle odata parsing for METHOD_NAME
-            //     // e.g. Count, Contains, EndsWith                
-            //     return m;
-            // }
+            // Handle string methods
+            if (m.Method.DeclaringType == typeof(string))
+            {
+                switch (m.Method.Name)
+                {
+                    case "Contains":
+                        HandleStringFunction(m, "contains", "substringof");
+                        return m;
+                    case "StartsWith":
+                        HandleStringFunction(m, "startswith", "startswith");
+                        return m;
+                    case "EndsWith":
+                        HandleStringFunction(m, "endswith", "endswith");
+                        return m;
+                }
+            }
 
             throw new NotSupportedException($"The method '{m.Method.Name}' is not supported");
+        }
+
+        private void HandleStringFunction(MethodCallExpression m, string v4FunctionName, string v2v3FunctionName)
+        {
+            // For string instance methods like str.Contains(value), str.StartsWith(value), str.EndsWith(value)
+            // m.Object is the string instance (e.g., p.Name)
+            // m.Arguments[0] is the parameter (e.g., "search")
+
+            if (m.Object == null)
+            {
+                throw new NotSupportedException($"Static string method '{m.Method.Name}' is not supported");
+            }
+
+            if (v4FunctionName == "contains" && (odataVersion == ODataVersion.V2 || odataVersion == ODataVersion.V3))
+            {
+                // OData v2/v3 uses substringof with reversed parameter order: substringof('value', Property)
+                sb.Append("substringof(");
+                Visit(m.Arguments[0]); // The search value
+                sb.Append(", ");
+                Visit(m.Object); // The property being searched
+                sb.Append(")");
+            }
+            else
+            {
+                // OData v4 uses contains(Property, 'value')
+                // OData v2/v3/v4 all use startswith(Property, 'value') and endswith(Property, 'value')
+                var functionName = (odataVersion == ODataVersion.V4) ? v4FunctionName : v2v3FunctionName;
+                sb.Append(functionName);
+                sb.Append("(");
+                Visit(m.Object); // The property being searched
+                sb.Append(", ");
+                Visit(m.Arguments[0]); // The search value
+                sb.Append(")");
+            }
         }
 
         protected override Expression VisitUnary(UnaryExpression u)
