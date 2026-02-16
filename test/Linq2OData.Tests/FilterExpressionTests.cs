@@ -512,6 +512,79 @@ public class FilterExpressionTests
         Assert.Equal("(Category/Name eq null)", result);
     }
 
+    [Fact]
+    public void ODataFilterVisitor_MethodValue()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var beforeExecution = DateTime.Now.AddDays(-100);
+        Expression<Func<TestProduct, bool>> expression = p => p.CreatedDate > DateTime.Now.AddDays(-100);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+        var afterExecution = DateTime.Now.AddDays(-100);
+
+        // Assert
+        Assert.StartsWith("(CreatedDate gt datetime'", result);
+        Assert.EndsWith("')", result);
+
+        // Verify the date is approximately -100 days from now
+        var dateStr = result.Substring("(CreatedDate gt datetime'".Length, 19);
+        var parsedDate = DateTime.ParseExact(dateStr, "yyyy-MM-ddTHH:mm:ss", null);
+        Assert.True(parsedDate >= beforeExecution.AddSeconds(-1) && parsedDate <= afterExecution.AddSeconds(1));
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_DateTimeOffsetMethodValue_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.LastModified < DateTimeOffset.UtcNow.AddHours(-24);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.StartsWith("(LastModified lt datetimeoffset'", result);
+        Assert.EndsWith("')", result);
+        Assert.Contains("+00:00", result); // UTC offset
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_MethodValueInComplexExpression_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => 
+            p.Price > 100 && p.CreatedDate >= DateTime.UtcNow.AddMonths(-6);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.StartsWith("((Price gt 100) and (CreatedDate ge datetime'", result);
+        Assert.EndsWith("'))", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_MathMethodValue_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        decimal calculatedPrice = CalculateMinPrice();
+        Expression<Func<TestProduct, bool>> expression = p => p.Price > CalculateMinPrice();
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        // Culture-specific decimal formatting, so verify structure
+        Assert.StartsWith("(Price gt 100", result);
+        Assert.EndsWith(")", result);
+    }
+
+    private static decimal CalculateMinPrice() => 100.0m;
+
     #endregion
 
     #region Edge Cases
@@ -540,6 +613,570 @@ public class FilterExpressionTests
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => visitor.ToFilter<TestProduct>(null!, ODataVersion.V4));
+    }
+
+    #endregion
+
+    #region String Method Tests - OData V2
+
+    [Fact]
+    public void ODataFilterVisitor_StringContains_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Contains("Widget");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        // OData V2 uses substringof with reversed parameters
+        Assert.Equal("substringof('Widget', Name)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringContainsWithVariable_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var searchTerm = "Phone";
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Contains(searchTerm);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("substringof('Phone', Name)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringStartsWith_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.StartsWith("Apple");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("startswith(Name, 'Apple')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringEndsWith_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.EndsWith("Pro");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("endswith(Name, 'Pro')", result);
+    }
+
+    #endregion
+
+    #region String Method Tests - OData V3
+
+    [Fact]
+    public void ODataFilterVisitor_StringContains_V3_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Contains("Widget");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V3);
+
+        // Assert
+        // OData V3 uses substringof with reversed parameters
+        Assert.Equal("substringof('Widget', Name)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringStartsWith_V3_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.StartsWith("Apple");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V3);
+
+        // Assert
+        Assert.Equal("startswith(Name, 'Apple')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringEndsWith_V3_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.EndsWith("Pro");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V3);
+
+        // Assert
+        Assert.Equal("endswith(Name, 'Pro')", result);
+    }
+
+    #endregion
+
+    #region String Method Tests - OData V4
+
+    [Fact]
+    public void ODataFilterVisitor_StringContains_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Contains("Widget");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        // OData V4 uses contains with normal parameter order
+        Assert.Equal("contains(Name, 'Widget')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringContainsWithVariable_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var searchTerm = "Phone";
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Contains(searchTerm);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("contains(Name, 'Phone')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringStartsWith_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.StartsWith("Apple");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("startswith(Name, 'Apple')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringEndsWith_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.EndsWith("Pro");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("endswith(Name, 'Pro')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringMethodsInComplexExpression_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Contains("Phone") && p.Price > 500;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(contains(Name, 'Phone') and (Price gt 500))", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_MultipleStringMethods_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.StartsWith("Apple") || p.Name.EndsWith("Pro");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(startswith(Name, 'Apple') or endswith(Name, 'Pro'))", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringContainsOnNestedProperty_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Category!.Name!.Contains("Electro");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("contains(Category/Name, 'Electro')", result);
+    }
+
+    #endregion
+
+    #region NOT Operator Tests
+
+    [Fact]
+    public void ODataFilterVisitor_NotOperator_OnBooleanProperty_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => !p.IsAvailable;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("not IsAvailable", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_NotOperator_OnComparison_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => !(p.Price > 100);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("not (Price gt 100)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_NotOperator_WithLogicalOperators_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => !(p.Price > 100 && p.Stock < 50);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("not ((Price gt 100) and (Stock lt 50))", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_NotOperator_Combined_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => !p.IsAvailable && p.Price > 50;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        // The NOT operator doesn't add extra parentheses around its operand
+        Assert.Equal("(not IsAvailable and (Price gt 50))", result);
+    }
+
+    #endregion
+
+    #region String Function Tests - ToLower/ToUpper
+
+    [Fact]
+    public void ODataFilterVisitor_StringToLower_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.ToLower() == "widget";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(tolower(Name) eq 'widget')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringToLowerInvariant_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.ToLowerInvariant() == "widget";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(tolower(Name) eq 'widget')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringToUpper_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.ToUpper() == "WIDGET";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(toupper(Name) eq 'WIDGET')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringToUpperInvariant_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.ToUpperInvariant() == "WIDGET";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(toupper(Name) eq 'WIDGET')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringToLower_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.ToLower() == "widget";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("(tolower(Name) eq 'widget')", result);
+    }
+
+    #endregion
+
+    #region String Function Tests - Length
+
+    [Fact]
+    public void ODataFilterVisitor_StringLength_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Length > 5;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(length(Name) gt 5)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringLength_Equal_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Length == 10;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(length(Name) eq 10)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringLength_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Length < 20;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("(length(Name) lt 20)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringLength_OnNestedProperty_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Category!.Name!.Length > 3;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(length(Category/Name) gt 3)", result);
+    }
+
+    #endregion
+
+    #region String Function Tests - Trim
+
+    [Fact]
+    public void ODataFilterVisitor_StringTrim_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Trim() == "Widget";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(trim(Name) eq 'Widget')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringTrim_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Trim() == "Widget";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("(trim(Name) eq 'Widget')", result);
+    }
+
+    #endregion
+
+    #region String Function Tests - Substring
+
+    [Fact]
+    public void ODataFilterVisitor_StringSubstring_WithStartIndex_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Substring(0) == "Widget";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(substring(Name, 0) eq 'Widget')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringSubstring_WithStartIndexAndLength_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Substring(0, 3) == "Wid";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(substring(Name, 0, 3) eq 'Wid')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringSubstring_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Substring(1, 5) == "idget";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("(substring(Name, 1, 5) eq 'idget')", result);
+    }
+
+    #endregion
+
+    #region String Function Tests - IndexOf
+
+    [Fact]
+    public void ODataFilterVisitor_StringIndexOf_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.IndexOf("get") > 0;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(indexof(Name, 'get') gt 0)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringIndexOf_Equal_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.IndexOf("Widget") == 0;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(indexof(Name, 'Widget') eq 0)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringIndexOf_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.IndexOf("Pro") >= 0;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("(indexof(Name, 'Pro') ge 0)", result);
+    }
+
+    #endregion
+
+    #region Combined String Functions Tests
+
+    [Fact]
+    public void ODataFilterVisitor_CombinedStringFunctions_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.ToLower().Trim().Contains("widget");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("contains(trim(tolower(Name)), 'widget')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_StringFunctionsInLogicalExpression_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Name!.Length > 5 && p.Name.ToUpper().StartsWith("WID");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("((length(Name) gt 5) and startswith(toupper(Name), 'WID'))", result);
     }
 
     #endregion

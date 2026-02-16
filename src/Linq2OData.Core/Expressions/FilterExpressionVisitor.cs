@@ -73,21 +73,188 @@ namespace Linq2OData.Core.Expressions
         #region Override        
         protected override Expression VisitMethodCall(MethodCallExpression m)
         {
-            // Example of how to implement methods call in the future if needed.
-            // if (m.Method.Name == "METHOD_NAME")
-            // {
-            //     // handle odata parsing for METHOD_NAME
-            //     // e.g. Count, Contains, EndsWith                
-            //     return m;
-            // }
+            // Handle string methods on entity properties
+            if (m.Method.DeclaringType == typeof(string) && m.Object != null)
+            {
+                // Check if this is a string method on an entity property (not a constant evaluation)
+                if (IsEntityPropertyAccess(m.Object))
+                {
+                    switch (m.Method.Name)
+                    {
+                        case "Contains":
+                            HandleStringFunction(m, "contains", "substringof");
+                            return m;
+                        case "StartsWith":
+                            HandleStringFunction(m, "startswith", "startswith");
+                            return m;
+                        case "EndsWith":
+                            HandleStringFunction(m, "endswith", "endswith");
+                            return m;
+                        case "ToLower":
+                        case "ToLowerInvariant":
+                            HandleStringTransformFunction(m, "tolower");
+                            return m;
+                        case "ToUpper":
+                        case "ToUpperInvariant":
+                            HandleStringTransformFunction(m, "toupper");
+                            return m;
+                        case "Trim":
+                            HandleStringTransformFunction(m, "trim");
+                            return m;
+                        case "Substring":
+                            HandleSubstringFunction(m);
+                            return m;
+                        case "IndexOf":
+                            HandleIndexOfFunction(m);
+                            return m;
+                    }
+                }
+            }
 
-            throw new NotSupportedException($"The method '{m.Method.Name}' is not supported");
+            // Try to evaluate the method call as a constant expression
+            // This handles cases like DateTime.Now.AddDays(-100), GetValue(), etc.
+            try
+            {
+                var lambda = Expression.Lambda(m);
+                var compiled = lambda.Compile();
+                var value = compiled.DynamicInvoke();
+                AppendByValueType(value, sb);
+                return m;
+            }
+            catch
+            {
+                throw new NotSupportedException($"The method '{m.Method.Name}' is not supported");
+            }
+        }
+
+        private bool IsEntityPropertyAccess(Expression expression)
+        {
+            // Check if the expression ultimately references the entity parameter
+            while (expression != null)
+            {
+                switch (expression.NodeType)
+                {
+                    case ExpressionType.Parameter:
+                        return true;
+                    case ExpressionType.MemberAccess:
+                        expression = ((MemberExpression)expression).Expression!;
+                        break;
+                    case ExpressionType.Convert:
+                        expression = ((UnaryExpression)expression).Operand;
+                        break;
+                    case ExpressionType.Call:
+                        // For method calls like ToLower(), Trim(), etc., check the object they're called on
+                        var methodCall = (MethodCallExpression)expression;
+                        if (methodCall.Object != null)
+                        {
+                            expression = methodCall.Object;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                        break;
+                    default:
+                        return false;
+                }
+            }
+            return false;
+        }
+
+        private void HandleStringFunction(MethodCallExpression m, string v4FunctionName, string v2v3FunctionName)
+        {
+            // For string instance methods like str.Contains(value), str.StartsWith(value), str.EndsWith(value)
+            // m.Object is the string instance (e.g., p.Name)
+            // m.Arguments[0] is the parameter (e.g., "search")
+
+            if (m.Object == null)
+            {
+                throw new NotSupportedException($"Static string method '{m.Method.Name}' is not supported");
+            }
+
+            if (v4FunctionName == "contains" && (odataVersion == ODataVersion.V2 || odataVersion == ODataVersion.V3))
+            {
+                // OData v2/v3 uses substringof with reversed parameter order: substringof('value', Property)
+                sb.Append("substringof(");
+                Visit(m.Arguments[0]); // The search value
+                sb.Append(", ");
+                Visit(m.Object); // The property being searched
+                sb.Append(")");
+            }
+            else
+            {
+                // OData v4 uses contains(Property, 'value')
+                // OData v2/v3/v4 all use startswith(Property, 'value') and endswith(Property, 'value')
+                var functionName = (odataVersion == ODataVersion.V4) ? v4FunctionName : v2v3FunctionName;
+                sb.Append(functionName);
+                sb.Append("(");
+                Visit(m.Object); // The property being searched
+                sb.Append(", ");
+                Visit(m.Arguments[0]); // The search value
+                sb.Append(")");
+            }
+        }
+
+        private void HandleStringTransformFunction(MethodCallExpression m, string functionName)
+        {
+            // For string transform methods like str.ToLower(), str.ToUpper(), str.Trim()
+            // These take no arguments and just transform the string
+            if (m.Object == null)
+            {
+                throw new NotSupportedException($"Static string method '{m.Method.Name}' is not supported");
+            }
+
+            sb.Append(functionName);
+            sb.Append("(");
+            Visit(m.Object); // The property being transformed
+            sb.Append(")");
+        }
+
+        private void HandleSubstringFunction(MethodCallExpression m)
+        {
+            // substring(Property, startIndex) or substring(Property, startIndex, length)
+            if (m.Object == null)
+            {
+                throw new NotSupportedException($"Static string method '{m.Method.Name}' is not supported");
+            }
+
+            sb.Append("substring(");
+            Visit(m.Object); // The property
+            sb.Append(", ");
+            Visit(m.Arguments[0]); // Start index
+
+            if (m.Arguments.Count > 1)
+            {
+                sb.Append(", ");
+                Visit(m.Arguments[1]); // Length
+            }
+
+            sb.Append(")");
+        }
+
+        private void HandleIndexOfFunction(MethodCallExpression m)
+        {
+            // indexof(Property, 'searchString')
+            if (m.Object == null)
+            {
+                throw new NotSupportedException($"Static string method '{m.Method.Name}' is not supported");
+            }
+
+            sb.Append("indexof(");
+            Visit(m.Object); // The property
+            sb.Append(", ");
+            Visit(m.Arguments[0]); // Search string
+            sb.Append(")");
         }
 
         protected override Expression VisitUnary(UnaryExpression u)
         {
             switch (u.NodeType)
             {
+                case ExpressionType.Not:
+                    sb.Append("not ");
+                    Visit(u.Operand);
+                    break;
                 case ExpressionType.Convert:
                     Visit(u.Operand);
                     break;
@@ -151,6 +318,18 @@ namespace Linq2OData.Core.Expressions
 
         protected override Expression VisitMember(MemberExpression m)
         {
+            // Handle string.Length property on entity properties
+            if (m.Member.Name == "Length" && m.Member.DeclaringType == typeof(string) && m.Expression != null)
+            {
+                if (IsEntityPropertyAccess(m.Expression))
+                {
+                    sb.Append("length(");
+                    Visit(m.Expression);
+                    sb.Append(")");
+                    return m;
+                }
+            }
+
             if (m.Expression?.NodeType == ExpressionType.Parameter)
             {
                 sb.Append(m.Member.Name);
