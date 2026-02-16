@@ -13,6 +13,7 @@ namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 [JsonDerivedType(typeof(PlanItem))]
 [JsonDerivedType(typeof(PublicTransportation), "#Microsoft.OData.SampleService.Models.TripPin.PublicTransportation")]
 [JsonDerivedType(typeof(Event), "#Microsoft.OData.SampleService.Models.TripPin.Event")]
+[JsonDerivedType(typeof(Flight), "#Microsoft.OData.SampleService.Models.TripPin.Flight")]
 
 
 public partial class PlanItem  : IPlanItemKeys

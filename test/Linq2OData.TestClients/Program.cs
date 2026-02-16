@@ -16,14 +16,11 @@ namespace Linq2OData.TestClients
             Console.WriteLine("Here we go!");
 
             // await GenerateDemoClientV2Async();
-            //   await GenerateDemoClientV4Async();
-           //await GenerateTripPinClientAsync();
+            // await GenerateDemoClientV4Async();
+            // await GenerateTripPinClientAsync();
 
             await TestTripPinAsync();
             // await TestV4ClientAsync();
-            //TestAddHocClient();
-
-
         }
 
         private static async Task TestTripPinAsync()
@@ -39,12 +36,10 @@ namespace Linq2OData.TestClients
                 .Query<TripPin.Microsoft.OData.SampleService.Models.TripPin.Person>()
                 .Top(1)
                 .Expand(e => e.Trips!.Select(e => e.PlanItems))
-         
+
                 .ExecuteAsync();
 
-            var t = result;
-
-
+            Console.WriteLine($"Success! Got {result?.Count} people with {result?[0].Trips?.Count} trips");
         }
 
         private static async Task TestV2ClientAsync()
@@ -58,7 +53,7 @@ namespace Linq2OData.TestClients
             var clientV2 = new DemoClientV2.ODataDemoClientV2(httpClient);
 
             var kalle = clientV2.Services;
-            
+
             var queryResult = await clientV2
                .Query<DemoClientV2.ODataDemo.Product>()
                .Filter(e => e.ID != 1)

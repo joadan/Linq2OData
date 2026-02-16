@@ -25,6 +25,10 @@ namespace Linq2OData.Core
             // Add ODataInputBase converter factory for all versions to handle nested Input objects
             jsonOptions.Converters.Add(new ODataInputBaseConverterFactory());
 
+            // Add TimeSpan converters for all versions (handles both ISO 8601 Duration and standard TimeSpan formats)
+            jsonOptions.Converters.Add(new ODataTimeSpanConverter());
+            jsonOptions.Converters.Add(new ODataNullableTimeSpanConverter());
+
             if (odataVersion < ODataVersion.V4) //Not really sure about this but I belive it is a good start
             {
                 jsonOptions.Converters.Add(new MicrosoftDateTimeConverter());
