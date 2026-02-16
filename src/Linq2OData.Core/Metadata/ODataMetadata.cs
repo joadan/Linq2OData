@@ -14,6 +14,19 @@ public class ODataMetadata
         return EntityTypes.Where(et => et.BaseType == $"{Namespace}.{entityTypeName}");
     }
 
+    public IEnumerable<ODataEntityType> GetAllDerivedTypes(string entityTypeName)
+    {
+        var directChildren = GetDerivedTypes(entityTypeName).ToList();
+        var allDescendants = new List<ODataEntityType>(directChildren);
+
+        foreach (var child in directChildren)
+        {
+            allDescendants.AddRange(GetAllDerivedTypes(child.Name));
+        }
+
+        return allDescendants;
+    }
+
     internal void SetEntityPaths()
     {
         foreach (var entitySet in EntitySets)

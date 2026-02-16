@@ -153,9 +153,11 @@ namespace Linq2OData.Core.Expressions
                 }
 
                 // Visit the method arguments (typically lambdas)
-                foreach (var arg in node.Arguments)
+                // Skip the first argument if it's the source (for extension methods)
+                var startIndex = (node.Object == null && node.Arguments.Count > 0 && node.Arguments[0] == sourceMember) ? 1 : 0;
+                for (int i = startIndex; i < node.Arguments.Count; i++)
                 {
-                    Visit(arg);
+                    Visit(node.Arguments[i]);
                 }
 
                 // Pop the source node after visiting arguments

@@ -161,25 +161,17 @@ namespace Linq2OData.Core.Expressions
 
             var complexChildren = Children.Where(c => c.IsComplex).ToList();
 
-            if (complexChildren.Any())
+            // For a linear chain (single complex child), build the nested path
+            if (complexChildren.Count == 1)
             {
-                // Build nested paths
-                var paths = new List<string>();
-                foreach (var child in complexChildren)
+                var childPath = complexChildren[0].BuildExpandPath();
+                if (!string.IsNullOrEmpty(childPath))
                 {
-                    var childPath = child.BuildExpandPath();
-                    if (!string.IsNullOrEmpty(childPath))
-                    {
-                        paths.Add($"{Name}/{childPath}");
-                    }
-                }
-
-                if (paths.Any())
-                {
-                    return string.Join(",", paths);
+                    return $"{Name}/{childPath}";
                 }
             }
 
+            // For leaf nodes or nodes with multiple branches, just return the name
             return Name;
         }
 

@@ -9,25 +9,37 @@ namespace Linq2OData.TestClients
 
         const string demoUrlV2 = "https://services.odata.org/V2/(S(jo0zj0zu5nmnrfcfj2zv1ny2))/OData/OData.svc/";
         const string demoUrlV4 = "https://services.odata.org/V4/(S(jo0zj0zu5nmnrfcfj2zv1ny2))/OData/OData.svc/";
+        const string tripPinUrl = "https://services.odata.org/V4/(S(0qbgsoxblavd1okt2uawjtfe))/TripPinServiceRW/";
 
         static async Task Main(string[] args)
         {
             Console.WriteLine("Here we go!");
 
-           // await GenerateDemoClientV2Async();
-             //await GenerateDemoClientV4Async();
+            // await GenerateDemoClientV2Async();
+            // await GenerateDemoClientV4Async();
+            // await GenerateTripPinClientAsync();
 
-            await TestV2ClientAsync();
-           // await TestV4ClientAsync();
-            //TestAddHocClient();
-
-
+            await TestTripPinAsync();
+            // await TestV4ClientAsync();
         }
 
-        private static void TestAddHocClient()
+        private static async Task TestTripPinAsync()
         {
-            var odataClient = new Linq2OData.Core.ODataClient(new HttpClient(), Core.ODataVersion.V2);
+            var httpClient = new HttpClient
+            {
+                BaseAddress = new Uri(tripPinUrl)
+            };
 
+            var tripPinClient = new TripPin.TripPinClient(httpClient);
+
+            var result = await tripPinClient
+                .Query<TripPin.Microsoft.OData.SampleService.Models.TripPin.Person>()
+                .Top(1)
+                .Expand(e => e.Trips!.Select(e => e.PlanItems))
+
+                .ExecuteAsync();
+
+            Console.WriteLine($"Success! Got {result?.Count} people with {result?[0].Trips?.Count} trips");
         }
 
         private static async Task TestV2ClientAsync()
@@ -41,7 +53,7 @@ namespace Linq2OData.TestClients
             var clientV2 = new DemoClientV2.ODataDemoClientV2(httpClient);
 
             var kalle = clientV2.Services;
-            
+
             var queryResult = await clientV2
                .Query<DemoClientV2.ODataDemo.Product>()
                .Filter(e => e.ID != 1)
@@ -113,6 +125,26 @@ namespace Linq2OData.TestClients
             var projectDirectory = Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName;
             if (projectDirectory == null) { throw new Exception("Unable to get project directory"); }
             var files = generator.GenerateClient(Path.Combine(projectDirectory, "DemoClientV4"));
+        }
+
+        private static async Task GenerateTripPinClientAsync()
+        {
+            var httpClient = new HttpClient();
+            var metadata = await httpClient.GetStringAsync(tripPinUrl + "$metadata");
+
+            var request = new Linq2OData.Generator.Models.ClientRequest
+            {
+                Name = "TripPinClient",
+                Namespace = "TripPin",
+            };
+            request.AddMetadata(metadata);
+
+            var generator = new Linq2OData.Generator.ClientGenerator(request);
+
+
+            var projectDirectory = Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName;
+            if (projectDirectory == null) { throw new Exception("Unable to get project directory"); }
+            var files = generator.GenerateClient(Path.Combine(projectDirectory, "TripPinClientV4"));
         }
 
     }

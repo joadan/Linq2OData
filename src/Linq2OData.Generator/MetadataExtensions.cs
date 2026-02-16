@@ -24,6 +24,7 @@ internal static class MetadataExtensions
         { "Edm.Double", "double" },
         { "Edm.Guid", "Guid" },
         { "Edm.Binary", "byte[]" },
+        { "Edm.Duration", "TimeSpan" },
         // OData v2 only
         { "Edm.DateTime", "DateTime" },
         { "Edm.Time", "TimeSpan" },
@@ -53,9 +54,10 @@ internal static class MetadataExtensions
 
     extension(ClientMetadata navigation)
     {
-        internal string JsonName => $"{navigation.Metadata.Namespace}_Json";
-        internal string HelperName => $"{navigation.Metadata.Namespace}_Helper";
-        internal string ServiceName => $"{navigation.Metadata.Namespace}_Service";
+        internal string NamespaceName => $"{navigation.Metadata.Namespace.Replace(".", "_")}";
+        internal string JsonName => $"{navigation.NamespaceName}_Json";
+        internal string HelperName => $"{navigation.NamespaceName}_Helper";
+        internal string ServiceName => $"{navigation.NamespaceName}_Service";
 
         internal string MetadataAsJson => System.Text.Json.JsonSerializer.Serialize(navigation.Metadata);
 
