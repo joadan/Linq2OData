@@ -73,24 +73,63 @@ namespace Linq2OData.Core.Expressions
         #region Override        
         protected override Expression VisitMethodCall(MethodCallExpression m)
         {
-            // Handle string methods
-            if (m.Method.DeclaringType == typeof(string))
+            // Handle string methods on entity properties
+            if (m.Method.DeclaringType == typeof(string) && m.Object != null)
             {
-                switch (m.Method.Name)
+                // Check if this is a string method on an entity property (not a constant evaluation)
+                if (IsEntityPropertyAccess(m.Object))
                 {
-                    case "Contains":
-                        HandleStringFunction(m, "contains", "substringof");
-                        return m;
-                    case "StartsWith":
-                        HandleStringFunction(m, "startswith", "startswith");
-                        return m;
-                    case "EndsWith":
-                        HandleStringFunction(m, "endswith", "endswith");
-                        return m;
+                    switch (m.Method.Name)
+                    {
+                        case "Contains":
+                            HandleStringFunction(m, "contains", "substringof");
+                            return m;
+                        case "StartsWith":
+                            HandleStringFunction(m, "startswith", "startswith");
+                            return m;
+                        case "EndsWith":
+                            HandleStringFunction(m, "endswith", "endswith");
+                            return m;
+                    }
                 }
             }
 
-            throw new NotSupportedException($"The method '{m.Method.Name}' is not supported");
+            // Try to evaluate the method call as a constant expression
+            // This handles cases like DateTime.Now.AddDays(-100), GetValue(), etc.
+            try
+            {
+                var lambda = Expression.Lambda(m);
+                var compiled = lambda.Compile();
+                var value = compiled.DynamicInvoke();
+                AppendByValueType(value, sb);
+                return m;
+            }
+            catch
+            {
+                throw new NotSupportedException($"The method '{m.Method.Name}' is not supported");
+            }
+        }
+
+        private bool IsEntityPropertyAccess(Expression expression)
+        {
+            // Check if the expression ultimately references the entity parameter
+            while (expression != null)
+            {
+                switch (expression.NodeType)
+                {
+                    case ExpressionType.Parameter:
+                        return true;
+                    case ExpressionType.MemberAccess:
+                        expression = ((MemberExpression)expression).Expression!;
+                        break;
+                    case ExpressionType.Convert:
+                        expression = ((UnaryExpression)expression).Operand;
+                        break;
+                    default:
+                        return false;
+                }
+            }
+            return false;
         }
 
         private void HandleStringFunction(MethodCallExpression m, string v4FunctionName, string v2v3FunctionName)

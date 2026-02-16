@@ -512,6 +512,79 @@ public class FilterExpressionTests
         Assert.Equal("(Category/Name eq null)", result);
     }
 
+    [Fact]
+    public void ODataFilterVisitor_MethodValue()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var beforeExecution = DateTime.Now.AddDays(-100);
+        Expression<Func<TestProduct, bool>> expression = p => p.CreatedDate > DateTime.Now.AddDays(-100);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+        var afterExecution = DateTime.Now.AddDays(-100);
+
+        // Assert
+        Assert.StartsWith("(CreatedDate gt datetime'", result);
+        Assert.EndsWith("')", result);
+
+        // Verify the date is approximately -100 days from now
+        var dateStr = result.Substring("(CreatedDate gt datetime'".Length, 19);
+        var parsedDate = DateTime.ParseExact(dateStr, "yyyy-MM-ddTHH:mm:ss", null);
+        Assert.True(parsedDate >= beforeExecution.AddSeconds(-1) && parsedDate <= afterExecution.AddSeconds(1));
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_DateTimeOffsetMethodValue_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.LastModified < DateTimeOffset.UtcNow.AddHours(-24);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.StartsWith("(LastModified lt datetimeoffset'", result);
+        Assert.EndsWith("')", result);
+        Assert.Contains("+00:00", result); // UTC offset
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_MethodValueInComplexExpression_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => 
+            p.Price > 100 && p.CreatedDate >= DateTime.UtcNow.AddMonths(-6);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.StartsWith("((Price gt 100) and (CreatedDate ge datetime'", result);
+        Assert.EndsWith("'))", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_MathMethodValue_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        decimal calculatedPrice = CalculateMinPrice();
+        Expression<Func<TestProduct, bool>> expression = p => p.Price > CalculateMinPrice();
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        // Culture-specific decimal formatting, so verify structure
+        Assert.StartsWith("(Price gt 100", result);
+        Assert.EndsWith(")", result);
+    }
+
+    private static decimal CalculateMinPrice() => 100.0m;
+
     #endregion
 
     #region Edge Cases
