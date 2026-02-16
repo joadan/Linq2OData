@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Linq2OData.Core
 {
-    internal class ODataRequestException : SystemException
+    public class ODataRequestException : SystemException
     {
         public ODataError? ODataError { get; private set; }
         public string RequestUrl { get; private set; }
@@ -17,9 +17,6 @@ namespace Linq2OData.Core
             RequestMethod = requestMessage?.Method.Method ?? "";
             ODataError = odataError;
         }
-
-
-       
 
     }
 }
