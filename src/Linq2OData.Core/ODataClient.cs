@@ -162,12 +162,12 @@ namespace Linq2OData.Core
 
             if (!string.IsNullOrWhiteSpace(expand))
             {
-                queryParameters.Add($"$expand={expand}");
+                queryParameters.Add($"$expand={Uri.EscapeDataString(expand)}");
             }
 
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                queryParameters.Add($"$filter={filter}");
+                queryParameters.Add($"$filter={Uri.EscapeDataString(filter)}");
             }
 
             if (!string.IsNullOrWhiteSpace(orderby))
