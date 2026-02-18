@@ -32,14 +32,28 @@ namespace Linq2OData.TestClients
 
             var tripPinClient = new TripPin.TripPinClient(httpClient);
 
-            var result = await tripPinClient
-                .Query<TripPin.Microsoft.OData.SampleService.Models.TripPin.Person>()
-                .Top(1)
-                .Expand(e => e.Trips!.Select(e => e.PlanItems))
+            try
+            {
 
-                .ExecuteAsync();
+                var result = await tripPinClient
+                    .Query<TripPin.Microsoft.OData.SampleService.Models.TripPin.Person>()
+                    .Top(10)
+                    .Filter(e => e.FirstName != "Uno")
+                    .Expand(e => e.Trips!.Select(e => e.PlanItems))
+                       .ExecuteAsync();
 
-            Console.WriteLine($"Success! Got {result?.Count} people with {result?[0].Trips?.Count} trips");
+                Console.WriteLine($"Success! Got {result?.Count} people with {result?[0].Trips?.Count} trips");
+            }
+            catch (Exception ex)
+            {
+                var t = ex;
+                throw;
+            }
+
+
+             
+
+      
         }
 
         private static async Task TestV2ClientAsync()
