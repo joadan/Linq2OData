@@ -82,7 +82,7 @@ public class ClientGeneratorTests
         var request = new ClientRequest
         {
             Name = "ODataLargeClient",
-            Namespace = "MyApp.OData",
+            Namespace = "MyNamespace",
         };
         request.AddMetadata(odataDemoMetadataV4);
 
@@ -91,10 +91,24 @@ public class ClientGeneratorTests
         // Act
         var files = generator.GenerateClient();
 
-        
+
+        // Act - Compile the generated code using Roslyn
+        var compilation = CompileGeneratedCode(files);
+
         // Assert
-        Assert.NotNull(files);
-        Assert.NotEmpty(files);
+        var diagnostics = compilation.GetDiagnostics()
+            .Where(d => d.Severity == DiagnosticSeverity.Error)
+            .ToList();
+
+        if (diagnostics.Any())
+        {
+            var errors = string.Join("\n", diagnostics.Select(d =>
+                $"{d.Id}: {d.GetMessage()} at {d.Location.GetLineSpan()}"));
+            Assert.Fail($"Compilation failed with {diagnostics.Count} error(s):\n{errors}");
+        }
+
+        Assert.Empty(diagnostics);
+
     }
 
     /// <summary>
