@@ -77,6 +77,33 @@ namespace Linq2OData.Core
             return odataResponse!.Data!;
         }
 
+        public async Task InvokeActionAsync(string actionPath, object? parameters = null, CancellationToken token = default)
+        {
+            string json = parameters != null ? JsonSerializer.Serialize(parameters, jsonOptions) : "{}";
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync(actionPath, content, token);
+            await ValidateResponseAsync(response);
+        }
+
+        public async Task<ODataResponse<T>?> InvokeActionAsync<T>(string actionPath, object? parameters = null, CancellationToken token = default)
+        {
+            string json = parameters != null ? JsonSerializer.Serialize(parameters, jsonOptions) : "{}";
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync(actionPath, content, token);
+            await ValidateResponseAsync(response);
+            var rawResponse = await response.Content.ReadAsStringAsync(token);
+            return ProcessQueryResponse<T>(rawResponse);
+        }
+
+        public async Task<ODataResponse<T>?> InvokeFunctionAsync<T>(string functionPath, CancellationToken token = default)
+        {
+            using var response = await httpClient.GetAsync(functionPath, token);
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound) { return null; }
+            await ValidateResponseAsync(response);
+            var rawResponse = await response.Content.ReadAsStringAsync(token);
+            return ProcessQueryResponse<T>(rawResponse);
+        }
+
         public async Task<bool> UpdateEntityAsync(string entitysetName, string keyExpression, ODataInputBase input)
         {
             string json = JsonSerializer.Serialize(input, jsonOptions);

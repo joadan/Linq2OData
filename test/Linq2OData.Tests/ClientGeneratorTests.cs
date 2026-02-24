@@ -549,5 +549,92 @@ global using System.Threading.Tasks;
         Assert.Empty(diagnostics);
     }
 
+    [Fact]
+    public void GenerateClient_WithFunctionsAndActions_ShouldGenerateMethods()
+    {
+        // Arrange
+        var request = new ClientRequest
+        {
+            Name = "TrippinClient",
+            Namespace = "TripPin",
+        };
+        request.AddMetadata(trippinMetadataV4);
+
+        var generator = new ClientGenerator(request);
+
+        // Act
+        var files = generator.GenerateClient();
+        var clientFile = files.First(f => f.FolderPath == "Client" && f.FileName == "TrippinClient.cs");
+
+        // Assert - unbound action with no return type
+        Assert.Contains("public async Task ResetDataSourceAsync(", clientFile.Content);
+        Assert.Contains("await odataClient.InvokeActionAsync(\"ResetDataSource\", null, cancellationToken)", clientFile.Content);
+
+        // Assert - unbound function with no parameters that returns a single entity
+        Assert.Contains("public async Task<Person?> GetPersonWithMostFriendsAsync(", clientFile.Content);
+        Assert.Contains("InvokeFunctionAsync<Person>($\"GetPersonWithMostFriends\"", clientFile.Content);
+
+        // Assert - unbound function with parameters that returns a single entity
+        Assert.Contains("public async Task<Airport?> GetNearestAirportAsync(double @lat, double @lon,", clientFile.Content);
+        Assert.Contains("InvokeFunctionAsync<Airport>($\"GetNearestAirport(lat={@lat},lon={@lon})\"", clientFile.Content);
+
+        // Assert - using directive for referenced types
+        Assert.Contains("using TripPin.Trippin;", clientFile.Content);
+    }
+
+    [Fact]
+    public void GeneratedClientWithFunctionsAndActions_ShouldCompileSuccessfully()
+    {
+        // Arrange
+        var request = new ClientRequest
+        {
+            Name = "TrippinClient",
+            Namespace = "TripPin",
+        };
+        request.AddMetadata(trippinMetadataV4);
+
+        var generator = new ClientGenerator(request);
+        var files = generator.GenerateClient();
+
+        // Act - Compile the generated code using Roslyn
+        var compilation = CompileGeneratedCode(files);
+
+        // Assert
+        var diagnostics = compilation.GetDiagnostics()
+            .Where(d => d.Severity == DiagnosticSeverity.Error)
+            .ToList();
+
+        if (diagnostics.Any())
+        {
+            var errors = string.Join("\n", diagnostics.Select(d =>
+                $"{d.Id}: {d.GetMessage()} at {d.Location.GetLineSpan()}"));
+            Assert.Fail($"Compilation failed with {diagnostics.Count} error(s):\n{errors}");
+        }
+
+        Assert.Empty(diagnostics);
+    }
+
+    [Fact]
+    public void GenerateClient_WithFunctionReturningCollection_ShouldGenerateMethod()
+    {
+        // Arrange - complex metadata has GetInvoicesByAmount returning Collection(Invoice)
+        var request = new ClientRequest
+        {
+            Name = "CompanyClient",
+            Namespace = "MyApp",
+        };
+        request.AddMetadata(complexMetadataV4);
+
+        var generator = new ClientGenerator(request);
+
+        // Act
+        var files = generator.GenerateClient();
+        var clientFile = files.First(f => f.FolderPath == "Client" && f.FileName == "CompanyClient.cs");
+
+        // Assert - function returning a collection
+        Assert.Contains("public async Task<List<Invoice>?> GetInvoicesByAmountAsync(", clientFile.Content);
+        Assert.Contains("InvokeFunctionAsync<List<Invoice>>", clientFile.Content);
+    }
+
 }
 

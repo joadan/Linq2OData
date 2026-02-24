@@ -236,4 +236,91 @@ internal static class MetadataExtensions
 
     }
 
+    extension(ODataFunction function)
+    {
+        /// <summary>
+        /// Returns the C# return type for this function/action.
+        /// Returns "void" (empty) when there is no return type.
+        /// </summary>
+        internal string CSharpReturnType
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(function.ReturnType))
+                    return "void";
+
+                var rt = function.ReturnType;
+
+                bool isCollection = rt.StartsWith("Collection(") && rt.EndsWith(")");
+                if (isCollection)
+                    rt = rt.Substring("Collection(".Length, rt.Length - "Collection(".Length - 1);
+
+                string csharpType = rt.StartsWith("Edm.")
+                    ? MapEdmTypeToCSharp(rt)
+                    : StripNamespace(rt).ToValidCSharpClassName();
+
+                return isCollection ? $"List<{csharpType}>" : csharpType;
+            }
+        }
+
+        /// <summary>
+        /// Returns the C# method parameter list string (e.g. "double lat, double lon").
+        /// </summary>
+        internal string CSharpParameters
+        {
+            get
+            {
+                var parts = function.Parameters.Select(p => $"{p.CSharpType} {p.CSharpParameterName}");
+                return string.Join(", ", parts);
+            }
+        }
+
+        /// <summary>
+        /// Builds the OData URL segment for a function call (GET).
+        /// E.g. for GetNearestAirport(lat, lon) → "GetNearestAirport(lat={lat},lon={lon})"
+        /// </summary>
+        internal string FunctionUrlTemplate
+        {
+            get
+            {
+                if (!function.Parameters.Any())
+                    return function.Name;
+
+                var paramParts = function.Parameters.Select(p =>
+                {
+                    var isString = p.DataType.Equals("Edm.String", StringComparison.OrdinalIgnoreCase);
+                    var varName = p.CSharpParameterName;
+                    return isString ? $"{p.Name}='{{Uri.EscapeDataString({varName})}}'" : $"{p.Name}={{{varName}}}";
+                });
+                return $"{function.Name}({string.Join(",", paramParts)})";
+            }
+        }
+
+        /// <summary>
+        /// Returns the C# method name (Pascal-case).
+        /// </summary>
+        internal string CSharpMethodName => function.Name.ToValidCSharpPascalCase();
+    }
+
+    extension(ODataFunctionParameter param)
+    {
+        /// <summary>
+        /// Returns the C# type for this parameter.
+        /// </summary>
+        internal string CSharpType
+        {
+            get
+            {
+                if (param.DataType.StartsWith("Edm."))
+                    return MapEdmTypeToCSharp(param.DataType);
+                return StripNamespace(param.DataType).ToValidCSharpClassName();
+            }
+        }
+
+        /// <summary>
+        /// Returns a safe camelCase C# parameter name.
+        /// </summary>
+        internal string CSharpParameterName => param.Name.ToValidCSharpCamelCaseParameterName();
+    }
+
 }
