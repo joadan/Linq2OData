@@ -17,7 +17,7 @@ public partial class <#= entityType.InputName #> : ODataInputBase
 {
 <# foreach (var property in entityType.Properties) { #>
 	// IsEnumType: <#= property.IsEnumType #>
-    public <#= property.CSharpNameInput #> <#= property.Name.SafeVariableName() #> 
+	public <#= property.CSharpNameInput #> <#= property.Name.SafeVariableName(entityType.InputName) #> 
 	{
 		get => GetValue<<#= property.CSharpNameInput #>>("<#= property.Name #>");
 		set => SetValue("<#= property.Name #>", value);

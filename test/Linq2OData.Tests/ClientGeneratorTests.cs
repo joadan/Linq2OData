@@ -450,5 +450,104 @@ global using System.Threading.Tasks;
         Assert.Empty(diagnostics);
     }
 
+    [Fact]
+    public void GenerateClient_WithPropertyNameMatchingTypeName_ShouldAppendTrailingUnderscore()
+    {
+        // Arrange - metadata where a property and a navigation share the name of their enclosing type
+        const string metadata = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+              <edmx:DataServices>
+                <Schema Namespace="TestService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                  <EntityType Name="Status">
+                    <Key><PropertyRef Name="Id" /></Key>
+                    <Property Name="Id" Type="Edm.Int32" Nullable="false" />
+                    <Property Name="Status" Type="Edm.String" />
+                    <Property Name="Description" Type="Edm.String" />
+                  </EntityType>
+                  <EntityType Name="Tag">
+                    <Key><PropertyRef Name="Id" /></Key>
+                    <Property Name="Id" Type="Edm.Int32" Nullable="false" />
+                    <Property Name="Name" Type="Edm.String" />
+                    <NavigationProperty Name="Tag" Type="TestService.Status" />
+                  </EntityType>
+                  <EntityContainer Name="TestContainer">
+                    <EntitySet Name="Statuses" EntityType="TestService.Status" />
+                    <EntitySet Name="Tags" EntityType="TestService.Tag" />
+                  </EntityContainer>
+                </Schema>
+              </edmx:DataServices>
+            </edmx:Edmx>
+            """;
+
+        var request = new ClientRequest { Name = "TestClient", Namespace = "MyApp.OData" };
+        request.AddMetadata(metadata);
+        var files = new ClientGenerator(request).GenerateClient();
+
+        // Assert - property "Status" in class "Status" becomes "Status_"
+        var statusFile = files.First(f => f.FileName == "Status.cs" && f.FolderPath == "Types");
+        Assert.Contains("[ODataMember(\"Status\")]", statusFile.Content);    // OData name unchanged
+        Assert.Contains("public string? Status_ { get; set; }", statusFile.Content); // C# name has trailing _
+        Assert.DoesNotContain("public string? Status { get; set; }", statusFile.Content);
+
+        // Assert - navigation "Tag" in class "Tag" becomes "Tag_"
+        var tagFile = files.First(f => f.FileName == "Tag.cs" && f.FolderPath == "Types");
+        Assert.Contains("[ODataMember(\"Tag\", true)]", tagFile.Content);    // OData name unchanged
+        Assert.Contains("public Status? Tag_ { get; set; }", tagFile.Content); // C# name has trailing _
+        Assert.DoesNotContain("public Status? Tag { get; set; }", tagFile.Content);
+    }
+
+    [Fact]
+    public void GenerateClient_WithPropertyNameMatchingTypeName_ShouldCompileSuccessfully()
+    {
+        // Arrange
+        const string metadata = """
+            <?xml version="1.0" encoding="utf-8"?>
+            <edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+              <edmx:DataServices>
+                <Schema Namespace="TestService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                  <EntityType Name="Status">
+                    <Key><PropertyRef Name="Id" /></Key>
+                    <Property Name="Id" Type="Edm.Int32" Nullable="false" />
+                    <Property Name="Status" Type="Edm.String" />
+                    <Property Name="Description" Type="Edm.String" />
+                  </EntityType>
+                  <EntityType Name="Tag">
+                    <Key><PropertyRef Name="Id" /></Key>
+                    <Property Name="Id" Type="Edm.Int32" Nullable="false" />
+                    <Property Name="Name" Type="Edm.String" />
+                    <NavigationProperty Name="Tag" Type="TestService.Status" />
+                  </EntityType>
+                  <EntityContainer Name="TestContainer">
+                    <EntitySet Name="Statuses" EntityType="TestService.Status" />
+                    <EntitySet Name="Tags" EntityType="TestService.Tag" />
+                  </EntityContainer>
+                </Schema>
+              </edmx:DataServices>
+            </edmx:Edmx>
+            """;
+
+        var request = new ClientRequest { Name = "TestClient", Namespace = "MyApp.OData" };
+        request.AddMetadata(metadata);
+        var files = new ClientGenerator(request).GenerateClient();
+
+        // Act
+        var compilation = CompileGeneratedCode(files);
+
+        // Assert
+        var diagnostics = compilation.GetDiagnostics()
+            .Where(d => d.Severity == DiagnosticSeverity.Error)
+            .ToList();
+
+        if (diagnostics.Any())
+        {
+            var errors = string.Join("\n", diagnostics.Select(d =>
+                $"{d.Id}: {d.GetMessage()} at {d.Location.GetLineSpan()}"));
+            Assert.Fail($"Compilation failed with {diagnostics.Count} error(s):\n{errors}");
+        }
+
+        Assert.Empty(diagnostics);
+    }
+
 }
 

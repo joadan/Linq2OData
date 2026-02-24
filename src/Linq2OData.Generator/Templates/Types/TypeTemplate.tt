@@ -19,7 +19,7 @@ public partial class <#= entityType.ClassName #> <#= BaseTypeAndInterface #>
 {
 <# foreach (var property in entityType.Properties) { #>
     <#= property.ODataAttributeString #>
-    public <#= property.CSharpType #> <#= property.Name.SafeVariableName() #> { get; set; }
+    public <#= property.CSharpType #> <#= property.Name.SafeVariableName(entityType.ClassName) #> { get; set; }
 <# } #>
     
     //Navigations
@@ -28,7 +28,7 @@ public partial class <#= entityType.ClassName #> <#= BaseTypeAndInterface #>
 <# if (odataVersion < Linq2OData.Core.ODataVersion.V4 && navigation.NavigationType != Linq2OData.Core.Metadata.ODataNavigationType.Many) { #>
     [JsonConverter(typeof(Linq2OData.Core.Converters.ODataNavigationPropertyConverter<<#= navigation.ToEntity #>>))]
 <# } #>
-    public <#= navigation.CSharpProperty #> <#= navigation.Name.SafeVariableName() #> { get; set; }
+    public <#= navigation.CSharpProperty #> <#= navigation.Name.SafeVariableName(entityType.ClassName) #> { get; set; }
 <# } #>
 
 <# if (entityType.KeyProperties.Any()) { #>

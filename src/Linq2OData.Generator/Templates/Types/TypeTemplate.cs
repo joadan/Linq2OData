@@ -102,7 +102,7 @@ namespace Linq2OData.Generator.Templates.Types
             this.Write(" ");
             
             #line 20 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(property.Name.SafeVariableName()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.Name.SafeVariableName(entityType.ClassName)));
             
             #line default
             #line hidden
@@ -159,7 +159,7 @@ namespace Linq2OData.Generator.Templates.Types
             this.Write(" ");
             
             #line 29 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(navigation.Name.SafeVariableName()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(navigation.Name.SafeVariableName(entityType.ClassName)));
             
             #line default
             #line hidden

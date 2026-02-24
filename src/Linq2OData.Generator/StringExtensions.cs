@@ -17,14 +17,18 @@ internal static class StringExtensions
     extension(string text)
     {
 
-        public string SafeVariableName()
+        public string SafeVariableName(string? enclosingTypeName = null)
         {
             if (IsCSharpKeyword(text)) {
                 return $"@{text}";
             }
 
+            if (enclosingTypeName != null && text == enclosingTypeName) {
+                return $"{text}_";
+            }
+
             return text;
-            
+
         }
 
         public  bool IsCSharpKeyword()

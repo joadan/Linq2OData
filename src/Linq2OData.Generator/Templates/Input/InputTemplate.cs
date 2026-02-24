@@ -81,7 +81,7 @@ namespace Linq2OData.Generator.Templates.Input
             this.Write(" ");
             
             #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(property.Name.SafeVariableName()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(property.Name.SafeVariableName(entityType.InputName)));
             
             #line default
             #line hidden
