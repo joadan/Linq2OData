@@ -14,6 +14,7 @@ public class ClientGeneratorTests
     private string sapSalesQuotationMetadataV2;
     private string largeMetadaV4;
     private string trippinMetadataV4;
+    private string complexMetadataV4;
 
     public ClientGeneratorTests()
     {
@@ -23,6 +24,7 @@ public class ClientGeneratorTests
         sapSalesQuotationMetadataV2 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V2", "SapSalesQuotation.xml"));
         largeMetadaV4 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V4", "LargeMetadata.xml"));
         trippinMetadataV4 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V4", "Trippin.xml"));
+        complexMetadataV4 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V4", "Complex.xml"));
     }
 
     [Fact]
@@ -378,4 +380,75 @@ global using System.Threading.Tasks;
         Assert.Empty(diagnostics);
     }
 
+    [Fact]
+    public void GenerateClientV4_WithMultiSchemaMetadata_ShouldGenerateFilesWithCorrectNamespaces()
+    {
+        var request = new ClientRequest
+        {
+            Name = "CompanyClient",
+            Namespace = "MyApp",
+        };
+        request.AddMetadata(complexMetadataV4);
+
+        var generator = new ClientGenerator(request);
+        var files = generator.GenerateClient();
+
+        Assert.NotNull(files);
+        Assert.NotEmpty(files);
+
+        // Types from Company.Core schema
+        var employeeFile = files.FirstOrDefault(f => f.FileName == "Employee.cs" && f.FolderPath == "Types");
+        Assert.NotNull(employeeFile);
+        Assert.Contains("namespace MyApp.Company.Core", employeeFile.Content);
+
+        var customerFile = files.FirstOrDefault(f => f.FileName == "Customer.cs" && f.FolderPath == "Types");
+        Assert.NotNull(customerFile);
+        Assert.Contains("namespace MyApp.Company.Core", customerFile.Content);
+
+        // Types from Company.Billing schema
+        var invoiceFile = files.FirstOrDefault(f => f.FileName == "Invoice.cs" && f.FolderPath == "Types");
+        Assert.NotNull(invoiceFile);
+        Assert.Contains("namespace MyApp.Company.Billing", invoiceFile.Content);
+
+        // Enum from Company.Core schema
+        var enumFile = files.FirstOrDefault(f => f.FileName == "PersonType.cs" && f.FolderPath == "Enums");
+        Assert.NotNull(enumFile);
+        Assert.Contains("namespace MyApp.Company.Core", enumFile.Content);
+
+        // ODataEntitySet attribute set correctly on entity-set types
+        Assert.Contains("[ODataEntitySet(\"Employees\")]", employeeFile.Content);
+        Assert.Contains("[ODataEntitySet(\"Customers\")]", customerFile.Content);
+        Assert.Contains("[ODataEntitySet(\"Invoices\")]", invoiceFile.Content);
+    }
+
+    [Fact]
+    public void GeneratedClientV4_WithMultiSchemaMetadata_ShouldCompileSuccessfully()
+    {
+        var request = new ClientRequest
+        {
+            Name = "CompanyClient",
+            Namespace = "MyApp",
+        };
+        request.AddMetadata(complexMetadataV4);
+
+        var generator = new ClientGenerator(request);
+        var files = generator.GenerateClient();
+
+        var compilation = CompileGeneratedCode(files);
+
+        var diagnostics = compilation.GetDiagnostics()
+            .Where(d => d.Severity == DiagnosticSeverity.Error)
+            .ToList();
+
+        if (diagnostics.Any())
+        {
+            var errors = string.Join("\n", diagnostics.Select(d =>
+                $"{d.Id}: {d.GetMessage()} at {d.Location.GetLineSpan()}"));
+            Assert.Fail($"Compilation failed with {diagnostics.Count} error(s):\n{errors}");
+        }
+
+        Assert.Empty(diagnostics);
+    }
+
 }
+

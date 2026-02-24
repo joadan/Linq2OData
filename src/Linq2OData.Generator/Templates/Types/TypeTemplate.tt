@@ -5,7 +5,9 @@
 <#@ import namespace="System.Collections.Generic" #>
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
-
+<# foreach (var externalNs in GetExternalNamespaces()) { #>
+using <#= externalNs #>;
+<# } #>
 namespace <#= fullNamspace #>;
 
 /// <summary>

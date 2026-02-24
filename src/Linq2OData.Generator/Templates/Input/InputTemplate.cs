@@ -28,7 +28,15 @@ namespace Linq2OData.Generator.Templates.Input
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("\r\nusing Linq2OData.Core;\r\n\r\nnamespace ");
+            this.Write("\r\nusing Linq2OData.Core;\r\n");
+
+            #line hidden
+            foreach (var externalNs in GetExternalNamespaces()) {
+                this.Write("using ");
+                this.Write(this.ToStringHelper.ToStringWithCulture(externalNs));
+                this.Write(";\r\n");
+            }
+            this.Write("\r\nnamespace ");
             
             #line 9 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespaceName));

@@ -5,7 +5,9 @@
 <#@ import namespace="System.Collections.Generic" #>
 
 using Linq2OData.Core;
-
+<# foreach (var externalNs in GetExternalNamespaces()) { #>
+using <#= externalNs #>;
+<# } #>
 namespace <#= namespaceName #>;
 
 /// <summary>

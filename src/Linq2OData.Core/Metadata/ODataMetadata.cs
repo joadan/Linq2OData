@@ -11,7 +11,11 @@ public class ODataMetadata
 
     public IEnumerable<ODataEntityType> GetDerivedTypes(string entityTypeName)
     {
-        return EntityTypes.Where(et => et.BaseType == $"{Namespace}.{entityTypeName}");
+        var baseEntity = EntityTypes.FirstOrDefault(et => et.Name == entityTypeName);
+        var qualifiedName = baseEntity?.SchemaNamespace != null
+            ? $"{baseEntity.SchemaNamespace}.{entityTypeName}"
+            : $"{Namespace}.{entityTypeName}";
+        return EntityTypes.Where(et => et.BaseType == qualifiedName);
     }
 
     public IEnumerable<ODataEntityType> GetAllDerivedTypes(string entityTypeName)
@@ -40,7 +44,8 @@ public class ODataMetadata
     {
         foreach (var derivedType in GetDerivedTypes(entityType.Name))
         {
-            derivedType.EntityPath = $"{entityType.EntityPath}/{Namespace}.{derivedType.Name}";
+            var schemaNamespace = derivedType.SchemaNamespace ?? Namespace;
+            derivedType.EntityPath = $"{entityType.EntityPath}/{schemaNamespace}.{derivedType.Name}";
             SetEntityDerivedPaths(derivedType);
         }
     }
@@ -60,6 +65,7 @@ public class ODataEntityType
     public string? Label { get; set; }
 
     public string? BaseType { get; set; }
+    public string? SchemaNamespace { get; set; }
 
     public bool IsEntitySet => !string.IsNullOrWhiteSpace(EntityPath);
 
@@ -136,6 +142,7 @@ public enum ODataNavigationType
 public class ODataEnumType
 {
     public required string Name { get; set; }
+    public string? SchemaNamespace { get; set; }
     public List<ODataEnumMember> Members { get; set; } = [];
 }
 
