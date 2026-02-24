@@ -1316,4 +1316,107 @@ public class FilterExpressionTests
     }
 
     #endregion
+
+    #region Enum Filter Tests
+
+    [ODataEnum("Trippin")]
+    public enum TestPersonGender
+    {
+        Male = 0,
+        Female = 1,
+        Unknown = 2,
+    }
+
+    [ODataEnum("Trippin")]
+    public enum TestFeature
+    {
+        Feature1 = 0,
+        Feature2 = 1,
+        Feature3 = 2,
+        Feature4 = 3,
+    }
+
+    [ODataEntitySet("People")]
+    public class TestPerson : IODataEntitySet
+    {
+        public string UserName { get; set; } = "";
+        public TestPersonGender Gender { get; set; }
+        public TestPersonGender? NullableGender { get; set; }
+        public TestFeature FavoriteFeature { get; set; }
+        public string __Key => $"UserName='{UserName}'";
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_EnumEqual_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestPerson, bool>> expression = p => p.Gender == TestPersonGender.Male;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(Gender eq Trippin.TestPersonGender'Male')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_EnumNotEqual_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestPerson, bool>> expression = p => p.Gender != TestPersonGender.Female;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(Gender ne Trippin.TestPersonGender'Female')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_EnumVariable_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var gender = TestPersonGender.Unknown;
+        Expression<Func<TestPerson, bool>> expression = p => p.Gender == gender;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(Gender eq Trippin.TestPersonGender'Unknown')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_DifferentEnumType_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestPerson, bool>> expression = p => p.FavoriteFeature == TestFeature.Feature2;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(FavoriteFeature eq Trippin.TestFeature'Feature2')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_EnumInComplexExpression_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestPerson, bool>> expression = p =>
+            p.Gender == TestPersonGender.Male && p.FavoriteFeature != TestFeature.Feature4;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("((Gender eq Trippin.TestPersonGender'Male') and (FavoriteFeature ne Trippin.TestFeature'Feature4'))", result);
+    }
+
+    #endregion
 }

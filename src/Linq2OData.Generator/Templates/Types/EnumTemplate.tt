@@ -4,10 +4,12 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 using System.Text.Json.Serialization;
+using Linq2OData.Core;
 
 namespace <#= fullNamspace #>;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
+[ODataEnum("<#= enumType.SchemaNamespace ?? fullNamspace #>")]
 public enum <#= enumType.Name #>
 {
 <# foreach (var member in enumType.Members) { #>

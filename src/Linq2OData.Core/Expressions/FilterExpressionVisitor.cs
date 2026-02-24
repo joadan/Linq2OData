@@ -256,7 +256,16 @@ namespace Linq2OData.Core.Expressions
                     Visit(u.Operand);
                     break;
                 case ExpressionType.Convert:
-                    Visit(u.Operand);
+                    if (u.Type.IsEnum && u.Operand.NodeType == ExpressionType.Constant)
+                    {
+                        var constExpr = (ConstantExpression)u.Operand;
+                        var enumValue = Enum.ToObject(u.Type, constExpr.Value!);
+                        AppendByValueType(enumValue, sb);
+                    }
+                    else
+                    {
+                        Visit(u.Operand);
+                    }
                     break;
                 default:
                     throw new NotSupportedException($"The unary operator '{u.NodeType}' is not supported");
@@ -267,7 +276,20 @@ namespace Linq2OData.Core.Expressions
         protected override Expression VisitBinary(BinaryExpression b)
         {
             sb.Append(ODataConstants.LeftParentheses);
-            Visit(b.Left);
+
+            // Detect enum comparison: the C# compiler may emit Convert(enumProp, int) == Constant(0, int)
+            var leftEnumType = ExtractEnumType(b.Left);
+            var rightEnumType = ExtractEnumType(b.Right);
+            var enumContext = leftEnumType ?? rightEnumType;
+
+            if (enumContext != null)
+            {
+                VisitEnumOperand(b.Left, enumContext);
+            }
+            else
+            {
+                Visit(b.Left);
+            }
 
             switch (b.NodeType)
             {
@@ -305,9 +327,56 @@ namespace Linq2OData.Core.Expressions
                     throw new NotSupportedException($"The binary operator '{b.NodeType}' is not supported");
             }
 
-            Visit(b.Right);
+            if (enumContext != null)
+            {
+                VisitEnumOperand(b.Right, enumContext);
+            }
+            else
+            {
+                Visit(b.Right);
+            }
+
             sb.Append(ODataConstants.RightParentheses);
             return b;
+        }
+
+        /// <summary>
+        /// Extracts the enum type from an expression, unwrapping Convert nodes the compiler inserts.
+        /// </summary>
+        private static Type? ExtractEnumType(Expression expr)
+        {
+            if (expr.Type.IsEnum) return expr.Type;
+            if (expr.NodeType == ExpressionType.Convert)
+            {
+                var operand = ((UnaryExpression)expr).Operand;
+                if (operand.Type.IsEnum) return operand.Type;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Visits one side of an enum comparison, stripping Convert wrappers from properties
+        /// and formatting int constants as OData enum literals.
+        /// </summary>
+        private void VisitEnumOperand(Expression expr, Type enumType)
+        {
+            // Convert(enumProp, int) → visit the inner property directly
+            if (expr.NodeType == ExpressionType.Convert)
+            {
+                Visit(((UnaryExpression)expr).Operand);
+                return;
+            }
+            // Plain int constant in enum context → format as OData enum literal
+            if (expr.NodeType == ExpressionType.Constant)
+            {
+                var constExpr = (ConstantExpression)expr;
+                var enumValue = constExpr.Type.IsEnum
+                    ? constExpr.Value!
+                    : Enum.ToObject(enumType, constExpr.Value!);
+                AppendByValueType(enumValue, sb);
+                return;
+            }
+            Visit(expr);
         }
 
         protected override Expression VisitConstant(ConstantExpression c)
@@ -480,6 +549,15 @@ namespace Linq2OData.Core.Expressions
                 }
                 value = valueProperty.GetValue(value)!;
                 type = underlyingType;
+            }
+
+            if (type.IsEnum)
+            {
+                var attr = type.GetCustomAttribute<ODataEnumAttribute>();
+                var odataNamespace = attr?.Namespace ?? type.Namespace ?? type.Name;
+                var memberName = Enum.GetName(type, value) ?? value.ToString()!;
+                sb.Append($"{odataNamespace}.{type.Name}'{memberName}'");
+                return;
             }
 
             switch (Type.GetTypeCode(type))
