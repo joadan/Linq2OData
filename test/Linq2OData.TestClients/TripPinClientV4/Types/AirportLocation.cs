@@ -9,13 +9,17 @@ using System.Text.Json.Serialization;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// ODataName: AirportLocation
+/// </summary>
 
 
 public partial class AirportLocation 
 {
     [ODataMember("Loc")]
     public object Loc { get; set; }
-
+    
+    //Navigations
 
 
 

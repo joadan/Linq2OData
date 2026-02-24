@@ -5,10 +5,12 @@
 
 #nullable enable
 using System.Text.Json.Serialization;
+using Linq2OData.Core;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
+[ODataEnum("Microsoft.OData.SampleService.Models.TripPin")]
 public enum PersonGender
 {
     Male = 0,

@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// ODataName: Trip
+/// </summary>
 
 
 public partial class Trip  : ITripKeys
@@ -29,7 +32,8 @@ public partial class Trip  : ITripKeys
     public DateTimeOffset EndsAt { get; set; }
     [ODataMember("Tags")]
     public List<string> Tags { get; set; }
-
+    
+    //Navigations
     [ODataMember("Photos", true)]
     public List<Photo>? Photos { get; set; }
     [ODataMember("PlanItems", true)]

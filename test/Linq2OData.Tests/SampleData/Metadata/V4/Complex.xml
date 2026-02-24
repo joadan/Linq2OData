@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0"
+           xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+
+	<edmx:DataServices>
+
+		<!-- ===================================================== -->
+		<!-- CORE DOMAIN (WITH ALIAS) -->
+		<!-- ===================================================== -->
+		<Schema Namespace="Company.Core"
+				Alias="Core"
+				xmlns="http://docs.oasis-open.org/odata/ns/edm">
+
+			<!-- ================= Enum ================= -->
+			<EnumType Name="PersonType">
+				<Member Name="Employee" Value="0"/>
+				<Member Name="Customer" Value="1"/>
+			</EnumType>
+
+			<!-- ================= Complex Types ================= -->
+			<ComplexType Name="Address">
+				<Property Name="Street" Type="Edm.String"/>
+				<Property Name="City" Type="Edm.String"/>
+				<Property Name="ZipCode" Type="Edm.String"/>
+			</ComplexType>
+
+			<!-- ================= Base Entity ================= -->
+			<EntityType Name="Person" Abstract="true">
+				<Key>
+					<PropertyRef Name="Id"/>
+				</Key>
+
+				<Property Name="Id" Type="Edm.Int32" Nullable="false"/>
+				<Property Name="Name" Type="Edm.String"/>
+				<Property Name="PersonType" Type="Core.PersonType"/>
+			</EntityType>
+
+			<!-- ================= Derived Entity ================= -->
+			<EntityType Name="Employee"
+						BaseType="Core.Person">
+
+				<Property Name="Salary" Type="Edm.Decimal"/>
+
+				<!-- Cross-namespace navigation (no alias used for Billing) -->
+				<NavigationProperty Name="Invoices"
+									Type="Collection(Company.Billing.Invoice)"
+									Partner="Employee"/>
+			</EntityType>
+
+			<!-- ================= Another Derived ================= -->
+			<EntityType Name="Customer"
+						BaseType="Core.Person">
+
+				<Property Name="PrimaryAddress"
+						  Type="Core.Address"/>
+
+				<NavigationProperty Name="Invoices"
+									Type="Collection(Company.Billing.Invoice)"
+									Partner="Customer"/>
+			</EntityType>
+
+			<!-- ================= Bound Action ================= -->
+			<Action Name="PromoteEmployee" IsBound="true">
+				<Parameter Name="bindingParameter"
+						   Type="Core.Employee"
+						   Nullable="false"/>
+			</Action>
+
+			<!-- ================= Bound Function ================= -->
+			<Function Name="GetAnnualSalary" IsBound="true">
+				<Parameter Name="bindingParameter"
+						   Type="Core.Employee"
+						   Nullable="false"/>
+				<ReturnType Type="Edm.Decimal"/>
+			</Function>
+
+		</Schema>
+
+
+		<!-- ===================================================== -->
+		<!-- BILLING DOMAIN (NO ALIAS USED HERE) -->
+		<!-- ===================================================== -->
+		<Schema Namespace="Company.Billing"
+				xmlns="http://docs.oasis-open.org/odata/ns/edm">
+
+			<!-- ================= Complex Type ================= -->
+			<ComplexType Name="Money">
+				<Property Name="Amount" Type="Edm.Decimal"/>
+				<Property Name="Currency" Type="Edm.String"/>
+			</ComplexType>
+
+			<!-- ================= Base Document ================= -->
+			<EntityType Name="Document" Abstract="true">
+				<Key>
+					<PropertyRef Name="Id"/>
+				</Key>
+
+				<Property Name="Id" Type="Edm.Guid" Nullable="false"/>
+				<Property Name="CreatedAt" Type="Edm.DateTimeOffset"/>
+			</EntityType>
+
+			<!-- ================= Invoice ================= -->
+			<EntityType Name="Invoice"
+						BaseType="Company.Billing.Document">
+
+				<Property Name="Total"
+						  Type="Company.Billing.Money"/>
+
+				<!-- Cross-namespace references USING alias -->
+				<NavigationProperty Name="Customer"
+									Type="Core.Customer"
+									Nullable="false"
+									Partner="Invoices"/>
+
+				<NavigationProperty Name="Employee"
+									Type="Core.Employee"
+									Nullable="false"
+									Partner="Invoices"/>
+
+				<!-- Containment -->
+				<NavigationProperty Name="Lines"
+									Type="Collection(Company.Billing.InvoiceLine)"
+									ContainsTarget="true"/>
+			</EntityType>
+
+			<!-- ================= Contained Entity ================= -->
+			<EntityType Name="InvoiceLine">
+				<Key>
+					<PropertyRef Name="LineNumber"/>
+				</Key>
+
+				<Property Name="LineNumber" Type="Edm.Int32" Nullable="false"/>
+				<Property Name="Description" Type="Edm.String"/>
+				<Property Name="LineAmount" Type="Company.Billing.Money"/>
+			</EntityType>
+
+			<!-- ================= Unbound Function ================= -->
+			<Function Name="GetInvoicesByAmount">
+				<Parameter Name="minAmount" Type="Edm.Decimal"/>
+				<ReturnType Type="Collection(Company.Billing.Invoice)"/>
+			</Function>
+
+			<!-- ================= Entity Container ================= -->
+			<EntityContainer Name="MainContainer">
+
+				<EntitySet Name="Employees"
+						   EntityType="Core.Employee"/>
+
+				<EntitySet Name="Customers"
+						   EntityType="Core.Customer"/>
+
+				<EntitySet Name="Invoices"
+						   EntityType="Company.Billing.Invoice"/>
+
+				<FunctionImport Name="GetInvoicesByAmount"
+								Function="Company.Billing.GetInvoicesByAmount"/>
+
+			</EntityContainer>
+
+		</Schema>
+
+	</edmx:DataServices>
+</edmx:Edmx>

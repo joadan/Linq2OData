@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// ODataName: Advertisement
+/// </summary>
 
 [ODataEntitySet("Advertisements")]
 public partial class Advertisement  : IDemoClientV4EntitySet, IAdvertisementKeys
@@ -19,7 +22,8 @@ public partial class Advertisement  : IDemoClientV4EntitySet, IAdvertisementKeys
     public string? Name { get; set; }
     [ODataMember("AirDate")]
     public DateTimeOffset AirDate { get; set; }
-
+    
+    //Navigations
     [ODataMember("FeaturedProduct", true)]
     public FeaturedProduct? FeaturedProduct { get; set; }
 

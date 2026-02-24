@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// ODataName: Person
+/// </summary>
 
 [ODataEntitySet("People")]
 public partial class Person  : ITripPinEntitySet, IPersonKeys
@@ -27,7 +30,8 @@ public partial class Person  : ITripPinEntitySet, IPersonKeys
     public PersonGender? Gender { get; set; }
     [ODataMember("Concurrency")]
     public long Concurrency { get; set; }
-
+    
+    //Navigations
     [ODataMember("Friends", true)]
     public List<Person>? Friends { get; set; }
     [ODataMember("Trips", true)]

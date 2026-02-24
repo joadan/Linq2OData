@@ -5,42 +5,46 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// OdataName: PlanItem
+/// </summary>
 public partial class PlanItemInput : ODataInputBase
 {
+	// IsEnumType: False
     public int? PlanItemId 
 	{
 		get => GetValue<int?>("PlanItemId");
 		set => SetValue("PlanItemId", value);
 	}
+	// IsEnumType: False
     public string? ConfirmationCode 
 	{
 		get => GetValue<string?>("ConfirmationCode");
 		set => SetValue("ConfirmationCode", value);
 	}
+	// IsEnumType: False
     public DateTimeOffset? StartsAt 
 	{
 		get => GetValue<DateTimeOffset?>("StartsAt");
 		set => SetValue("StartsAt", value);
 	}
+	// IsEnumType: False
     public DateTimeOffset? EndsAt 
 	{
 		get => GetValue<DateTimeOffset?>("EndsAt");
 		set => SetValue("EndsAt", value);
 	}
+	// IsEnumType: False
     public TimeSpan? Duration 
 	{
 		get => GetValue<TimeSpan?>("Duration");
 		set => SetValue("Duration", value);
 	}
 
+    //Navigations
 
 }

@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// ODataName: Product
+/// </summary>
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "@odata.type", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]
 [JsonDerivedType(typeof(Product))]
 [JsonDerivedType(typeof(FeaturedProduct), "#ODataDemo.FeaturedProduct")]
@@ -30,7 +33,8 @@ public partial class Product  : IDemoClientV4EntitySet, IProductKeys
     public short Rating { get; set; }
     [ODataMember("Price")]
     public double Price { get; set; }
-
+    
+    //Navigations
     [ODataMember("Categories", true)]
     public List<Category>? Categories { get; set; }
     [ODataMember("Supplier", true)]

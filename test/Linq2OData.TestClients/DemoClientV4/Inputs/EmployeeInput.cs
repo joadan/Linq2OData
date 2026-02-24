@@ -5,32 +5,34 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// OdataName: Employee
+/// </summary>
 public partial class EmployeeInput : ODataInputBase
 {
+	// IsEnumType: False
     public long? EmployeeID 
 	{
 		get => GetValue<long?>("EmployeeID");
 		set => SetValue("EmployeeID", value);
 	}
+	// IsEnumType: False
     public DateTimeOffset? HireDate 
 	{
 		get => GetValue<DateTimeOffset?>("HireDate");
 		set => SetValue("HireDate", value);
 	}
+	// IsEnumType: False
     public float? Salary 
 	{
 		get => GetValue<float?>("Salary");
 		set => SetValue("Salary", value);
 	}
 
+    //Navigations
 
 }

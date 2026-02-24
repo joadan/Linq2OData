@@ -9,13 +9,17 @@ using System.Text.Json.Serialization;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// ODataName: EventLocation
+/// </summary>
 
 
 public partial class EventLocation 
 {
     [ODataMember("BuildingInfo")]
     public string? BuildingInfo { get; set; }
-
+    
+    //Navigations
 
 
 

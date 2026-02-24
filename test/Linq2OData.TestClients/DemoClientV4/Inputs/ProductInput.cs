@@ -5,53 +5,59 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// OdataName: Product
+/// </summary>
 public partial class ProductInput : ODataInputBase
 {
+	// IsEnumType: False
     public int? ID 
 	{
 		get => GetValue<int?>("ID");
 		set => SetValue("ID", value);
 	}
+	// IsEnumType: False
     public string? Name 
 	{
 		get => GetValue<string?>("Name");
 		set => SetValue("Name", value);
 	}
+	// IsEnumType: False
     public string? Description 
 	{
 		get => GetValue<string?>("Description");
 		set => SetValue("Description", value);
 	}
+	// IsEnumType: False
     public DateTimeOffset? ReleaseDate 
 	{
 		get => GetValue<DateTimeOffset?>("ReleaseDate");
 		set => SetValue("ReleaseDate", value);
 	}
+	// IsEnumType: False
     public DateTimeOffset? DiscontinuedDate 
 	{
 		get => GetValue<DateTimeOffset?>("DiscontinuedDate");
 		set => SetValue("DiscontinuedDate", value);
 	}
+	// IsEnumType: False
     public short? Rating 
 	{
 		get => GetValue<short?>("Rating");
 		set => SetValue("Rating", value);
 	}
+	// IsEnumType: False
     public double? Price 
 	{
 		get => GetValue<double?>("Price");
 		set => SetValue("Price", value);
 	}
 
+    //Navigations
     public List<CategoryInput>? Categories 
 	{
 		get => GetValue<List<CategoryInput>?>("Categories");

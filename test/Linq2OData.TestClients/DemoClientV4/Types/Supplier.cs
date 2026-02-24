@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// ODataName: Supplier
+/// </summary>
 
 [ODataEntitySet("Suppliers")]
 public partial class Supplier  : IDemoClientV4EntitySet, ISupplierKeys
@@ -23,7 +26,8 @@ public partial class Supplier  : IDemoClientV4EntitySet, ISupplierKeys
     public object? Location { get; set; }
     [ODataMember("Concurrency")]
     public int Concurrency { get; set; }
-
+    
+    //Navigations
     [ODataMember("Products", true)]
     public List<Product>? Products { get; set; }
 

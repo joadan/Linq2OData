@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// ODataName: City
+/// </summary>
 
 
 public partial class City 
@@ -19,7 +22,8 @@ public partial class City
     public string? Name { get; set; }
     [ODataMember("Region")]
     public string? Region { get; set; }
-
+    
+    //Navigations
 
 
 

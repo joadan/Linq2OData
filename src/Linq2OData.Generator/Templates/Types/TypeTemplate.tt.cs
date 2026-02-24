@@ -4,14 +4,14 @@ using System.Text;
 
 namespace Linq2OData.Generator.Templates.Types
 {
-    public partial class TypeTemplate(ODataEntityType entityType, string fullNamspace, string? servicePath, string etityInterfaceName, IEnumerable<ODataEntityType> derivedTypes, string metadataNamespace, ODataVersion odataVersion)
+    public partial class TypeTemplate(ODataEntityType entityType, string fullNamspace, string? servicePath, string etityInterfaceName, IEnumerable<ODataEntityType> derivedTypes, string metadataNamespace, ODataVersion odataVersion, IReadOnlyDictionary<string, string> typeToNsMap)
     {
 
         public string BaseTypeAndInterface
         {
             get
             {
-                var result = string.IsNullOrWhiteSpace(entityType.BaseType) ? "" : $": {entityType.BaseType}";
+                var result = string.IsNullOrWhiteSpace(entityType.BaseTypeCSharp) ? "" : $": {entityType.BaseTypeCSharp}";
 
                 if (entityType.IsEntitySet)
                 {
@@ -82,13 +82,39 @@ namespace Linq2OData.Generator.Templates.Types
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine($"[JsonPolymorphic(TypeDiscriminatorPropertyName = \"@odata.type\", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]");
-            sb.AppendLine($"[JsonDerivedType(typeof({entityType.Name}))]");
+            sb.AppendLine($"[JsonDerivedType(typeof({entityType.ClassName}))]");
             foreach (var derivedType in derivedTypes)
             {
-                sb.AppendLine($"[JsonDerivedType(typeof({derivedType.Name}), \"#{metadataNamespace}.{derivedType.Name}\")]");
+                var typeNs = derivedType.SchemaNamespace ?? metadataNamespace;
+                sb.AppendLine($"[JsonDerivedType(typeof({derivedType.ClassName}), \"#{typeNs}.{derivedType.Name}\")]");
             }
             return sb.ToString();
         }
 
+        private static string StripNs(string typeName)
+            => typeName.Contains('.') ? typeName.Split('.').Last() : typeName;
+
+        private IEnumerable<string> GetExternalNamespaces()
+        {
+            var referencedNames = new HashSet<string>();
+
+            foreach (var nav in entityType.Navigations)
+                referencedNames.Add(nav.ToEntity);
+
+            foreach (var prop in entityType.Properties)
+                if (!prop.DataType.StartsWith("Edm.") && !prop.IsEnumType)
+                    referencedNames.Add(StripNs(prop.DataType));
+
+            if (!string.IsNullOrEmpty(entityType.BaseType))
+                referencedNames.Add(StripNs(entityType.BaseType));
+
+            return referencedNames
+                .Select(name => typeToNsMap.TryGetValue(name, out var ns) ? ns : null)
+                .Where(ns => ns != null && ns != fullNamspace)
+                .Distinct()
+                .OrderBy(ns => ns)!;
+        }
+
     }
 }
+

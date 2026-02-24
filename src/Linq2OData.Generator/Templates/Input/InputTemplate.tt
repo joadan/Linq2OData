@@ -5,23 +5,30 @@
 <#@ import namespace="System.Collections.Generic" #>
 
 using Linq2OData.Core;
-
+<# foreach (var externalNs in GetExternalNamespaces()) { #>
+using <#= externalNs #>;
+<# } #>
 namespace <#= namespaceName #>;
 
+/// <summary>
+/// OdataName: <#= entityType.Name #>
+/// </summary>
 public partial class <#= entityType.InputName #> : ODataInputBase
 {
 <# foreach (var property in entityType.Properties) { #>
-    public <#= property.CSharpNameInput #> <#= property.Name #> 
+	// IsEnumType: <#= property.IsEnumType #>
+	public <#= property.CSharpNameInput #> <#= property.Name.SafeVariableName(entityType.InputName) #> 
 	{
 		get => GetValue<<#= property.CSharpNameInput #>>("<#= property.Name #>");
 		set => SetValue("<#= property.Name #>", value);
 	}
 <# } #>
 
+    //Navigations
 <# foreach (var navigation in entityType.Navigations) { #>
     public <#= navigation.CSharpPropertyInput #> <#= navigation.Name #> 
 	{
-		get => GetValue<<#= navigation.CSharpPropertyInput #>>("<#= navigation.Name #>");
+		get => GetValue<<#= navigation.CSharpPropertyInput #>>("<#= navigation.Name.SafeVariableName() #>");
 		set => SetValue("<#= navigation.Name #>", value);
 	}
 <# } #>

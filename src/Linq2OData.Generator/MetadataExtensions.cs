@@ -64,7 +64,7 @@ internal static class MetadataExtensions
     }
 
 
-        extension(ODataNavigation navigation)
+    extension(ODataNavigation navigation)
     {
         internal string CSharpProperty
         {
@@ -96,7 +96,22 @@ internal static class MetadataExtensions
     extension(ODataEntityType entityType)
     {
 
-        internal string InputName => $"{entityType.Name}Input";
+        internal string ClassName => entityType.Name.ToValidCSharpClassName();
+
+        internal string InputName => $"{entityType.ClassName}Input";
+
+        internal string BaseTypeCSharp
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(entityType.BaseType))
+                {
+                    return string.Empty;
+                }
+                return $"{StripNamespace(entityType.BaseType).ToValidCSharpClassName()}";
+            }
+
+        }
 
         internal string KeyResultString
         {
@@ -152,47 +167,14 @@ internal static class MetadataExtensions
         {
             get
             {
-                // Handle Collection types
-                if (property.IsCollection)
+
+                if (property.IsPrimitiveType || property.IsEnumType)
                 {
-                    // DataType now contains the inner type directly
-                    var innerType = property.DataType;
-
-                    // Check if it's an Edm type
-                    if (innerType.StartsWith("Edm."))
-                    {
-                        // For Edm collections, use CSharpTypeRaw which already handles this
-                        return property.CSharpTypeRaw + "?";
-                    }
-                    else
-                    {
-                        // Custom type (complex type or enum)
-                        var typeName = innerType.Contains('.') ? innerType.Split('.').Last() : innerType;
-
-                        // If the inner type is an enum, don't add "Input"
-                        if (property.IsEnumType)
-                        {
-                            return $"List<{typeName}>?";
-                        }
-
-                        // For complex types, add "Input"
-                        return $"List<{typeName}Input>?";
-                    }
+                    return property.GetCSharpTypeRaw(false) + "?";
                 }
 
-                if (!property.DataType.StartsWith("Edm."))
-                {
-                    // For enum types, use the enum type directly without appending "Input"
-                    if (property.IsEnumType)
-                    {
-                        return property.CSharpTypeRaw + "?";
-                    }
 
-                    // For complex types, append "Input"
-                    return property.DataType + "Input?";
-                }
-
-                return property.CSharpTypeRaw + "?";
+                return property.GetCSharpTypeRaw(true) + "?";
 
             }
         }
@@ -203,7 +185,7 @@ internal static class MetadataExtensions
         {
             get
             {
-                var csharpType = property.CSharpTypeRaw;
+                var csharpType = property.GetCSharpTypeRaw(false);
 
                 if (property.Nullable || csharpType == "string" || (!property.IsPrimitiveType && !property.IsEnumType))
                 {
@@ -215,42 +197,42 @@ internal static class MetadataExtensions
             }
         }
 
-        internal string CSharpTypeRaw
+        internal string GetCSharpTypeRaw(bool isInput)
         {
-            get
+            var dataType = property.DataType;
+
+            if (isInput)
             {
-                // Handle Collection types
-                if (property.IsCollection)
-                {
-                    // DataType now contains the inner type directly
-                    var innerType = property.DataType;
-
-                    // Check if it's an Edm type
-                    if (innerType.StartsWith("Edm."))
-                    {
-                        var elementType = MapEdmTypeToCSharp(innerType);
-                        return $"List<{elementType}>";
-                    }
-                    else
-                    {
-                        // Custom type (complex type or enum) - strip namespace
-                        var typeName = StripNamespace(innerType);
-                        return $"List<{typeName}>";
-                    }
-                }
-
-                // For custom types (complex types or enums), strip namespace prefix
-                if (!property.DataType.StartsWith("Edm."))
-                {
-                    return StripNamespace(property.DataType);
-                }
-
-                // For Edm primitive types, map to C# types
-                return MapEdmTypeToCSharp(property.DataType);
+                dataType = dataType + "Input";
             }
 
-        }
+            // Handle Collection types
+            if (property.IsCollection)
+            {
 
+                // Check if it's an Edm type
+                if (property.IsPrimitiveType)
+                {
+                    var elementType = MapEdmTypeToCSharp(property.DataType);
+                    return $"List<{elementType}>";
+                }
+                else
+                {
+                    // Custom type (complex type or enum) - strip namespace
+                    var typeName = StripNamespace(dataType).ToValidCSharpClassName();
+                    return $"List<{typeName}>";
+                }
+            }
+
+            // For custom types (complex types or enums), strip namespace prefix
+            if (!property.IsPrimitiveType)
+            {
+                return StripNamespace(dataType).ToValidCSharpClassName();
+            }
+
+            // For Edm primitive types, map to C# types
+            return MapEdmTypeToCSharp(property.DataType);
+        }
 
     }
 

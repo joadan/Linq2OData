@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace DemoClientV2.ODataDemo;
 
+/// <summary>
+/// ODataName: Product
+/// </summary>
 
 [ODataEntitySet("Products")]
 public partial class Product  : IDemoClientV2EntitySet, IProductKeys
@@ -27,7 +30,8 @@ public partial class Product  : IDemoClientV2EntitySet, IProductKeys
     public int Rating { get; set; }
     [ODataMember("Price")]
     public decimal Price { get; set; }
-
+    
+    //Navigations
     [ODataMember("Category", true)]
     [JsonConverter(typeof(Linq2OData.Core.Converters.ODataNavigationPropertyConverter<Category>))]
     public Category? Category { get; set; }

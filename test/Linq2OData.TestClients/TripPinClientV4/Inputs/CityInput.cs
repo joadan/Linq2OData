@@ -5,32 +5,34 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// OdataName: City
+/// </summary>
 public partial class CityInput : ODataInputBase
 {
+	// IsEnumType: False
     public string? CountryRegion 
 	{
 		get => GetValue<string?>("CountryRegion");
 		set => SetValue("CountryRegion", value);
 	}
+	// IsEnumType: False
     public string? Name 
 	{
 		get => GetValue<string?>("Name");
 		set => SetValue("Name", value);
 	}
+	// IsEnumType: False
     public string? Region 
 	{
 		get => GetValue<string?>("Region");
 		set => SetValue("Region", value);
 	}
 
+    //Navigations
 
 }

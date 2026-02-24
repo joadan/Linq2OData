@@ -5,23 +5,23 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// OdataName: Flight
+/// </summary>
 public partial class FlightInput : ODataInputBase
 {
+	// IsEnumType: False
     public string? FlightNumber 
 	{
 		get => GetValue<string?>("FlightNumber");
 		set => SetValue("FlightNumber", value);
 	}
 
+    //Navigations
     public AirportInput? From 
 	{
 		get => GetValue<AirportInput?>("From");

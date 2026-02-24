@@ -10,6 +10,7 @@ namespace Linq2OData.Tests
         private string odataDemoMetadataV3;
         private string odataDemoMetadataV4;
         private string trippinMetadataV4;
+        private string complexMetadataV4;
 
         public MetadataTests()
         {
@@ -19,6 +20,7 @@ namespace Linq2OData.Tests
             odataDemoMetadataV3 =  File.ReadAllText(Path.Combine("SampleData", "Metadata", "V3", "ODataDemo.xml"));
             odataDemoMetadataV4 =  File.ReadAllText(Path.Combine("SampleData", "Metadata", "V4", "ODataDemo.xml"));
             trippinMetadataV4 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V4", "Trippin.xml"));
+            complexMetadataV4 = File.ReadAllText(Path.Combine("SampleData", "Metadata", "V4", "Complex.xml"));
         }
 
 
@@ -1182,6 +1184,175 @@ namespace Linq2OData.Tests
             Assert.NotNull(nameProperty);
             Assert.Equal("Edm.String", nameProperty.DataType);
             Assert.False(nameProperty.IsCollection);
+        }
+
+        #endregion
+
+        #region Multi-Schema V4 Tests
+
+        [Fact]
+        public void ParseComplexMetadata_ShouldParseMultipleSchemas()
+        {
+            var metadata = MetadataParser.Parse(complexMetadataV4);
+
+            Assert.NotNull(metadata);
+            Assert.Equal(ODataVersion.V4, metadata.ODataVersion);
+            // Primary namespace is the one that owns the EntityContainer
+            Assert.Equal("Company.Billing", metadata.Namespace);
+        }
+
+        [Fact]
+        public void ParseComplexMetadata_ShouldCollectEntityTypesFromAllSchemas()
+        {
+            var metadata = MetadataParser.Parse(complexMetadataV4);
+
+            // Company.Core: Person, Employee, Customer + Address (complex)
+            // Company.Billing: Document, Invoice, InvoiceLine + Money (complex)
+            Assert.Equal(8, metadata.EntityTypes.Count);
+
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Employee"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Customer"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Address"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Document"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Invoice"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "InvoiceLine"));
+            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Money"));
+        }
+
+        [Fact]
+        public void ParseComplexMetadata_ShouldTagTypesWithCorrectSchemaNamespace()
+        {
+            var metadata = MetadataParser.Parse(complexMetadataV4);
+
+            var employee = metadata.EntityTypes.First(e => e.Name == "Employee");
+            Assert.Equal("Company.Core", employee.SchemaNamespace);
+
+            var invoice = metadata.EntityTypes.First(e => e.Name == "Invoice");
+            Assert.Equal("Company.Billing", invoice.SchemaNamespace);
+
+            var address = metadata.EntityTypes.First(e => e.Name == "Address");
+            Assert.Equal("Company.Core", address.SchemaNamespace);
+
+            var money = metadata.EntityTypes.First(e => e.Name == "Money");
+            Assert.Equal("Company.Billing", money.SchemaNamespace);
+        }
+
+        [Fact]
+        public void ParseComplexMetadata_ShouldResolveAliasInBaseType()
+        {
+            var metadata = MetadataParser.Parse(complexMetadataV4);
+
+            // "Core.Person" alias in XML → resolved to "Company.Core.Person"
+            var employee = metadata.EntityTypes.First(e => e.Name == "Employee");
+            Assert.Equal("Company.Core.Person", employee.BaseType);
+
+            var customer = metadata.EntityTypes.First(e => e.Name == "Customer");
+            Assert.Equal("Company.Core.Person", customer.BaseType);
+
+            // Full namespace, no alias to resolve
+            var invoice = metadata.EntityTypes.First(e => e.Name == "Invoice");
+            Assert.Equal("Company.Billing.Document", invoice.BaseType);
+        }
+
+        [Fact]
+        public void ParseComplexMetadata_ShouldCollectEnumsFromAllSchemas()
+        {
+            var metadata = MetadataParser.Parse(complexMetadataV4);
+
+            Assert.Single(metadata.EnumTypes);
+            var personType = metadata.EnumTypes.First(e => e.Name == "PersonType");
+            Assert.Equal("Company.Core", personType.SchemaNamespace);
+            Assert.Equal(2, personType.Members.Count);
+        }
+
+        [Fact]
+        public void ParseComplexMetadata_ShouldResolveAliasInEntitySets()
+        {
+            var metadata = MetadataParser.Parse(complexMetadataV4);
+
+            Assert.Equal(3, metadata.EntitySets.Count);
+
+            // EntitySet EntityType="Core.Employee" → alias resolved → entity type found
+            var employeesSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Employees");
+            Assert.NotNull(employeesSet);
+            Assert.Equal("Employee", employeesSet.EntityTypeName);
+            Assert.NotNull(employeesSet.EntityType);
+
+            var customersSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Customers");
+            Assert.NotNull(customersSet);
+            Assert.Equal("Customer", customersSet.EntityTypeName);
+            Assert.NotNull(customersSet.EntityType);
+
+            var invoicesSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Invoices");
+            Assert.NotNull(invoicesSet);
+            Assert.Equal("Invoice", invoicesSet.EntityTypeName);
+            Assert.NotNull(invoicesSet.EntityType);
+        }
+
+        [Fact]
+        public void ParseComplexMetadata_ShouldParseCrossSchemaNavigationProperties()
+        {
+            var metadata = MetadataParser.Parse(complexMetadataV4);
+
+            // Invoice (Billing) → Customer (Core) and Employee (Core)
+            var invoice = metadata.EntityTypes.First(e => e.Name == "Invoice");
+            var customerNav = invoice.Navigations.FirstOrDefault(n => n.Name == "Customer");
+            Assert.NotNull(customerNav);
+            Assert.Equal("Customer", customerNav.ToEntity);
+            Assert.Equal(ODataNavigationType.ZeroOrOne, customerNav.NavigationType);
+
+            var employeeNav = invoice.Navigations.FirstOrDefault(n => n.Name == "Employee");
+            Assert.NotNull(employeeNav);
+            Assert.Equal("Employee", employeeNav.ToEntity);
+
+            // Employee (Core) → Invoices (Billing)
+            var employee = metadata.EntityTypes.First(e => e.Name == "Employee");
+            var invoicesNav = employee.Navigations.FirstOrDefault(n => n.Name == "Invoices");
+            Assert.NotNull(invoicesNav);
+            Assert.Equal("Invoice", invoicesNav.ToEntity);
+            Assert.Equal(ODataNavigationType.Many, invoicesNav.NavigationType);
+        }
+
+        [Fact]
+        public void ParseComplexMetadata_ShouldParseUnboundFunctionImport()
+        {
+            var metadata = MetadataParser.Parse(complexMetadataV4);
+
+            Assert.Single(metadata.Functions);
+            var func = metadata.Functions.First();
+            Assert.Equal("GetInvoicesByAmount", func.Name);
+            Assert.Equal("GET", func.HttpMethod);
+            Assert.Single(func.Parameters);
+            Assert.Equal("minAmount", func.Parameters[0].Name);
+            Assert.Equal("Edm.Decimal", func.Parameters[0].DataType);
+        }
+
+        [Fact]
+        public void ParseComplexMetadata_ShouldSetCrossSchemaEntityPaths()
+        {
+            var metadata = MetadataParser.Parse(complexMetadataV4);
+
+            // Entity sets set EntityPath on the entity types
+            var employee = metadata.EntityTypes.First(e => e.Name == "Employee");
+            Assert.Equal("Employees", employee.EntityPath);
+
+            var customer = metadata.EntityTypes.First(e => e.Name == "Customer");
+            Assert.Equal("Customers", customer.EntityPath);
+
+            var invoice = metadata.EntityTypes.First(e => e.Name == "Invoice");
+            Assert.Equal("Invoices", invoice.EntityPath);
+        }
+
+        [Fact]
+        public void ParseComplexMetadata_ShouldMarkEnumProperties()
+        {
+            var metadata = MetadataParser.Parse(complexMetadataV4);
+
+            var person = metadata.EntityTypes.First(e => e.Name == "Person");
+            var personTypeProp = person.Properties.FirstOrDefault(p => p.Name == "PersonType");
+            Assert.NotNull(personTypeProp);
+            Assert.True(personTypeProp.IsEnumType);
         }
 
         #endregion

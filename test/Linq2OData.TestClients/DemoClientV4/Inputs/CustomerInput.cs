@@ -5,22 +5,22 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// OdataName: Customer
+/// </summary>
 public partial class CustomerInput : ODataInputBase
 {
+	// IsEnumType: False
     public decimal? TotalExpense 
 	{
 		get => GetValue<decimal?>("TotalExpense");
 		set => SetValue("TotalExpense", value);
 	}
 
+    //Navigations
 
 }

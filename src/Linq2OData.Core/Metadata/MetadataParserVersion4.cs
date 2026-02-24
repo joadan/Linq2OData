@@ -4,6 +4,45 @@ namespace Linq2OData.Core.Metadata;
 
 internal static class MetadataParserVersion4
 {
+    private static string StripNamespace(string typeName)
+       => typeName.Contains('.') ? typeName.Split('.').Last() : typeName;
+
+    /// <summary>
+    /// Builds a map from schema alias to full namespace (e.g. "Core" → "Company.Core").
+    /// </summary>
+    private static Dictionary<string, string> BuildAliasMap(IEnumerable<XElement> schemas)
+    {
+        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var schema in schemas)
+        {
+            var ns = schema.Attribute("Namespace")?.Value;
+            var alias = schema.Attribute("Alias")?.Value;
+            if (!string.IsNullOrEmpty(alias) && !string.IsNullOrEmpty(ns))
+                map[alias] = ns;
+        }
+        return map;
+    }
+
+    /// <summary>
+    /// Resolves an alias-qualified type name to a fully-qualified one
+    /// (e.g. "Core.Person" → "Company.Core.Person" when alias "Core" maps to "Company.Core").
+    /// Returns the original string unchanged if no alias applies.
+    /// </summary>
+    private static string ResolveTypeName(string typeName, Dictionary<string, string> aliasMap)
+    {
+        if (string.IsNullOrEmpty(typeName) || aliasMap.Count == 0)
+            return typeName;
+
+        var dotIndex = typeName.IndexOf('.');
+        if (dotIndex <= 0) return typeName;
+
+        var prefix = typeName.Substring(0, dotIndex);
+        if (aliasMap.TryGetValue(prefix, out var fullNamespace))
+            return fullNamespace + typeName.Substring(dotIndex);
+
+        return typeName;
+    }
+
     internal static ODataMetadata Parse(XDocument doc)
     {
         var metadata = new ODataMetadata
@@ -11,38 +50,56 @@ internal static class MetadataParserVersion4
             ODataVersion = ODataVersion.V4
         };
 
-        // Define OData v4 namespaces
         XNamespace edmx = "http://docs.oasis-open.org/odata/ns/edmx";
         XNamespace edm = "http://docs.oasis-open.org/odata/ns/edm";
 
-        // Get the schema element
-        var schema = doc.Descendants(edm + "Schema").FirstOrDefault();
-
-        if (schema == null)
+        var schemas = doc.Descendants(edm + "Schema").ToList();
+        if (schemas.Count == 0)
             return metadata;
 
-        metadata.Namespace = schema.Attribute("Namespace")?.Value ?? string.Empty;
+        // Build alias→namespace map from all schemas
+        var aliasMap = BuildAliasMap(schemas);
 
-        // Parse EnumTypes
-        metadata.EnumTypes = ParseEnumTypes(schema, edm);
+        // The schema containing the EntityContainer is the primary schema
+        var containerSchema = schemas.FirstOrDefault(s => s.Descendants(edm + "EntityContainer").Any())
+                              ?? schemas[0];
 
-        // Parse EntityTypes
-        metadata.EntityTypes = ParseEntityTypes(schema, edm);
+        metadata.Namespace = containerSchema.Attribute("Namespace")?.Value ?? string.Empty;
 
-        // Add ComplexTypes as EntityTypes
-        metadata.EntityTypes.AddRange(ParseComplexTypes(schema, edm));
+        // Parse every schema, tagging each type with its SchemaNamespace
+        foreach (var schema in schemas)
+        {
+            var schemaNamespace = schema.Attribute("Namespace")?.Value ?? string.Empty;
 
-        // Parse EntityContainer to get EntitySets and Functions
-        var entityContainer = schema.Descendants(edm + "EntityContainer").FirstOrDefault();
+            foreach (var enumType in ParseEnumTypes(schema, edm))
+            {
+                enumType.SchemaNamespace = schemaNamespace;
+                metadata.EnumTypes.Add(enumType);
+            }
+
+            foreach (var entityType in ParseEntityTypes(schema, edm, aliasMap))
+            {
+                entityType.SchemaNamespace = schemaNamespace;
+                metadata.EntityTypes.Add(entityType);
+            }
+
+            foreach (var complexType in ParseComplexTypes(schema, edm))
+            {
+                complexType.SchemaNamespace = schemaNamespace;
+                metadata.EntityTypes.Add(complexType);
+            }
+        }
+
+        // Parse EntityContainer (entity sets + function/action imports)
+        var entityContainer = containerSchema.Descendants(edm + "EntityContainer").FirstOrDefault();
         if (entityContainer != null)
         {
-            metadata.EntitySets = ParseEntitySets(entityContainer, edm, metadata.Namespace, metadata.EntityTypes);
-            metadata.Functions = ParseActionImports(entityContainer, edm, metadata.Namespace);
+            metadata.EntitySets = ParseEntitySets(entityContainer, edm, metadata.Namespace, metadata.EntityTypes, aliasMap);
+            metadata.Functions = ParseActionImports(entityContainer, edm, metadata.Namespace, schemas);
         }
 
         metadata.SetEntityPaths();
 
-        // Mark properties that use enum types
         MarkEnumProperties(metadata);
 
         return metadata;
@@ -114,7 +171,7 @@ internal static class MetadataParserVersion4
         return results;
     }
 
-    private static List<ODataEntityType> ParseEntityTypes(XElement schema, XNamespace edmNamespace)
+    private static List<ODataEntityType> ParseEntityTypes(XElement schema, XNamespace edmNamespace, Dictionary<string, string> aliasMap)
     {
         var entityTypes = new List<ODataEntityType>();
 
@@ -124,6 +181,10 @@ internal static class MetadataParserVersion4
             var baseType = entityType.Attribute("BaseType")?.Value;
             if (string.IsNullOrEmpty(name))
                 continue;
+
+            // Resolve alias in BaseType (e.g. "Core.Person" → "Company.Core.Person")
+            if (baseType != null)
+                baseType = ResolveTypeName(baseType, aliasMap);
 
             var entity = new ODataEntityType
             {
@@ -240,23 +301,24 @@ internal static class MetadataParserVersion4
         return property;
     }
 
-    private static List<ODataEntitySet> ParseEntitySets(XElement entityContainer, XNamespace edmNamespace, string schemaNamespace, List<ODataEntityType> entityTypes)
+    private static List<ODataEntitySet> ParseEntitySets(XElement entityContainer, XNamespace edmNamespace, string schemaNamespace, List<ODataEntityType> entityTypes, Dictionary<string, string> aliasMap)
     {
         var entitySets = new List<ODataEntitySet>();
 
         foreach (var entitySet in entityContainer.Elements(edmNamespace + "EntitySet"))
         {
             var name = entitySet.Attribute("Name")?.Value;
-            var entityType = entitySet.Attribute("EntityType")?.Value;
+            var entityTypeRef = entitySet.Attribute("EntityType")?.Value;
 
-            if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(entityType))
+            if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(entityTypeRef))
             {
-                // Remove namespace prefix if present
-                var entityTypeName = entityType.Contains('.')
-                    ? entityType.Split('.').Last()
-                    : entityType;
+                // Resolve alias (e.g. "Core.Employee" → "Company.Core.Employee"), then strip to simple name
+                var resolved = ResolveTypeName(entityTypeRef, aliasMap);
+                var entityTypeName = resolved.Contains('.')
+                    ? resolved.Split('.').Last()
+                    : resolved;
 
-               
+
                 entitySets.Add(new ODataEntitySet
                 {
                     Name = name,
@@ -269,9 +331,7 @@ internal static class MetadataParserVersion4
         return entitySets;
     }
 
-    
-
-    private static List<ODataFunction> ParseActionImports(XElement entityContainer, XNamespace edmNamespace, string schemaNamespace)
+    private static List<ODataFunction> ParseActionImports(XElement entityContainer, XNamespace edmNamespace, string schemaNamespace, IReadOnlyList<XElement> allSchemas)
     {
         var functions = new List<ODataFunction>();
 
@@ -284,10 +344,14 @@ internal static class MetadataParserVersion4
             if (string.IsNullOrEmpty(name))
                 continue;
 
-            // Find the corresponding Action definition in the schema
             var actionName = action?.Contains('.') == true
                 ? action.Split('.').Last()
                 : action;
+
+            // Determine preferred schema namespace from the fully-qualified action reference
+            var actionRefNs = action?.Contains('.') == true
+                ? string.Join(".", action.Split('.').SkipLast(1))
+                : null;
 
             var function = new ODataFunction
             {
@@ -295,11 +359,19 @@ internal static class MetadataParserVersion4
                 HttpMethod = "POST" // Actions in V4 are always POST
             };
 
-            // Find the Action element to get parameters and return type
+
             if (!string.IsNullOrEmpty(actionName))
             {
-                var schema = entityContainer.Parent;
-                var actionElement = schema?.Elements(edmNamespace + "Action")
+                // Search preferred schema first (namespace derived from fully-qualified reference), then fall back to all schemas
+                XElement? actionElement = null;
+                if (actionRefNs != null)
+                {
+                    var targetSchema = allSchemas.FirstOrDefault(s => s.Attribute("Namespace")?.Value == actionRefNs);
+                    actionElement = targetSchema?.Elements(edmNamespace + "Action")
+                        .FirstOrDefault(a => a.Attribute("Name")?.Value == actionName);
+                }
+                actionElement ??= allSchemas
+                    .SelectMany(s => s.Elements(edmNamespace + "Action"))
                     .FirstOrDefault(a => a.Attribute("Name")?.Value == actionName);
 
                 if (actionElement != null)
@@ -364,8 +436,21 @@ internal static class MetadataParserVersion4
             // Find the Function element to get parameters and return type
             if (!string.IsNullOrEmpty(functionName))
             {
-                var schema = entityContainer.Parent;
-                var functionElement = schema?.Elements(edmNamespace + "Function")
+                // Determine the preferred schema namespace from the fully-qualified function reference
+                var functionRefNs = functionRef?.Contains('.') == true
+                    ? string.Join(".", functionRef.Split('.').SkipLast(1))
+                    : null;
+
+                // Search preferred schema first, then fall back to all schemas
+                XElement? functionElement = null;
+                if (functionRefNs != null)
+                {
+                    var targetSchema = allSchemas.FirstOrDefault(s => s.Attribute("Namespace")?.Value == functionRefNs);
+                    functionElement = targetSchema?.Elements(edmNamespace + "Function")
+                        .FirstOrDefault(f => f.Attribute("Name")?.Value == functionName);
+                }
+                functionElement ??= allSchemas
+                    .SelectMany(s => s.Elements(edmNamespace + "Function"))
                     .FirstOrDefault(f => f.Attribute("Name")?.Value == functionName);
 
                 if (functionElement != null)
@@ -408,23 +493,32 @@ internal static class MetadataParserVersion4
 
     private static void MarkEnumProperties(ODataMetadata metadata)
     {
-        // Create a set of fully qualified enum type names for quick lookup
+        //// Create a set of fully qualified enum type names for quick lookup
+        //var enumTypeNames = new HashSet<string>(
+        //    metadata.EnumTypes.Select(e => $"{metadata.Namespace}.{e.Name}")
+        //);
+
         var enumTypeNames = new HashSet<string>(
-            metadata.EnumTypes.Select(e => $"{metadata.Namespace}.{e.Name}")
-        );
+      metadata.EnumTypes.Select(e => $"{e.Name}")
+  );
 
         // Mark properties that reference enum types
         foreach (var entityType in metadata.EntityTypes)
         {
-            foreach (var property in entityType.Properties)
+           
+            foreach (var property in entityType.Properties.Where(e => !e.DataType.StartsWith("Edm.")))
             {
+
                 // Since DataType now contains the inner type directly for both
                 // collection and non-collection properties, we just check it directly
-                if (enumTypeNames.Contains(property.DataType))
+                if (enumTypeNames.Contains(StripNamespace(property.DataType)))
                 {
                     property.IsEnumType = true;
                 }
             }
         }
+
+
+
     }
 }

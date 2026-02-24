@@ -28,14 +28,21 @@ namespace Linq2OData.Generator.Templates.Types
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("using System.Text.Json.Serialization;\n\nnamespace ");
-            
+            this.Write("using System.Text.Json.Serialization;\nusing Linq2OData.Core;\n\nnamespace ");
+
             #line 8 "EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fullNamspace));
-            
+
             #line default
             #line hidden
-            this.Write(";\n\n[JsonConverter(typeof(JsonStringEnumConverter))]\npublic enum ");
+            this.Write(";\n\n[JsonConverter(typeof(JsonStringEnumConverter))]\n[ODataEnum(\"");
+
+            #line 11 "EnumTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(enumType.SchemaNamespace ?? fullNamspace));
+
+            #line default
+            #line hidden
+            this.Write("\")]\npublic enum ");
             
             #line 11 "EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumType.Name));

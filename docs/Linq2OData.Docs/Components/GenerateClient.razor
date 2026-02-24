@@ -76,7 +76,13 @@
                                         <Table Item="ODataEntityType" Items="@clientMetadata.Metadata.EntityTypes">
 
                                             <ChildContent>
-                                                <Column Item="ODataEntityType" Property="e => e.Name" Searchable Sortable />
+                                                <Column Item="ODataEntityType" Property="e => e.Name" Searchable Sortable >
+                                               <Template>
+                                                        <span class="a" @onclick="@(_ => OpenEntityTypeAsync(context))">@context.Name</span>
+                                               </Template>
+                                               
+
+                                                </Column>
                                                 <Column Item="ODataEntityType" Property="e => e.BaseType" Searchable Sortable />
 
                                                 <Column Item="ODataEntityType" Title="Keys">

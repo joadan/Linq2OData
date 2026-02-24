@@ -34,6 +34,142 @@ public class FilterExpressionTests
         public string __Key => $"ID={ID}";
     }
 
+    // Entities where C# property names differ from OData attribute names
+    [ODataEntitySet("Articles")]
+    public class TestArticle : IODataEntitySet
+    {
+        [ODataMember("ArticleId")]
+        public int CSharpId { get; set; }
+
+        [ODataMember("Title")]
+        public string? CSharpTitle { get; set; }
+
+        [ODataMember("ListPrice")]
+        public decimal CSharpPrice { get; set; }
+
+        [ODataMember("InStock")]
+        public bool CSharpIsAvailable { get; set; }
+
+        [ODataMember("ArticleCategory", isComplex: true)]
+        public TestArticleCategory? CSharpCategory { get; set; }
+
+        public string __Key => $"ArticleId={CSharpId}";
+    }
+
+    [ODataEntitySet("ArticleCategories")]
+    public class TestArticleCategory : IODataEntitySet
+    {
+        [ODataMember("CategoryId")]
+        public int CSharpId { get; set; }
+
+        [ODataMember("CategoryName")]
+        public string? CSharpName { get; set; }
+
+        public string __Key => $"CategoryId={CSharpId}";
+    }
+
+    #region ODataMemberAttribute Name Tests
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_SimpleProperty_UsesAttributeName()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpId == 42;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(ArticleId eq 42)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_StringProperty_UsesAttributeName()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpTitle == "Hello";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(Title eq 'Hello')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_BooleanProperty_UsesAttributeName()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpIsAvailable;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("InStock", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_NestedProperty_UsesAttributeNames()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpCategory!.CSharpName == "Fiction";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(ArticleCategory/CategoryName eq 'Fiction')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_StringContains_UsesAttributeName()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpTitle!.Contains("OData");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("contains(Title, 'OData')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_NestedStringContains_UsesAttributeNames()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpCategory!.CSharpName!.Contains("Sci");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("contains(ArticleCategory/CategoryName, 'Sci')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_CompoundExpression_UsesAttributeNames()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpPrice > 10 && a.CSharpIsAvailable;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("((ListPrice gt 10) and InStock)", result);
+    }
+
+    #endregion
+
     #region Basic Comparison Tests
 
     [Fact]
@@ -1177,6 +1313,109 @@ public class FilterExpressionTests
 
         // Assert
         Assert.Equal("((length(Name) gt 5) and startswith(toupper(Name), 'WID'))", result);
+    }
+
+    #endregion
+
+    #region Enum Filter Tests
+
+    [ODataEnum("Trippin")]
+    public enum TestPersonGender
+    {
+        Male = 0,
+        Female = 1,
+        Unknown = 2,
+    }
+
+    [ODataEnum("Trippin")]
+    public enum TestFeature
+    {
+        Feature1 = 0,
+        Feature2 = 1,
+        Feature3 = 2,
+        Feature4 = 3,
+    }
+
+    [ODataEntitySet("People")]
+    public class TestPerson : IODataEntitySet
+    {
+        public string UserName { get; set; } = "";
+        public TestPersonGender Gender { get; set; }
+        public TestPersonGender? NullableGender { get; set; }
+        public TestFeature FavoriteFeature { get; set; }
+        public string __Key => $"UserName='{UserName}'";
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_EnumEqual_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestPerson, bool>> expression = p => p.Gender == TestPersonGender.Male;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(Gender eq Trippin.TestPersonGender'Male')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_EnumNotEqual_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestPerson, bool>> expression = p => p.Gender != TestPersonGender.Female;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(Gender ne Trippin.TestPersonGender'Female')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_EnumVariable_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var gender = TestPersonGender.Unknown;
+        Expression<Func<TestPerson, bool>> expression = p => p.Gender == gender;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(Gender eq Trippin.TestPersonGender'Unknown')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_DifferentEnumType_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestPerson, bool>> expression = p => p.FavoriteFeature == TestFeature.Feature2;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(FavoriteFeature eq Trippin.TestFeature'Feature2')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_EnumInComplexExpression_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestPerson, bool>> expression = p =>
+            p.Gender == TestPersonGender.Male && p.FavoriteFeature != TestFeature.Feature4;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("((Gender eq Trippin.TestPersonGender'Male') and (FavoriteFeature ne Trippin.TestFeature'Feature4'))", result);
     }
 
     #endregion

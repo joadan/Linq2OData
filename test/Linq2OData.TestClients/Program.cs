@@ -1,6 +1,7 @@
-﻿using DemoClientV4.ODataDemo;
+﻿//using DemoClientV4.ODataDemo;
+using Linq2OData.Core.Metadata;
 using Linq2OData.Generator.Models;
-using Linq2OData.TestClients.AdHocClient;
+
 
 namespace Linq2OData.TestClients
 {
@@ -15,11 +16,13 @@ namespace Linq2OData.TestClients
         {
             Console.WriteLine("Here we go!");
 
-            // await GenerateDemoClientV2Async();
-            // await GenerateDemoClientV4Async();
-            // await GenerateTripPinClientAsync();
+           //  await GenerateDemoClientV2Async();
+           //  await GenerateDemoClientV4Async();
+           // await GenerateTripPinClientAsync();
 
-            await TestTripPinAsync();
+            //GenerateLargeClientAsync();
+
+             await TestTripPinAsync();
             // await TestV4ClientAsync();
         }
 
@@ -38,7 +41,7 @@ namespace Linq2OData.TestClients
                 var result = await tripPinClient
                     .Query<TripPin.Microsoft.OData.SampleService.Models.TripPin.Person>()
                     .Top(10)
-                    .Filter(e => e.FirstName != "Uno")
+                    .Filter(e => e.Gender != TripPin.Microsoft.OData.SampleService.Models.TripPin.PersonGender.Male)
                     .Expand(e => e.Trips!.Select(e => e.PlanItems))
                        .ExecuteAsync();
 
@@ -80,24 +83,24 @@ namespace Linq2OData.TestClients
 
         }
 
-        private static async Task TestV4ClientAsync()
-        {
-            var httpClient = new HttpClient
-            {
-                BaseAddress = new Uri(demoUrlV4)
-            };
+        //private static async Task TestV4ClientAsync()
+        //{
+        //    var httpClient = new HttpClient
+        //    {
+        //        BaseAddress = new Uri(demoUrlV4)
+        //    };
 
-            var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
+        //    var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
 
-            var queryResult = await clientV4
-            .Get<Product>(e => e.ID = 4)
-            .Expand(e => e.Categories)
-            .Expand(e => e.Supplier)
-            .ExecuteAsync();
+        //    var queryResult = await clientV4
+        //    .Get<Product>(e => e.ID = 4)
+        //    .Expand(e => e.Categories)
+        //    .Expand(e => e.Supplier)
+        //    .ExecuteAsync();
 
-            var r = queryResult;
+        //    var r = queryResult;
 
-        }
+        //}
 
 
 
@@ -160,6 +163,40 @@ namespace Linq2OData.TestClients
             if (projectDirectory == null) { throw new Exception("Unable to get project directory"); }
             var files = generator.GenerateClient(Path.Combine(projectDirectory, "TripPinClientV4"));
         }
+
+        private static void GenerateLargeClientAsync()
+        {
+           
+            var metadata = File.ReadAllText("Metadata/LargeMetadata.xml");
+
+
+
+
+            //var m = MetadataParser.Parse(metadata);
+
+            // var tt = m.EntityTypes.Where(e => e.Name.Equals("Solution", StringComparison.CurrentCultureIgnoreCase)).ToList();
+
+            // var hh = tt;
+
+            var request = new Linq2OData.Generator.Models.ClientRequest
+            {
+                Name = "LargeClient",
+                Namespace = "Large",
+            };
+            request.AddMetadata(metadata);
+
+            var generator = new Linq2OData.Generator.ClientGenerator(request);
+
+            var projectDirectory = Directory.GetParent(Directory.GetCurrentDirectory())?.Parent?.Parent?.FullName;
+
+            if (projectDirectory == null) { throw new Exception("Unable to get project directory"); }
+
+            var files = generator.GenerateClient(Path.Combine(projectDirectory, "LargeClientV4"));
+
+          //  var files = generator.GenerateClient();
+          
+        }
+
 
     }
 }

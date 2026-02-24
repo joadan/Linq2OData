@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// ODataName: PersonDetail
+/// </summary>
 
 [ODataEntitySet("PersonDetails")]
 public partial class PersonDetail  : IDemoClientV4EntitySet, IPersonDetailKeys
@@ -25,7 +28,8 @@ public partial class PersonDetail  : IDemoClientV4EntitySet, IPersonDetailKeys
     public Address? Address { get; set; }
     [ODataMember("Photo")]
     public object Photo { get; set; }
-
+    
+    //Navigations
     [ODataMember("Person", true)]
     public Person? Person { get; set; }
 

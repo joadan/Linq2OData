@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// ODataName: Address
+/// </summary>
 
 
 public partial class Address 
@@ -23,7 +26,8 @@ public partial class Address
     public string? ZipCode { get; set; }
     [ODataMember("Country")]
     public string? Country { get; set; }
-
+    
+    //Navigations
 
 
 

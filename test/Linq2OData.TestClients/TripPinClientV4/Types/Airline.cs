@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// ODataName: Airline
+/// </summary>
 
 [ODataEntitySet("Airlines")]
 public partial class Airline  : ITripPinEntitySet, IAirlineKeys
@@ -17,7 +20,8 @@ public partial class Airline  : ITripPinEntitySet, IAirlineKeys
     public string? AirlineCode { get; set; }
     [ODataMember("Name")]
     public string? Name { get; set; }
-
+    
+    //Navigations
 
  public string __Key => $"AirlineCode='{AirlineCode}'"; 
 

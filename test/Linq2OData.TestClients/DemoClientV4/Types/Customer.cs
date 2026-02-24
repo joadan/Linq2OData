@@ -9,13 +9,17 @@ using System.Text.Json.Serialization;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// ODataName: Customer
+/// </summary>
 
 [ODataEntitySet("Persons/ODataDemo.Customer")]
-public partial class Customer : ODataDemo.Person, IDemoClientV4EntitySet
+public partial class Customer : Person, IDemoClientV4EntitySet
 {
     [ODataMember("TotalExpense")]
     public decimal TotalExpense { get; set; }
-
+    
+    //Navigations
 
 
 

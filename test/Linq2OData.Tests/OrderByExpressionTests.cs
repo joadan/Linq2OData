@@ -42,6 +42,80 @@ public class OrderByExpressionTests
         public string __Key => $"ID={ID}";
     }
 
+    // Entities where C# property names differ from OData attribute names
+    [ODataEntitySet("Articles")]
+    public class TestArticle : IODataEntitySet
+    {
+        [ODataMember("ArticleId")]
+        public int CSharpId { get; set; }
+
+        [ODataMember("Title")]
+        public string? CSharpTitle { get; set; }
+
+        [ODataMember("ListPrice")]
+        public decimal CSharpPrice { get; set; }
+
+        [ODataMember("ArticleCategory", isComplex: true)]
+        public TestArticleCategory? CSharpCategory { get; set; }
+
+        public string __Key => $"ArticleId={CSharpId}";
+    }
+
+    [ODataEntitySet("ArticleCategories")]
+    public class TestArticleCategory : IODataEntitySet
+    {
+        [ODataMember("CategoryName")]
+        public string? CSharpName { get; set; }
+
+        public string __Key => $"CategoryName={CSharpName}";
+    }
+
+    #region ODataMemberAttribute Name Tests
+
+    [Fact]
+    public void ODataOrderByVisitor_ODataMemberAttribute_SimpleProperty_UsesAttributeName()
+    {
+        // Arrange
+        var visitor = new ODataOrderByVisitor();
+        Expression<Func<TestArticle, string>> expression = a => a.CSharpTitle!;
+
+        // Act
+        var result = visitor.ToOrderBy(expression);
+
+        // Assert
+        Assert.Equal("Title", result);
+    }
+
+    [Fact]
+    public void ODataOrderByVisitor_ODataMemberAttribute_NestedProperty_UsesAttributeNames()
+    {
+        // Arrange
+        var visitor = new ODataOrderByVisitor();
+        Expression<Func<TestArticle, string>> expression = a => a.CSharpCategory!.CSharpName!;
+
+        // Act
+        var result = visitor.ToOrderBy(expression);
+
+        // Assert
+        Assert.Equal("ArticleCategory/CategoryName", result);
+    }
+
+    [Fact]
+    public void ODataOrderByVisitor_ODataMemberAttribute_NumericProperty_UsesAttributeName()
+    {
+        // Arrange
+        var visitor = new ODataOrderByVisitor();
+        Expression<Func<TestArticle, decimal>> expression = a => a.CSharpPrice;
+
+        // Act
+        var result = visitor.ToOrderBy(expression);
+
+        // Assert
+        Assert.Equal("ListPrice", result);
+    }
+
+    #endregion
+
     #region ODataOrderByVisitor Tests
 
     [Fact]
