@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// PlanItem
+/// </summary>
 public partial class PlanItemInput : ODataInputBase
 {
     public int? PlanItemId 

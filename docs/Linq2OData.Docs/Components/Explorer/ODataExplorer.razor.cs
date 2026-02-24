@@ -58,7 +58,7 @@ public partial class ODataExplorer
             var component = new RenderComponent<ExceptionModal>().Set(e => e.Exception, ex);
             var result = await Modal.ShowAsync("Error", component, new() { Size = ModalSize.Large });
 
-            throw;
+            //throw;
 
         }
         finally
@@ -66,15 +66,6 @@ public partial class ODataExplorer
             isLoading = false;
         }
 
-
-
-
-
-
-
     }
 
-
-
-
-}
+    }

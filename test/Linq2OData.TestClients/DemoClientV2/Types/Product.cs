@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace DemoClientV2.ODataDemo;
 
+/// <summary>
+/// ODataName: Product
+/// </summary>
 
 [ODataEntitySet("Products")]
 public partial class Product  : IDemoClientV2EntitySet, IProductKeys

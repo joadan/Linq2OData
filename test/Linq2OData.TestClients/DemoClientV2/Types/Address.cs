@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace DemoClientV2.ODataDemo;
 
+/// <summary>
+/// ODataName: Address
+/// </summary>
 
 
 public partial class Address 

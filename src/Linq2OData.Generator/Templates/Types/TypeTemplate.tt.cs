@@ -11,7 +11,7 @@ namespace Linq2OData.Generator.Templates.Types
         {
             get
             {
-                var result = string.IsNullOrWhiteSpace(entityType.BaseType) ? "" : $": {entityType.BaseType}";
+                var result = string.IsNullOrWhiteSpace(entityType.BaseTypeCSharp) ? "" : $": {entityType.BaseTypeCSharp}";
 
                 if (entityType.IsEntitySet)
                 {
@@ -82,10 +82,10 @@ namespace Linq2OData.Generator.Templates.Types
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine($"[JsonPolymorphic(TypeDiscriminatorPropertyName = \"@odata.type\", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]");
-            sb.AppendLine($"[JsonDerivedType(typeof({entityType.Name}))]");
+            sb.AppendLine($"[JsonDerivedType(typeof({entityType.ClassName}))]");
             foreach (var derivedType in derivedTypes)
             {
-                sb.AppendLine($"[JsonDerivedType(typeof({derivedType.Name}), \"#{metadataNamespace}.{derivedType.Name}\")]");
+                sb.AppendLine($"[JsonDerivedType(typeof({derivedType.ClassName}), \"#{metadataNamespace}.{derivedType.Name}\")]");
             }
             return sb.ToString();
         }

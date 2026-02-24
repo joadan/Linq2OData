@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// ODataName: Airport
+/// </summary>
 
 [ODataEntitySet("Airports")]
 public partial class Airport  : ITripPinEntitySet, IAirportKeys

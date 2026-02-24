@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// PublicTransportation
+/// </summary>
 public partial class PublicTransportationInput : ODataInputBase
 {
     public string? SeatNumber 

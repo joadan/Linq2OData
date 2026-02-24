@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// ODataName: Photo
+/// </summary>
 
 [ODataEntitySet("Photos")]
 public partial class Photo  : ITripPinEntitySet, IPhotoKeys

@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace DemoClientV2.ODataDemo;
 
+/// <summary>
+/// Address
+/// </summary>
 public partial class AddressInput : ODataInputBase
 {
     public string? Street 

@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// ODataName: PlanItem
+/// </summary>
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "@odata.type", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]
 [JsonDerivedType(typeof(PlanItem))]
 [JsonDerivedType(typeof(PublicTransportation), "#Microsoft.OData.SampleService.Models.TripPin.PublicTransportation")]

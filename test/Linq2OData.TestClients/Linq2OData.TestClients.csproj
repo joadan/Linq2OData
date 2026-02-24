@@ -11,4 +11,10 @@
     <ProjectReference Include="..\..\src\Linq2OData.Generator\Linq2OData.Generator.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Metadata\LargeMetadata.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

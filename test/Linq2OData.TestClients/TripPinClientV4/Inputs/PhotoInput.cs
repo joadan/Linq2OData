@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// Photo
+/// </summary>
 public partial class PhotoInput : ODataInputBase
 {
     public long? Id 

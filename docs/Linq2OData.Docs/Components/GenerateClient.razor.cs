@@ -1,8 +1,11 @@
+using Linq2OData.Core.Metadata;
+using Linq2OData.Docs.Components.Explorer;
 using Linq2OData.Generator;
 using Linq2OData.Generator.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using System.IO.Compression;
+using System.Reflection;
 using System.Text;
 using TabBlazor;
 using TabBlazor.Services;
@@ -33,7 +36,7 @@ namespace Linq2OData.Docs.Components
 
         private async Task LoadFilesAsync(InputFileChangeEventArgs e)
         {
-            const long maxSize = 10 * 1024 * 1024; // must be >= file size
+            const long maxSize = 30 * 1024 * 1024; // must be >= file size
             const int bufferSize = 8 * 1024;      // 8 KB
 
             foreach (var file in e.GetMultipleFiles(10))
@@ -68,6 +71,14 @@ namespace Linq2OData.Docs.Components
                 }
                 request.AddMetadata(sb.ToString());
             }
+        }
+
+
+        private async Task OpenEntityTypeAsync(ODataEntityType oDataEntityType)
+        {
+            var component = new RenderComponent<TypeView>().Set(e => e.ODataType, oDataEntityType);
+            var result = await modalService.ShowAsync(oDataEntityType.Name, component, new() { Size = ModalSize.Large });
+
         }
 
         private async Task SaveEntriesAsync(List<FileEntry> entries)

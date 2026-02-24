@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// ODataName: Employee
+/// </summary>
 
 [ODataEntitySet("Persons/ODataDemo.Employee")]
 public partial class Employee : ODataDemo.Person, IDemoClientV4EntitySet

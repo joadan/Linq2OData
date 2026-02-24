@@ -1,0 +1,41 @@
+﻿@using Linq2OData.Core.Metadata
+<h3>Type View</h3>
+
+
+@if (ODataType != null)
+{
+    <DataGrid>
+        <DataGridItem Title="Name">
+            @ODataType.Name
+        </DataGridItem>
+    </DataGrid>
+
+
+    <Tabs>
+        <Tab Title="Properties">
+            <ChildContent>
+                <Table Item="ODataProperty" Items="@ODataType.Properties">
+
+                    <Column Item="ODataProperty" Property="e => e.Name" Sortable Searchable />
+                    <Column Item="ODataProperty" Property="e => e.DataType" Sortable Searchable />
+                    <Column Item="ODataProperty" Property="e => e.Description" Sortable Searchable />
+                    <Column Item="ODataProperty" Property="e => e.IsCollection" Sortable />
+                    <Column Item="ODataProperty" Property="e => e.IsEnumType" Sortable />
+                </Table>
+            </ChildContent>
+        </Tab>
+
+        <Tab Title="Navigations">
+            <ChildContent>
+                <Table Item="ODataNavigation" Items="@ODataType.Navigations">
+
+                    <Column Item="ODataNavigation" Property="e => e.Name" Sortable Searchable />
+                    <Column Item="ODataNavigation" Property="e => e.NavigationType" Sortable Searchable />
+                    <Column Item="ODataNavigation" Property="e => e.ToEntity" Sortable Searchable />
+                    
+                </Table>
+            </ChildContent>
+        </Tab>
+
+    </Tabs>
+}

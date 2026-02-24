@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// ODataName: Event
+/// </summary>
 
 
 public partial class Event : Microsoft.OData.SampleService.Models.TripPin.PlanItem

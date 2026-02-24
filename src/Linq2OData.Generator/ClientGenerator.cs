@@ -43,7 +43,6 @@ public class ClientGenerator(ClientRequest request)
         GenerateTypesCode();
         GenerateClientCode();
         GenerateInputTypesCode();
-        AddSharedCode();
 
         return files;
     }
@@ -70,26 +69,7 @@ public class ClientGenerator(ClientRequest request)
         return files;
     }
 
-    private void AddSharedCode()
-    {
-
-        //var sharedPath = Path.Combine("Dependencies", "Linq2OData.Client");
-
-        //if(Directory.Exists(sharedPath))
-        //{
-        //    var sharedFiles = Directory.GetFiles(sharedPath, "*.cs", SearchOption.AllDirectories);
-        //    foreach (var sharedFile in sharedFiles)
-        //    {
-        //        //var relativePath = Path.GetRelativePath(sharedPath, sharedFile);
-        //        var fileContent = File.ReadAllText(sharedFile);
-        //        AddFile(Path.GetDirectoryName(sharedFile)!.Replace("\\", "/"), Path.GetFileName(sharedFile), fileContent);
-        //    }
-        //}
-
-        //var files =   Directory.GetFiles(Path.Combine("Dependencies", "Linq2OData.Client"), "*.cs", SearchOption.AllDirectories);
-
-    }
-
+   
     private void GenerateClientCode()
     {
         var templateText = new ClientTemp(request, (ODataVersion)version!).TransformText();
@@ -118,7 +98,7 @@ public class ClientGenerator(ClientRequest request)
             foreach (var entityType in metadata.EntityTypes)
             {
                 var classText = new TypeTemplate(entityType, fullNamspace, clientMetadata.ServicePath, request.InterfaceName, metadata.GetAllDerivedTypes(entityType.Name), metadata.Namespace, (ODataVersion)version!).TransformText();
-                AddFile("Types", entityType.Name + ".cs", classText);
+                AddFile("Types", entityType.ClassName + ".cs", classText);
             }
         }
     }
@@ -154,8 +134,22 @@ public class ClientGenerator(ClientRequest request)
         files.Add(new FileEntry
         {
             FolderPath = directoryName,
-            FileName = fileName,
+            FileName = GetUniqueFileName(directoryName, fileName),
             Content = content
         });
     }
+
+    private string GetUniqueFileName(string directoryName, string fileName)
+    {
+        
+        var existingFile = files.FirstOrDefault(f => f.FolderPath.Equals(directoryName, StringComparison.CurrentCultureIgnoreCase) && f.FileName.Equals(fileName, StringComparison.CurrentCultureIgnoreCase));
+        if (existingFile == null)
+        {
+            return fileName;
+        }
+       
+        return GetUniqueFileName(directoryName, "_" + fileName);
+
+    }
+
 }

@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// Event
+/// </summary>
 public partial class EventInput : ODataInputBase
 {
     public string? Description 
@@ -21,9 +19,9 @@ public partial class EventInput : ODataInputBase
 		get => GetValue<string?>("Description");
 		set => SetValue("Description", value);
 	}
-    public Microsoft.OData.SampleService.Models.TripPin.EventLocationInput? OccursAt 
+    public EventLocationInput? OccursAt 
 	{
-		get => GetValue<Microsoft.OData.SampleService.Models.TripPin.EventLocationInput?>("OccursAt");
+		get => GetValue<EventLocationInput?>("OccursAt");
 		set => SetValue("OccursAt", value);
 	}
 

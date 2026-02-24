@@ -9,6 +9,9 @@ using System.Text.Json.Serialization;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// ODataName: Flight
+/// </summary>
 
 
 public partial class Flight : Microsoft.OData.SampleService.Models.TripPin.PublicTransportation

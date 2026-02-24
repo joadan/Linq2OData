@@ -4,6 +4,9 @@ namespace Linq2OData.Core.Metadata;
 
 internal static class MetadataParserVersion4
 {
+    private static string StripNamespace(string typeName)
+       => typeName.Contains('.') ? typeName.Split('.').Last() : typeName;
+
     internal static ODataMetadata Parse(XDocument doc)
     {
         var metadata = new ODataMetadata
@@ -408,23 +411,32 @@ internal static class MetadataParserVersion4
 
     private static void MarkEnumProperties(ODataMetadata metadata)
     {
-        // Create a set of fully qualified enum type names for quick lookup
+        //// Create a set of fully qualified enum type names for quick lookup
+        //var enumTypeNames = new HashSet<string>(
+        //    metadata.EnumTypes.Select(e => $"{metadata.Namespace}.{e.Name}")
+        //);
+
         var enumTypeNames = new HashSet<string>(
-            metadata.EnumTypes.Select(e => $"{metadata.Namespace}.{e.Name}")
-        );
+      metadata.EnumTypes.Select(e => $"{e.Name}")
+  );
 
         // Mark properties that reference enum types
         foreach (var entityType in metadata.EntityTypes)
         {
-            foreach (var property in entityType.Properties)
+           
+            foreach (var property in entityType.Properties.Where(e => !e.DataType.StartsWith("Edm.")))
             {
+
                 // Since DataType now contains the inner type directly for both
                 // collection and non-collection properties, we just check it directly
-                if (enumTypeNames.Contains(property.DataType))
+                if (enumTypeNames.Contains(StripNamespace(property.DataType)))
                 {
                     property.IsEnumType = true;
                 }
             }
         }
+
+
+
     }
 }

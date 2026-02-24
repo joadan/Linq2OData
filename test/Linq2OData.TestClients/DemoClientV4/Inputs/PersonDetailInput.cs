@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// PersonDetail
+/// </summary>
 public partial class PersonDetailInput : ODataInputBase
 {
     public int? PersonID 
@@ -36,9 +34,9 @@ public partial class PersonDetailInput : ODataInputBase
 		get => GetValue<string?>("Phone");
 		set => SetValue("Phone", value);
 	}
-    public ODataDemo.AddressInput? Address 
+    public AddressInput? Address 
 	{
-		get => GetValue<ODataDemo.AddressInput?>("Address");
+		get => GetValue<AddressInput?>("Address");
 		set => SetValue("Address", value);
 	}
     public object? Photo 

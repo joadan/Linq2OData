@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// Employee
+/// </summary>
 public partial class EmployeeInput : ODataInputBase
 {
     public long? EmployeeID 

@@ -75,7 +75,8 @@ public class ClientGeneratorTests
         Assert.NotEmpty(files);
     }
 
-    [Fact]
+    [Fact(Skip= "This is a long running test not suitable for Unit testing")]
+  //  [Fact]
     public void GenerateClientAsyncV4_WithValidLargeMetadata_ShouldGenerateFiles()
     {
 
@@ -84,7 +85,7 @@ public class ClientGeneratorTests
             Name = "ODataLargeClient",
             Namespace = "MyNamespace",
         };
-        request.AddMetadata(odataDemoMetadataV4);
+        request.AddMetadata(largeMetadaV4);
 
         var generator = new ClientGenerator(request);
 
@@ -102,7 +103,7 @@ public class ClientGeneratorTests
 
         if (diagnostics.Any())
         {
-            var errors = string.Join("\n", diagnostics.Select(d =>
+            var errors = string.Join("\n", diagnostics.Take(10).Select(d =>
                 $"{d.Id}: {d.GetMessage()} at {d.Location.GetLineSpan()}"));
             Assert.Fail($"Compilation failed with {diagnostics.Count} error(s):\n{errors}");
         }

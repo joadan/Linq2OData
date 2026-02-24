@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// EventLocation
+/// </summary>
 public partial class EventLocationInput : ODataInputBase
 {
     public string? BuildingInfo 

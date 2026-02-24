@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// ProductDetail
+/// </summary>
 public partial class ProductDetailInput : ODataInputBase
 {
     public int? ProductID 

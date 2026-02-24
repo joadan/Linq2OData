@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// Airline
+/// </summary>
 public partial class AirlineInput : ODataInputBase
 {
     public string? AirlineCode 

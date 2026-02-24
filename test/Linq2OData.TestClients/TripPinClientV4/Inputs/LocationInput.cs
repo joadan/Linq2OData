@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// Location
+/// </summary>
 public partial class LocationInput : ODataInputBase
 {
     public string? Address 
@@ -21,9 +19,9 @@ public partial class LocationInput : ODataInputBase
 		get => GetValue<string?>("Address");
 		set => SetValue("Address", value);
 	}
-    public Microsoft.OData.SampleService.Models.TripPin.CityInput? City 
+    public CityInput? City 
 	{
-		get => GetValue<Microsoft.OData.SampleService.Models.TripPin.CityInput?>("City");
+		get => GetValue<CityInput?>("City");
 		set => SetValue("City", value);
 	}
 

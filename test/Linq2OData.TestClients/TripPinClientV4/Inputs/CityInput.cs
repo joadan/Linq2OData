@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// City
+/// </summary>
 public partial class CityInput : ODataInputBase
 {
     public string? CountryRegion 

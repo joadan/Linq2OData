@@ -8,21 +8,25 @@ using System.Text.Json.Serialization;
 
 namespace <#= fullNamspace #>;
 
+/// <summary>
+/// ODataName: <#= entityType.Name #>
+/// </summary>
 <#= GetDerivedAttributes() #>
 <#= GetEntitySetAttribute() #>
-public partial class <#= entityType.Name #> <#= BaseTypeAndInterface #>
+public partial class <#= entityType.ClassName #> <#= BaseTypeAndInterface #>
 {
 <# foreach (var property in entityType.Properties) { #>
     <#= property.ODataAttributeString #>
-    public <#= property.CSharpType #> <#= property.Name #> { get; set; }
+    public <#= property.CSharpType #> <#= property.Name.SafeVariableName() #> { get; set; }
 <# } #>
-
+    
+    //Navigations
 <# foreach (var navigation in entityType.Navigations) { #>
     [ODataMember("<#= navigation.Name #>", true)]
 <# if (odataVersion < Linq2OData.Core.ODataVersion.V4 && navigation.NavigationType != Linq2OData.Core.Metadata.ODataNavigationType.Many) { #>
     [JsonConverter(typeof(Linq2OData.Core.Converters.ODataNavigationPropertyConverter<<#= navigation.ToEntity #>>))]
 <# } #>
-    public <#= navigation.CSharpProperty #> <#= navigation.Name #> { get; set; }
+    public <#= navigation.CSharpProperty #> <#= navigation.Name.SafeVariableName() #> { get; set; }
 <# } #>
 
 <# if (entityType.KeyProperties.Any()) { #>

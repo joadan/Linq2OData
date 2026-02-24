@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace DemoClientV4.ODataDemo;
 
+/// <summary>
+/// Customer
+/// </summary>
 public partial class CustomerInput : ODataInputBase
 {
     public decimal? TotalExpense 

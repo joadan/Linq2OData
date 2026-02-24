@@ -5,15 +5,13 @@
 
 #nullable enable
 
-
-
-
-
-
 using Linq2OData.Core;
 
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
+/// <summary>
+/// Airport
+/// </summary>
 public partial class AirportInput : ODataInputBase
 {
     public string? IcaoCode 
@@ -31,9 +29,9 @@ public partial class AirportInput : ODataInputBase
 		get => GetValue<string?>("IataCode");
 		set => SetValue("IataCode", value);
 	}
-    public Microsoft.OData.SampleService.Models.TripPin.AirportLocationInput? Location 
+    public AirportLocationInput? Location 
 	{
-		get => GetValue<Microsoft.OData.SampleService.Models.TripPin.AirportLocationInput?>("Location");
+		get => GetValue<AirportLocationInput?>("Location");
 		set => SetValue("Location", value);
 	}
 
