@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace Linq2OData.Core.Expressions
@@ -51,7 +52,7 @@ namespace Linq2OData.Core.Expressions
         {
             if (m.Expression?.NodeType == ExpressionType.Parameter)
             {
-                sb.Append(m.Member.Name);
+                sb.Append(GetODataMemberName(m.Member));
                 return m;
             }
             else if (m.Expression?.NodeType == ExpressionType.MemberAccess)
@@ -62,8 +63,7 @@ namespace Linq2OData.Core.Expressions
                 // Recursively get all access members
                 while (expression?.NodeType == ExpressionType.MemberAccess && expression is MemberExpression memberExpression)
                 {
-                    var propertyAccessName = memberExpression.Member.Name;
-                    memberAccessNames.Add(propertyAccessName);
+                    memberAccessNames.Add(GetODataMemberName(memberExpression.Member));
 
                     if (memberExpression.Expression == null) break;
 
@@ -87,6 +87,12 @@ namespace Linq2OData.Core.Expressions
             }
 
             throw new NotSupportedException($"The member '{m.Member.Name}' is not supported in orderby expressions");
+        }
+
+        private static string GetODataMemberName(MemberInfo member)
+        {
+            var attr = member.GetCustomAttribute<ODataMemberAttribute>();
+            return attr?.Name ?? member.Name;
         }
 
         protected override Expression VisitUnary(UnaryExpression u)

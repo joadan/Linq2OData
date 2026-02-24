@@ -332,19 +332,20 @@ namespace Linq2OData.Core.Expressions
 
             if (m.Expression?.NodeType == ExpressionType.Parameter)
             {
-                sb.Append(m.Member.Name);
+                sb.Append(GetODataMemberName(m.Member));
                 return m;
             }
             else if (m.Expression?.NodeType == ExpressionType.MemberAccess) // Expression when some member is being accessed
             {
                 Expression expression = m;
                 var memberAccessNames = new List<string>();
+                var odataMemberNames = new List<string>();
 
                 // Recursively get all access members
                 while (expression?.NodeType == ExpressionType.MemberAccess && expression is MemberExpression memberExpression)
                 {
-                    var propertyAccessName = memberExpression.Member.Name;
-                    memberAccessNames.Add(propertyAccessName);
+                    memberAccessNames.Add(memberExpression.Member.Name);
+                    odataMemberNames.Add(GetODataMemberName(memberExpression.Member));
 
                     if (memberExpression.Expression == null) break;
 
@@ -357,6 +358,7 @@ namespace Linq2OData.Core.Expressions
                 // Original = Prop, Some, Access
                 // Reversed = Access, Some, Prop
                 memberAccessNames.Reverse();
+                odataMemberNames.Reverse();
 
                 if (expression is ConstantExpression constantExpression)
                 {
@@ -370,7 +372,7 @@ namespace Linq2OData.Core.Expressions
                     // e.g. 
                     // Original = x => x.Accessing.Some.Member.From.The.Parameter
                     // Resulting OData = Accessing/Some/Member/From/The/Parameter
-                    sb.Append(string.Join("/", memberAccessNames));
+                    sb.Append(string.Join("/", odataMemberNames));
                     return m;
                 }
                 else if (expression is MemberExpression memberExpression)
@@ -507,6 +509,12 @@ namespace Linq2OData.Core.Expressions
                     sb.Append(value);
                     break;
             }
+        }
+
+        private static string GetODataMemberName(MemberInfo member)
+        {
+            var attr = member.GetCustomAttribute<ODataMemberAttribute>();
+            return attr?.Name ?? member.Name;
         }
 
         private static object? AccessMultipleMembers(object value, IEnumerable<string> memberAccessNames)

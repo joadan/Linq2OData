@@ -34,6 +34,142 @@ public class FilterExpressionTests
         public string __Key => $"ID={ID}";
     }
 
+    // Entities where C# property names differ from OData attribute names
+    [ODataEntitySet("Articles")]
+    public class TestArticle : IODataEntitySet
+    {
+        [ODataMember("ArticleId")]
+        public int CSharpId { get; set; }
+
+        [ODataMember("Title")]
+        public string? CSharpTitle { get; set; }
+
+        [ODataMember("ListPrice")]
+        public decimal CSharpPrice { get; set; }
+
+        [ODataMember("InStock")]
+        public bool CSharpIsAvailable { get; set; }
+
+        [ODataMember("ArticleCategory", isComplex: true)]
+        public TestArticleCategory? CSharpCategory { get; set; }
+
+        public string __Key => $"ArticleId={CSharpId}";
+    }
+
+    [ODataEntitySet("ArticleCategories")]
+    public class TestArticleCategory : IODataEntitySet
+    {
+        [ODataMember("CategoryId")]
+        public int CSharpId { get; set; }
+
+        [ODataMember("CategoryName")]
+        public string? CSharpName { get; set; }
+
+        public string __Key => $"CategoryId={CSharpId}";
+    }
+
+    #region ODataMemberAttribute Name Tests
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_SimpleProperty_UsesAttributeName()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpId == 42;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(ArticleId eq 42)", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_StringProperty_UsesAttributeName()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpTitle == "Hello";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(Title eq 'Hello')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_BooleanProperty_UsesAttributeName()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpIsAvailable;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("InStock", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_NestedProperty_UsesAttributeNames()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpCategory!.CSharpName == "Fiction";
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(ArticleCategory/CategoryName eq 'Fiction')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_StringContains_UsesAttributeName()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpTitle!.Contains("OData");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("contains(Title, 'OData')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_NestedStringContains_UsesAttributeNames()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpCategory!.CSharpName!.Contains("Sci");
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("contains(ArticleCategory/CategoryName, 'Sci')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_ODataMemberAttribute_CompoundExpression_UsesAttributeNames()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestArticle, bool>> expression = a => a.CSharpPrice > 10 && a.CSharpIsAvailable;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("((ListPrice gt 10) and InStock)", result);
+    }
+
+    #endregion
+
     #region Basic Comparison Tests
 
     [Fact]
