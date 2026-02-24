@@ -10,11 +10,12 @@ using Linq2OData.Core;
 namespace DemoClientV4.ODataDemo;
 
 /// <summary>
-/// FeaturedProduct
+/// OdataName: FeaturedProduct
 /// </summary>
 public partial class FeaturedProductInput : ODataInputBase
 {
 
+    //Navigations
     public AdvertisementInput? Advertisement 
 	{
 		get => GetValue<AdvertisementInput?>("Advertisement");

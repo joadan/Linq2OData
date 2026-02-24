@@ -10,30 +10,35 @@ using Linq2OData.Core;
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
 /// <summary>
-/// Airport
+/// OdataName: Airport
 /// </summary>
 public partial class AirportInput : ODataInputBase
 {
+	// IsEnumType: False
     public string? IcaoCode 
 	{
 		get => GetValue<string?>("IcaoCode");
 		set => SetValue("IcaoCode", value);
 	}
+	// IsEnumType: False
     public string? Name 
 	{
 		get => GetValue<string?>("Name");
 		set => SetValue("Name", value);
 	}
+	// IsEnumType: False
     public string? IataCode 
 	{
 		get => GetValue<string?>("IataCode");
 		set => SetValue("IataCode", value);
 	}
+	// IsEnumType: False
     public AirportLocationInput? Location 
 	{
 		get => GetValue<AirportLocationInput?>("Location");
 		set => SetValue("Location", value);
 	}
 
+    //Navigations
 
 }

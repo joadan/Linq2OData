@@ -18,7 +18,8 @@ public partial class AirportLocation
 {
     [ODataMember("Loc")]
     public object Loc { get; set; }
-
+    
+    //Navigations
 
 
 

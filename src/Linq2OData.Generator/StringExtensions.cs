@@ -43,9 +43,9 @@ internal static class StringExtensions
 
             if (!isValid)
             {
-                // File name contains invalid chars, remove them
+                // File name contains invalid chars, replace with underscores
                 var regex = new Regex(@"[^\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}\p{Nl}\p{Mn}\p{Mc}\p{Cf}\p{Pc}\p{Lm}]");
-                text = regex.Replace(text, "");
+                text = regex.Replace(text, "_");
 
                 // Class name doesn't begin with a letter, insert an underscore
                 if (!char.IsLetter(text, 0))

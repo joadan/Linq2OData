@@ -24,7 +24,8 @@ public partial class Airport  : ITripPinEntitySet, IAirportKeys
     public string? IataCode { get; set; }
     [ODataMember("Location", true)]
     public AirportLocation? Location { get; set; }
-
+    
+    //Navigations
 
  public string __Key => $"IcaoCode='{IcaoCode}'"; 
 

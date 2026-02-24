@@ -10,46 +10,54 @@ using Linq2OData.Core;
 namespace DemoClientV2.ODataDemo;
 
 /// <summary>
-/// Product
+/// OdataName: Product
 /// </summary>
 public partial class ProductInput : ODataInputBase
 {
+	// IsEnumType: False
     public int? ID 
 	{
 		get => GetValue<int?>("ID");
 		set => SetValue("ID", value);
 	}
+	// IsEnumType: False
     public string? Name 
 	{
 		get => GetValue<string?>("Name");
 		set => SetValue("Name", value);
 	}
+	// IsEnumType: False
     public string? Description 
 	{
 		get => GetValue<string?>("Description");
 		set => SetValue("Description", value);
 	}
+	// IsEnumType: False
     public DateTime? ReleaseDate 
 	{
 		get => GetValue<DateTime?>("ReleaseDate");
 		set => SetValue("ReleaseDate", value);
 	}
+	// IsEnumType: False
     public DateTime? DiscontinuedDate 
 	{
 		get => GetValue<DateTime?>("DiscontinuedDate");
 		set => SetValue("DiscontinuedDate", value);
 	}
+	// IsEnumType: False
     public int? Rating 
 	{
 		get => GetValue<int?>("Rating");
 		set => SetValue("Rating", value);
 	}
+	// IsEnumType: False
     public decimal? Price 
 	{
 		get => GetValue<decimal?>("Price");
 		set => SetValue("Price", value);
 	}
 
+    //Navigations
     public CategoryInput? Category 
 	{
 		get => GetValue<CategoryInput?>("Category");

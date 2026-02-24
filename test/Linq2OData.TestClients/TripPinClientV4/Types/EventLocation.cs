@@ -18,7 +18,8 @@ public partial class EventLocation
 {
     [ODataMember("BuildingInfo")]
     public string? BuildingInfo { get; set; }
-
+    
+    //Navigations
 
 
 

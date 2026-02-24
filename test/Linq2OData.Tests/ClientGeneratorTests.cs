@@ -77,8 +77,8 @@ public class ClientGeneratorTests
         Assert.NotEmpty(files);
     }
 
-    [Fact(Skip= "This is a long running test not suitable for Unit testing")]
-  //  [Fact]
+   [Fact(Skip= "This is a long running test not suitable for Unit testing")]
+    //[Fact]
     public void GenerateClientAsyncV4_WithValidLargeMetadata_ShouldGenerateFiles()
     {
 

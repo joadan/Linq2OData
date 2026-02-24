@@ -32,7 +32,8 @@ public partial class Trip  : ITripKeys
     public DateTimeOffset EndsAt { get; set; }
     [ODataMember("Tags")]
     public List<string> Tags { get; set; }
-
+    
+    //Navigations
     [ODataMember("Photos", true)]
     public List<Photo>? Photos { get; set; }
     [ODataMember("PlanItems", true)]

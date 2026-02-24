@@ -20,7 +20,8 @@ public partial class Photo  : ITripPinEntitySet, IPhotoKeys
     public long Id { get; set; }
     [ODataMember("Name")]
     public string? Name { get; set; }
-
+    
+    //Navigations
 
  public string __Key => $"Id={Id}"; 
 

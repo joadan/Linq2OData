@@ -14,13 +14,14 @@ namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 /// </summary>
 
 
-public partial class Event : Microsoft.OData.SampleService.Models.TripPin.PlanItem
+public partial class Event : PlanItem
 {
     [ODataMember("Description")]
     public string? Description { get; set; }
     [ODataMember("OccursAt", true)]
     public EventLocation? OccursAt { get; set; }
-
+    
+    //Navigations
 
 
 

@@ -10,36 +10,42 @@ using Linq2OData.Core;
 namespace DemoClientV4.ODataDemo;
 
 /// <summary>
-/// Supplier
+/// OdataName: Supplier
 /// </summary>
 public partial class SupplierInput : ODataInputBase
 {
+	// IsEnumType: False
     public int? ID 
 	{
 		get => GetValue<int?>("ID");
 		set => SetValue("ID", value);
 	}
+	// IsEnumType: False
     public string? Name 
 	{
 		get => GetValue<string?>("Name");
 		set => SetValue("Name", value);
 	}
+	// IsEnumType: False
     public AddressInput? Address 
 	{
 		get => GetValue<AddressInput?>("Address");
 		set => SetValue("Address", value);
 	}
+	// IsEnumType: False
     public object? Location 
 	{
 		get => GetValue<object?>("Location");
 		set => SetValue("Location", value);
 	}
+	// IsEnumType: False
     public int? Concurrency 
 	{
 		get => GetValue<int?>("Concurrency");
 		set => SetValue("Concurrency", value);
 	}
 
+    //Navigations
     public List<ProductInput>? Products 
 	{
 		get => GetValue<List<ProductInput>?>("Products");

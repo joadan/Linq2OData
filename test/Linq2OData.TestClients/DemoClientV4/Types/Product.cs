@@ -33,7 +33,8 @@ public partial class Product  : IDemoClientV4EntitySet, IProductKeys
     public short Rating { get; set; }
     [ODataMember("Price")]
     public double Price { get; set; }
-
+    
+    //Navigations
     [ODataMember("Categories", true)]
     public List<Category>? Categories { get; set; }
     [ODataMember("Supplier", true)]

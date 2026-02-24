@@ -22,7 +22,8 @@ public partial class Advertisement  : IDemoClientV4EntitySet, IAdvertisementKeys
     public string? Name { get; set; }
     [ODataMember("AirDate")]
     public DateTimeOffset AirDate { get; set; }
-
+    
+    //Navigations
     [ODataMember("FeaturedProduct", true)]
     public FeaturedProduct? FeaturedProduct { get; set; }
 

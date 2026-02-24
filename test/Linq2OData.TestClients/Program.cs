@@ -16,13 +16,13 @@ namespace Linq2OData.TestClients
         {
             Console.WriteLine("Here we go!");
 
-            // await GenerateDemoClientV2Async();
-            // await GenerateDemoClientV4Async();
-            //await GenerateTripPinClientAsync();
+           //  await GenerateDemoClientV2Async();
+           //  await GenerateDemoClientV4Async();
+           // await GenerateTripPinClientAsync();
 
-            GenerateLargeClientAsync();
+            //GenerateLargeClientAsync();
 
-            // await TestTripPinAsync();
+             await TestTripPinAsync();
             // await TestV4ClientAsync();
         }
 
@@ -41,7 +41,7 @@ namespace Linq2OData.TestClients
                 var result = await tripPinClient
                     .Query<TripPin.Microsoft.OData.SampleService.Models.TripPin.Person>()
                     .Top(10)
-                    .Filter(e => e.FirstName != "Uno")
+                    .Filter(e => e.Gender != TripPin.Microsoft.OData.SampleService.Models.TripPin.PersonGender.Male)
                     .Expand(e => e.Trips!.Select(e => e.PlanItems))
                        .ExecuteAsync();
 

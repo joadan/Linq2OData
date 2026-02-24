@@ -20,7 +20,8 @@ public partial class Category  : IDemoClientV4EntitySet, ICategoryKeys
     public int ID { get; set; }
     [ODataMember("Name")]
     public string? Name { get; set; }
-
+    
+    //Navigations
     [ODataMember("Products", true)]
     public List<Product>? Products { get; set; }
 

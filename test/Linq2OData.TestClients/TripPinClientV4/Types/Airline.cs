@@ -20,7 +20,8 @@ public partial class Airline  : ITripPinEntitySet, IAirlineKeys
     public string? AirlineCode { get; set; }
     [ODataMember("Name")]
     public string? Name { get; set; }
-
+    
+    //Navigations
 
  public string __Key => $"AirlineCode='{AirlineCode}'"; 
 

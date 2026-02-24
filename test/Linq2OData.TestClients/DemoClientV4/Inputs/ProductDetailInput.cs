@@ -10,21 +10,24 @@ using Linq2OData.Core;
 namespace DemoClientV4.ODataDemo;
 
 /// <summary>
-/// ProductDetail
+/// OdataName: ProductDetail
 /// </summary>
 public partial class ProductDetailInput : ODataInputBase
 {
+	// IsEnumType: False
     public int? ProductID 
 	{
 		get => GetValue<int?>("ProductID");
 		set => SetValue("ProductID", value);
 	}
+	// IsEnumType: False
     public string? Details 
 	{
 		get => GetValue<string?>("Details");
 		set => SetValue("Details", value);
 	}
 
+    //Navigations
     public ProductInput? Product 
 	{
 		get => GetValue<ProductInput?>("Product");

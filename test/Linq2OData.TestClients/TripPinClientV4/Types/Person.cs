@@ -30,7 +30,8 @@ public partial class Person  : ITripPinEntitySet, IPersonKeys
     public PersonGender? Gender { get; set; }
     [ODataMember("Concurrency")]
     public long Concurrency { get; set; }
-
+    
+    //Navigations
     [ODataMember("Friends", true)]
     public List<Person>? Friends { get; set; }
     [ODataMember("Trips", true)]

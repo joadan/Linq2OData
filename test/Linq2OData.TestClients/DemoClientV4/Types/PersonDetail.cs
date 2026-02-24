@@ -28,7 +28,8 @@ public partial class PersonDetail  : IDemoClientV4EntitySet, IPersonDetailKeys
     public Address? Address { get; set; }
     [ODataMember("Photo")]
     public object Photo { get; set; }
-
+    
+    //Navigations
     [ODataMember("Person", true)]
     public Person? Person { get; set; }
 

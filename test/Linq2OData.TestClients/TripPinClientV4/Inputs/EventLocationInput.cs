@@ -10,15 +10,17 @@ using Linq2OData.Core;
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
 /// <summary>
-/// EventLocation
+/// OdataName: EventLocation
 /// </summary>
 public partial class EventLocationInput : ODataInputBase
 {
+	// IsEnumType: False
     public string? BuildingInfo 
 	{
 		get => GetValue<string?>("BuildingInfo");
 		set => SetValue("BuildingInfo", value);
 	}
 
+    //Navigations
 
 }

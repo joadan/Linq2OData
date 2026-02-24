@@ -26,7 +26,8 @@ public partial class Address
     public string? ZipCode { get; set; }
     [ODataMember("Country")]
     public string? Country { get; set; }
-
+    
+    //Navigations
 
 
 

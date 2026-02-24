@@ -14,7 +14,7 @@ namespace DemoClientV4.ODataDemo;
 /// </summary>
 
 [ODataEntitySet("Persons/ODataDemo.Employee")]
-public partial class Employee : ODataDemo.Person, IDemoClientV4EntitySet
+public partial class Employee : Person, IDemoClientV4EntitySet
 {
     [ODataMember("EmployeeID")]
     public long EmployeeID { get; set; }
@@ -22,7 +22,8 @@ public partial class Employee : ODataDemo.Person, IDemoClientV4EntitySet
     public DateTimeOffset HireDate { get; set; }
     [ODataMember("Salary")]
     public float Salary { get; set; }
-
+    
+    //Navigations
 
 
 

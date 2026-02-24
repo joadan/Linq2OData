@@ -17,11 +17,12 @@ namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 [JsonDerivedType(typeof(Flight), "#Microsoft.OData.SampleService.Models.TripPin.Flight")]
 
 
-public partial class PublicTransportation : Microsoft.OData.SampleService.Models.TripPin.PlanItem
+public partial class PublicTransportation : PlanItem
 {
     [ODataMember("SeatNumber")]
     public string? SeatNumber { get; set; }
-
+    
+    //Navigations
 
 
 

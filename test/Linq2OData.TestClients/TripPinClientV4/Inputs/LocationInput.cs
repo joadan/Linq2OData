@@ -10,20 +10,23 @@ using Linq2OData.Core;
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
 /// <summary>
-/// Location
+/// OdataName: Location
 /// </summary>
 public partial class LocationInput : ODataInputBase
 {
+	// IsEnumType: False
     public string? Address 
 	{
 		get => GetValue<string?>("Address");
 		set => SetValue("Address", value);
 	}
+	// IsEnumType: False
     public CityInput? City 
 	{
 		get => GetValue<CityInput?>("City");
 		set => SetValue("City", value);
 	}
 
+    //Navigations
 
 }

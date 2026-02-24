@@ -31,7 +31,8 @@ public partial class PlanItem  : IPlanItemKeys
     public DateTimeOffset? EndsAt { get; set; }
     [ODataMember("Duration")]
     public TimeSpan? Duration { get; set; }
-
+    
+    //Navigations
 
  public string __Key => $"PlanItemId={PlanItemId}"; 
 

@@ -10,20 +10,23 @@ using Linq2OData.Core;
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
 /// <summary>
-/// Photo
+/// OdataName: Photo
 /// </summary>
 public partial class PhotoInput : ODataInputBase
 {
+	// IsEnumType: False
     public long? Id 
 	{
 		get => GetValue<long?>("Id");
 		set => SetValue("Id", value);
 	}
+	// IsEnumType: False
     public string? Name 
 	{
 		get => GetValue<string?>("Name");
 		set => SetValue("Name", value);
 	}
 
+    //Navigations
 
 }

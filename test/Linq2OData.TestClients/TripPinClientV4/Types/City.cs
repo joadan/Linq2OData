@@ -22,7 +22,8 @@ public partial class City
     public string? Name { get; set; }
     [ODataMember("Region")]
     public string? Region { get; set; }
-
+    
+    //Navigations
 
 
 

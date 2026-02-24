@@ -20,7 +20,8 @@ public partial class Location
     public string? Address { get; set; }
     [ODataMember("City", true)]
     public City? City { get; set; }
-
+    
+    //Navigations
 
 
 
