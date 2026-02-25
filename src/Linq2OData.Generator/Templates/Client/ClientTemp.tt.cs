@@ -24,6 +24,13 @@ namespace Linq2OData.Generator.Templates.Client
             return string.Join(", ", parts);
         }
 
+        private static string GetSingletonPath(ClientMetadata clientMetadata, ODataSingleton singleton)
+        {
+            if (string.IsNullOrWhiteSpace(clientMetadata.ServicePath))
+                return singleton.Name;
+            return $"{clientMetadata.ServicePath}/{singleton.Name}";
+        }
+
         private IEnumerable<string> GetFunctionUsingDirectives()
         {
             var namespaces = new HashSet<string>();

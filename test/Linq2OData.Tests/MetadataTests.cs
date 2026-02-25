@@ -1356,5 +1356,39 @@ namespace Linq2OData.Tests
         }
 
         #endregion
+
+        #region Singleton Tests
+
+        [Fact]
+        public void ParseTrippinMetadata_ShouldParseSingletons()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(trippinMetadataV4);
+
+            // Assert
+            Assert.NotNull(metadata.Singletons);
+            Assert.NotEmpty(metadata.Singletons);
+
+            var meSingleton = metadata.Singletons.FirstOrDefault(s => s.Name == "Me");
+            Assert.NotNull(meSingleton);
+            Assert.Equal("Person", meSingleton.EntityTypeName);
+            Assert.NotNull(meSingleton.EntityType);
+        }
+
+        [Fact]
+        public void ParseTrippinMetadata_SingletonEntityType_ShouldBeMarkedAsSingleton()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(trippinMetadataV4);
+
+            // Assert - Person type used by both People EntitySet and Me Singleton
+            var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
+            Assert.NotNull(personEntity);
+            Assert.True(personEntity.IsSingleton);
+            // EntityPath should remain "People" (from EntitySet, not overwritten by singleton)
+            Assert.Equal("People", personEntity.EntityPath);
+        }
+
+        #endregion
     }
 }

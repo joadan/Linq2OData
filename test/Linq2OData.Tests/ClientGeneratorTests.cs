@@ -636,5 +636,29 @@ global using System.Threading.Tasks;
         Assert.Contains("InvokeFunctionAsync<List<Invoice>>", clientFile.Content);
     }
 
+    [Fact]
+    public void GenerateClientV4_WithSingletonMetadata_ShouldGenerateSingletonMethod()
+    {
+        // Arrange - TripPin metadata has a "Me" singleton of type Person
+        var request = new ClientRequest
+        {
+            Name = "TripPinClient",
+            Namespace = "MyApp.TripPin",
+        };
+        request.AddMetadata(trippinMetadataV4);
+
+        var generator = new ClientGenerator(request);
+
+        // Act
+        var files = generator.GenerateClient();
+        var clientFile = files.First(f => f.FolderPath == "Client" && f.FileName == "TripPinClient.cs");
+
+        Console.WriteLine(clientFile.Content);
+
+        // Assert - singleton method is generated
+        Assert.Contains("public SingletonBuilder<Person> Me()", clientFile.Content);
+        Assert.Contains("new SingletonBuilder<Person>(odataClient, \"Me\")", clientFile.Content);
+    }
+
 }
 
