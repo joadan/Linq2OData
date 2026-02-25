@@ -492,10 +492,15 @@ internal static class MetadataParserVersion4
                     }
 
                     // Parse parameters
+                    var isBoundFunc = functionElement.Attribute("IsBound")?.Value?.ToLower() == "true";
                     foreach (var param in functionElement.Elements(edmNamespace + "Parameter"))
                     {
                         var paramName = param.Attribute("Name")?.Value;
                         var paramType = param.Attribute("Type")?.Value;
+
+                        // Skip the binding parameter (first parameter) for bound functions
+                        if (isBoundFunc && function.Parameters.Count == 0)
+                            continue;
 
                         if (!string.IsNullOrEmpty(paramName) && !string.IsNullOrEmpty(paramType))
                         {
