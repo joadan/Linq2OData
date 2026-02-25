@@ -5,6 +5,7 @@ public class ODataMetadata
     public ODataVersion ODataVersion { get; set; }
     public string Namespace { get; set; } = string.Empty;
     public List<ODataEntitySet> EntitySets { get; set; } = [];
+    public List<ODataSingleton> Singletons { get; set; } = [];
     public List<ODataEntityType> EntityTypes { get; set; } = [];
     public List<ODataEnumType> EnumTypes { get; set; } = [];
     public List<ODataFunction> Functions { get; set; } = [];
@@ -38,6 +39,16 @@ public class ODataMetadata
             entitySet.EntityType.EntityPath = entitySet.Name;
             SetEntityDerivedPaths(entitySet.EntityType);
         }
+
+        foreach (var singleton in Singletons)
+        {
+            singleton.EntityType.IsSingleton = true;
+            // Only set EntityPath for singletons if the entity type isn't already in an entity set
+            if (string.IsNullOrWhiteSpace(singleton.EntityType.EntityPath))
+            {
+                singleton.EntityType.EntityPath = singleton.Name;
+            }
+        }
     }
 
     internal void SetEntityDerivedPaths(ODataEntityType entityType)
@@ -59,6 +70,14 @@ public class ODataEntitySet
     public required ODataEntityType EntityType { get; set; }
 
 }
+
+public class ODataSingleton
+{
+    public required string Name { get; set; }
+    public required string EntityTypeName { get; set; }
+    public required ODataEntityType EntityType { get; set; }
+}
+
 public class ODataEntityType
 {
     public required string Name { get; set; }
@@ -68,6 +87,8 @@ public class ODataEntityType
     public string? SchemaNamespace { get; set; }
 
     public bool IsEntitySet => !string.IsNullOrWhiteSpace(EntityPath);
+
+    public bool IsSingleton { get; set; } = false;
 
     public string? EntityPath { get; set; }
 

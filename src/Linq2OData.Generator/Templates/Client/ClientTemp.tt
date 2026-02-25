@@ -49,6 +49,12 @@ public class <#= request.Name #>
         return new CreateBuilder<T>(odataClient);
     }
 <# foreach (var clientMetadata in request.Metadata) { #>
+<# foreach (var singleton in clientMetadata.Metadata.Singletons) { #>
+    public SingletonBuilder<<#= singleton.EntityType.ClassName #>> <#= singleton.Name #>()
+    {
+        return new SingletonBuilder<<#= singleton.EntityType.ClassName #>>(odataClient, "<#= GetSingletonPath(clientMetadata, singleton) #>");
+    }
+<# } #>
 <# foreach (var func in clientMetadata.Metadata.Functions) { #>
 <# if (func.HttpMethod == "GET") { #>
 <# if (func.CSharpReturnType == "void") { #>

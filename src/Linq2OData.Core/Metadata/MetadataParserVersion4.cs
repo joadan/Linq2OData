@@ -95,6 +95,7 @@ internal static class MetadataParserVersion4
         if (entityContainer != null)
         {
             metadata.EntitySets = ParseEntitySets(entityContainer, edm, metadata.Namespace, metadata.EntityTypes, aliasMap);
+            metadata.Singletons = ParseSingletons(entityContainer, edm, metadata.EntityTypes, aliasMap);
             metadata.Functions = ParseActionImports(entityContainer, edm, metadata.Namespace, schemas);
         }
 
@@ -329,6 +330,34 @@ internal static class MetadataParserVersion4
         }
 
         return entitySets;
+    }
+
+    private static List<ODataSingleton> ParseSingletons(XElement entityContainer, XNamespace edmNamespace, List<ODataEntityType> entityTypes, Dictionary<string, string> aliasMap)
+    {
+        var singletons = new List<ODataSingleton>();
+
+        foreach (var singleton in entityContainer.Elements(edmNamespace + "Singleton"))
+        {
+            var name = singleton.Attribute("Name")?.Value;
+            var entityTypeRef = singleton.Attribute("Type")?.Value;
+
+            if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(entityTypeRef))
+            {
+                var resolved = ResolveTypeName(entityTypeRef, aliasMap);
+                var entityTypeName = resolved.Contains('.')
+                    ? resolved.Split('.').Last()
+                    : resolved;
+
+                singletons.Add(new ODataSingleton
+                {
+                    Name = name,
+                    EntityTypeName = entityTypeName,
+                    EntityType = entityTypes.FirstOrDefault(et => et.Name == entityTypeName)!
+                });
+            }
+        }
+
+        return singletons;
     }
 
     private static List<ODataFunction> ParseActionImports(XElement entityContainer, XNamespace edmNamespace, string schemaNamespace, IReadOnlyList<XElement> allSchemas)

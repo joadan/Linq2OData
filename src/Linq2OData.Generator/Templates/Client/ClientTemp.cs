@@ -122,6 +122,18 @@ namespace Linq2OData.Generator.Templates.Client
 
             foreach (var clientMetadata in request.Metadata)
             {
+                foreach (var singleton in clientMetadata.Metadata.Singletons)
+                {
+                    this.Write("    public SingletonBuilder<");
+                    this.Write(this.ToStringHelper.ToStringWithCulture(singleton.EntityType.ClassName));
+                    this.Write("> ");
+                    this.Write(this.ToStringHelper.ToStringWithCulture(singleton.Name));
+                    this.Write("()\r\n    {\r\n        return new SingletonBuilder<");
+                    this.Write(this.ToStringHelper.ToStringWithCulture(singleton.EntityType.ClassName));
+                    this.Write(">(odataClient, \"");
+                    this.Write(this.ToStringHelper.ToStringWithCulture(GetSingletonPath(clientMetadata, singleton)));
+                    this.Write("\");\r\n    }\r\n");
+                }
                 foreach (var func in clientMetadata.Metadata.Functions)
                 {
                     if (func.HttpMethod == "GET")
