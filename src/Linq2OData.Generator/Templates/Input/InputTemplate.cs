@@ -29,135 +29,134 @@ namespace Linq2OData.Generator.Templates.Input
         public virtual string TransformText()
         {
             this.Write("\r\nusing Linq2OData.Core;\r\n");
-
+            
+            #line 8 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+ foreach (var externalNs in GetExternalNamespaces()) { 
+            
+            #line default
             #line hidden
-            foreach (var externalNs in GetExternalNamespaces()) {
-                this.Write("using ");
-                this.Write(this.ToStringHelper.ToStringWithCulture(externalNs));
-                this.Write(";\r\n");
-            }
-            this.Write("\r\nnamespace ");
+            this.Write("using ");
             
             #line 9 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(externalNs));
+            
+            #line default
+            #line hidden
+            this.Write(";\r\n");
+            
+            #line 10 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("namespace ");
+            
+            #line 11 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespaceName));
             
             #line default
             #line hidden
-            this.Write(";\r\n\r\n/// <summary>\r\n/// OdataName: ");
+            this.Write(";\r\n\r\npublic partial class ");
             
-            #line 12 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(entityType.Name));
-            
-            #line default
-            #line hidden
-            this.Write("\r\n/// </summary>\r\npublic partial class ");
-            
-            #line 14 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 13 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(entityType.InputName));
             
             #line default
             #line hidden
             this.Write(" : ODataInputBase\r\n{\r\n");
             
-            #line 16 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 15 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
  foreach (var property in entityType.Properties) { 
             
             #line default
             #line hidden
-            this.Write("\t// IsEnumType: ");
+            this.Write("\tpublic ");
             
-            #line 17 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(property.IsEnumType));
-            
-            #line default
-            #line hidden
-            this.Write("\r\n    public ");
-            
-            #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 16 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.CSharpNameInput));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 16 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Name.SafeVariableName(entityType.InputName)));
             
             #line default
             #line hidden
             this.Write(" \r\n\t{\r\n\t\tget => GetValue<");
             
-            #line 20 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.CSharpNameInput));
             
             #line default
             #line hidden
             this.Write(">(\"");
             
-            #line 20 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Name));
             
             #line default
             #line hidden
             this.Write("\");\r\n\t\tset => SetValue(\"");
             
-            #line 21 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 19 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Name));
             
             #line default
             #line hidden
             this.Write("\", value);\r\n\t}\r\n");
             
-            #line 23 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 21 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("\r\n    //Navigations\r\n");
             
-            #line 26 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 24 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
  foreach (var navigation in entityType.Navigations) { 
             
             #line default
             #line hidden
             this.Write("    public ");
             
-            #line 27 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 25 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(navigation.CSharpPropertyInput));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 27 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 25 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(navigation.Name));
             
             #line default
             #line hidden
             this.Write(" \r\n\t{\r\n\t\tget => GetValue<");
             
-            #line 29 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 27 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(navigation.CSharpPropertyInput));
             
             #line default
             #line hidden
             this.Write(">(\"");
             
-            #line 29 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 27 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(navigation.Name.SafeVariableName()));
             
             #line default
             #line hidden
             this.Write("\");\r\n\t\tset => SetValue(\"");
             
-            #line 30 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 28 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(navigation.Name));
             
             #line default
             #line hidden
             this.Write("\", value);\r\n\t}\r\n");
             
-            #line 32 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
+            #line 30 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Input\InputTemplate.tt"
  } 
             
             #line default

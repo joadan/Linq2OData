@@ -311,9 +311,17 @@ internal static class MetadataExtensions
         {
             get
             {
-                if (param.DataType.StartsWith("Edm."))
-                    return MapEdmTypeToCSharp(param.DataType);
-                return StripNamespace(param.DataType).ToValidCSharpClassName();
+                var dataType = param.DataType;
+
+                bool isCollection = dataType.StartsWith("Collection(") && dataType.EndsWith(")");
+                if (isCollection)
+                    dataType = dataType.Substring("Collection(".Length, dataType.Length - "Collection(".Length - 1);
+
+                string csharpType = dataType.StartsWith("Edm.")
+                    ? MapEdmTypeToCSharp(dataType)
+                    : StripNamespace(dataType).ToValidCSharpClassName();
+
+                return isCollection ? $"List<{csharpType}>" : csharpType;
             }
         }
 

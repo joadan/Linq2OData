@@ -174,11 +174,11 @@ namespace Linq2OData.Generator.Templates.Client
                             this.Write("CancellationToken cancellationToken = default)\r\n    {\r\n");
                             if (func.Parameters.Any())
                             {
-                                this.Write("        var parameters = new Dictionary<string, object?> { ");
+                                this.Write("        var actionParameters = new Dictionary<string, object?> { ");
                                 this.Write(this.ToStringHelper.ToStringWithCulture(GetActionParameterDict(func)));
                                 this.Write(" };\r\n        await odataClient.InvokeActionAsync(\"");
                                 this.Write(this.ToStringHelper.ToStringWithCulture(func.Name));
-                                this.Write("\", parameters, cancellationToken);\r\n    }\r\n");
+                                this.Write("\", actionParameters, cancellationToken);\r\n    }\r\n");
                             }
                             else
                             {
@@ -198,13 +198,13 @@ namespace Linq2OData.Generator.Templates.Client
                             this.Write("CancellationToken cancellationToken = default)\r\n    {\r\n");
                             if (func.Parameters.Any())
                             {
-                                this.Write("        var parameters = new Dictionary<string, object?> { ");
+                                this.Write("        var actionParameters = new Dictionary<string, object?> { ");
                                 this.Write(this.ToStringHelper.ToStringWithCulture(GetActionParameterDict(func)));
                                 this.Write(" };\r\n        var result = await odataClient.InvokeActionAsync<");
                                 this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpReturnType));
                                 this.Write(">(\"");
                                 this.Write(this.ToStringHelper.ToStringWithCulture(func.Name));
-                                this.Write("\", parameters, cancellationToken);\r\n        return result?.Data;\r\n    }\r\n");
+                                this.Write("\", actionParameters, cancellationToken);\r\n        return result?.Data;\r\n    }\r\n");
                             }
                             else
                             {

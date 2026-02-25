@@ -74,8 +74,8 @@ public class <#= request.Name #>
     public async Task <#= func.CSharpMethodName #>Async(<#= func.CSharpParameters.Length > 0 ? func.CSharpParameters + ", " : "" #>CancellationToken cancellationToken = default)
     {
 <# if (func.Parameters.Any()) { #>
-        var parameters = new Dictionary<string, object?> { <#= GetActionParameterDict(func) #> };
-        await odataClient.InvokeActionAsync("<#= func.Name #>", parameters, cancellationToken);
+        var actionParameters = new Dictionary<string, object?> { <#= GetActionParameterDict(func) #> };
+        await odataClient.InvokeActionAsync("<#= func.Name #>", actionParameters, cancellationToken);
 <# } else { #>
         await odataClient.InvokeActionAsync("<#= func.Name #>", null, cancellationToken);
 <# } #>
@@ -84,8 +84,8 @@ public class <#= request.Name #>
     public async Task<<#= func.CSharpReturnType #>?> <#= func.CSharpMethodName #>Async(<#= func.CSharpParameters.Length > 0 ? func.CSharpParameters + ", " : "" #>CancellationToken cancellationToken = default)
     {
 <# if (func.Parameters.Any()) { #>
-        var parameters = new Dictionary<string, object?> { <#= GetActionParameterDict(func) #> };
-        var result = await odataClient.InvokeActionAsync<<#= func.CSharpReturnType #>>("<#= func.Name #>", parameters, cancellationToken);
+        var actionParameters = new Dictionary<string, object?> { <#= GetActionParameterDict(func) #> };
+        var result = await odataClient.InvokeActionAsync<<#= func.CSharpReturnType #>>("<#= func.Name #>", actionParameters, cancellationToken);
 <# } else { #>
         var result = await odataClient.InvokeActionAsync<<#= func.CSharpReturnType #>>("<#= func.Name #>", null, cancellationToken);
 <# } #>

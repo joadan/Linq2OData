@@ -29,6 +29,13 @@ namespace Linq2OData.Core
             jsonOptions.Converters.Add(new ODataTimeSpanConverter());
             jsonOptions.Converters.Add(new ODataNullableTimeSpanConverter());
 
+            // Intercepts all IODataEntitySet types and deserializes them property-by-property from a
+            // JsonNode. STJ never builds its own type metadata for entity types, so the entire connected
+            // type graph is never eagerly reflected. Nav props are deserialized on-demand only when
+            // present in the response. Also handles V2/V3 __deferred wrappers, superseding
+            // ODataNavigationPropertyConverterFactory.
+            jsonOptions.Converters.Add(new ODataEntityConverterFactory());
+
             if (odataVersion < ODataVersion.V4) //Not really sure about this but I belive it is a good start
             {
                 jsonOptions.Converters.Add(new MicrosoftDateTimeConverter());
@@ -37,10 +44,8 @@ namespace Linq2OData.Core
                 jsonOptions.Converters.Add(new DecimalStringJsonConverter());
                 jsonOptions.Converters.Add(new Int64StringJsonConverter());
                 jsonOptions.Converters.Add(new NullableInt64StringJsonConverter());
-                // Add the collection converter for handling "results" wrapper in navigation properties (read/write)
+                // Handles the "results" wrapper for V2/V3 collection navigation properties
                 jsonOptions.Converters.Add(new ODataCollectionConverterFactory());
-                // Add the navigation property converter for handling "__deferred" wrapper in non-expanded properties
-                jsonOptions.Converters.Add(new ODataNavigationPropertyConverterFactory());
             }
 
 
