@@ -6,12 +6,8 @@
 #nullable enable
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
-
 namespace DemoClientV2.ODataDemo;
 
-/// <summary>
-/// ODataName: Category
-/// </summary>
 
 [ODataEntitySet("Categories")]
 public partial class Category  : IDemoClientV2EntitySet, ICategoryKeys
@@ -23,6 +19,7 @@ public partial class Category  : IDemoClientV2EntitySet, ICategoryKeys
     
     //Navigations
     [ODataMember("Products", true)]
+    [JsonIgnore]
     public List<Product>? Products { get; set; }
 
  public string __Key => $"ID={ID}"; 

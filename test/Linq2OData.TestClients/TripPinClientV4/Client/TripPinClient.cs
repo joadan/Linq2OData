@@ -47,6 +47,10 @@ public class TripPinClient
     {
         return new CreateBuilder<T>(odataClient);
     }
+    public SingletonBuilder<Person> Me()
+    {
+        return new SingletonBuilder<Person>(odataClient, "Me");
+    }
     public async Task ResetDataSourceAsync(CancellationToken cancellationToken = default)
     {
         await odataClient.InvokeActionAsync("ResetDataSource", null, cancellationToken);

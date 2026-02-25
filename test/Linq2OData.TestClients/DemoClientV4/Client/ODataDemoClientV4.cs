@@ -7,7 +7,6 @@
 
 using Linq2OData.Core;
 using Linq2OData.Core.Builders;
-
 namespace DemoClientV4;
 
 public interface IDemoClientV4EntitySet : IODataEntitySet {}
@@ -46,6 +45,11 @@ public class ODataDemoClientV4
     public CreateBuilder<T> Create<T>() where T : IDemoClientV4EntitySet, new()
     {
         return new CreateBuilder<T>(odataClient);
+    }
+    public async Task IncreaseSalariesAsync(int @percentage, CancellationToken cancellationToken = default)
+    {
+        var actionParameters = new Dictionary<string, object?> { { "percentage", @percentage } };
+        await odataClient.InvokeActionAsync("IncreaseSalaries", actionParameters, cancellationToken);
     }
 }
 

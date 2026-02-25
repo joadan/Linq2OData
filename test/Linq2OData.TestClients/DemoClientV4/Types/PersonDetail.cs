@@ -6,12 +6,8 @@
 #nullable enable
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
-
 namespace DemoClientV4.ODataDemo;
 
-/// <summary>
-/// ODataName: PersonDetail
-/// </summary>
 
 [ODataEntitySet("PersonDetails")]
 public partial class PersonDetail  : IDemoClientV4EntitySet, IPersonDetailKeys
@@ -31,6 +27,7 @@ public partial class PersonDetail  : IDemoClientV4EntitySet, IPersonDetailKeys
     
     //Navigations
     [ODataMember("Person", true)]
+    [JsonIgnore]
     public Person? Person { get; set; }
 
  public string __Key => $"PersonID={PersonID}"; 

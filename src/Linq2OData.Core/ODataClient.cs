@@ -135,8 +135,6 @@ namespace Linq2OData.Core
 
             if (!response.IsSuccessStatusCode)
             {
-               
-
                 await ValidateResponseAsync(response);
             }
 

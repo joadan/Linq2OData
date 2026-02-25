@@ -6,58 +6,46 @@
 #nullable enable
 
 using Linq2OData.Core;
-
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
-/// <summary>
-/// OdataName: Trip
-/// </summary>
 public partial class TripInput : ODataInputBase
 {
-	// IsEnumType: False
-    public int? TripId 
+	public int? TripId 
 	{
 		get => GetValue<int?>("TripId");
 		set => SetValue("TripId", value);
 	}
-	// IsEnumType: False
-    public Guid? ShareId 
+	public Guid? ShareId 
 	{
 		get => GetValue<Guid?>("ShareId");
 		set => SetValue("ShareId", value);
 	}
-	// IsEnumType: False
-    public string? Description 
+	public string? Description 
 	{
 		get => GetValue<string?>("Description");
 		set => SetValue("Description", value);
 	}
-	// IsEnumType: False
-    public string? Name 
+	public string? Name 
 	{
 		get => GetValue<string?>("Name");
 		set => SetValue("Name", value);
 	}
-	// IsEnumType: False
-    public float? Budget 
+	public float? Budget 
 	{
 		get => GetValue<float?>("Budget");
 		set => SetValue("Budget", value);
 	}
-	// IsEnumType: False
-    public DateTimeOffset? StartsAt 
+	public DateTimeOffset? StartsAt 
 	{
 		get => GetValue<DateTimeOffset?>("StartsAt");
 		set => SetValue("StartsAt", value);
 	}
-	// IsEnumType: False
-    public DateTimeOffset? EndsAt 
+	public DateTimeOffset? EndsAt 
 	{
 		get => GetValue<DateTimeOffset?>("EndsAt");
 		set => SetValue("EndsAt", value);
 	}
-	// IsEnumType: False
-    public List<string>? Tags 
+	public List<string>? Tags 
 	{
 		get => GetValue<List<string>?>("Tags");
 		set => SetValue("Tags", value);

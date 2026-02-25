@@ -6,22 +6,16 @@
 #nullable enable
 
 using Linq2OData.Core;
-
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
-/// <summary>
-/// OdataName: Photo
-/// </summary>
 public partial class PhotoInput : ODataInputBase
 {
-	// IsEnumType: False
-    public long? Id 
+	public long? Id 
 	{
 		get => GetValue<long?>("Id");
 		set => SetValue("Id", value);
 	}
-	// IsEnumType: False
-    public string? Name 
+	public string? Name 
 	{
 		get => GetValue<string?>("Name");
 		set => SetValue("Name", value);

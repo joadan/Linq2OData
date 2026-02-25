@@ -6,12 +6,8 @@
 #nullable enable
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
-
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
-/// <summary>
-/// ODataName: Flight
-/// </summary>
 
 
 public partial class Flight : PublicTransportation
@@ -21,10 +17,13 @@ public partial class Flight : PublicTransportation
     
     //Navigations
     [ODataMember("From", true)]
+    [JsonIgnore]
     public Airport? From { get; set; }
     [ODataMember("To", true)]
+    [JsonIgnore]
     public Airport? To { get; set; }
     [ODataMember("Airline", true)]
+    [JsonIgnore]
     public Airline? Airline { get; set; }
 
 

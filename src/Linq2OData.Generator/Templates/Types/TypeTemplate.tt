@@ -10,15 +10,15 @@ using <#= externalNs #>;
 <# } #>
 namespace <#= fullNamspace #>;
 
-<#= GetDerivedAttributes() #>
-<#= GetEntitySetAttribute() #>
+<#= GetPolymorphicMetadata() #>
+<#= GetEntitySetAttribute() + GetEntityAttribute() #>
 public partial class <#= entityType.ClassName #> <#= BaseTypeAndInterface #>
 {
 <# foreach (var property in entityType.Properties) { #>
     <#= property.ODataAttributeString #>
     public <#= property.CSharpType #> <#= property.Name.SafeVariableName(entityType.ClassName) #> { get; set; }
 <# } #>
-    
+
     //Navigations
 <# foreach (var navigation in entityType.Navigations) { #>
     [ODataMember("<#= navigation.Name #>", true)]

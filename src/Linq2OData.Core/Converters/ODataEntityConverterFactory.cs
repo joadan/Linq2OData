@@ -6,32 +6,38 @@ using System.Text.Json.Serialization;
 namespace Linq2OData.Core.Converters
 {
 	/// <summary>
-	/// Intercepts deserialization of all <see cref="IODataEntitySet"/> entity types and
-	/// deserializes them property-by-property from a <see cref="JsonNode"/>.
+	/// Intercepts deserialization of all OData entity types decorated with <see cref="ODataEntityAttribute"/>
+	/// (or <see cref="ODataEntitySetAttribute"/>) and deserializes them property-by-property from a
+	/// <see cref="JsonNode"/>.
 	/// This prevents System.Text.Json from eagerly building type metadata for the entire
 	/// connected entity graph, eliminating slow first-request reflection on large models.
 	/// Navigation properties are only deserialized when the JSON response actually contains them.
 	/// Supersedes <see cref="ODataNavigationPropertyConverterFactory"/> for all OData versions.
+	/// 
+	/// Handles OData polymorphism by reading @odata.type discriminators and instantiating the correct
+	/// derived type, completely replacing STJ's [JsonPolymorphic] system to ensure compatibility with
+	/// custom deserialization logic.
 	/// </summary>
 	public class ODataEntityConverterFactory : JsonConverterFactory
 	{
 		public override bool CanConvert(Type typeToConvert) =>
 			typeToConvert.IsClass &&
 			!typeToConvert.IsAbstract &&
-			typeof(IODataEntitySet).IsAssignableFrom(typeToConvert);
+			typeToConvert.GetCustomAttribute<ODataEntityAttribute>(inherit: true) != null;
 
 		public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options) =>
 			(JsonConverter)Activator.CreateInstance(
 				typeof(ODataEntityConverter<>).MakeGenericType(typeToConvert))!;
 	}
 
-	internal sealed class ODataEntityConverter<T> : JsonConverter<T> where T : class, IODataEntitySet, new()
+	internal sealed class ODataEntityConverter<T> : JsonConverter<T> where T : class, new()
 	{
 		private sealed record PropertyEntry(PropertyInfo Prop, string JsonName, bool IsNavProp);
+		private sealed record DerivedTypeEntry(string Discriminator, Type Type);
 
 		// Per-type caches built once via static initializer — one instance per closed generic type
 		private static readonly PropertyEntry[] _properties = BuildPropertyCache();
-		private static readonly Dictionary<string, Type> _derivedTypeMap = BuildDerivedTypeMap();
+		private static readonly DerivedTypeEntry[]? _derivedTypes = BuildDerivedTypeCache();
 
 		private static PropertyEntry[] BuildPropertyCache()
 		{
@@ -46,25 +52,30 @@ namespace Linq2OData.Core.Converters
 				if (!isNavProp && prop.GetCustomAttribute<JsonIgnoreAttribute>()?.Condition == JsonIgnoreCondition.Always)
 					continue;
 
-				var jsonName = prop.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? prop.Name;
+				// Determine JSON property name: prefer JsonPropertyName, fall back to ODataMember, then prop.Name.
+				// This is critical for generated types where navigation properties only have ODataMemberAttribute,
+				// not JsonPropertyNameAttribute, ensuring they deserialize correctly from OData responses.
+				var jsonName = prop.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name
+					?? prop.GetCustomAttribute<ODataMemberAttribute>()?.Name
+					?? prop.Name;
 				entries.Add(new PropertyEntry(prop, jsonName, isNavProp));
 			}
 			return [.. entries];
 		}
 
-		/// <summary>
-		/// Builds a discriminator-to-concrete-type map from <see cref="JsonDerivedTypeAttribute"/>s
-		/// on the base entity type to support OData polymorphism via the @odata.type property.
-		/// </summary>
-		private static Dictionary<string, Type> BuildDerivedTypeMap()
+		private static DerivedTypeEntry[]? BuildDerivedTypeCache()
 		{
-			var map = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
-			foreach (var attr in typeof(T).GetCustomAttributes<JsonDerivedTypeAttribute>())
+			// Check if this type has [ODataPolymorphic] — meaning it's a polymorphic base
+			var polyAttr = typeof(T).GetCustomAttribute<ODataPolymorphicAttribute>(inherit: false);
+			if (polyAttr == null)
+				return null;
+
+			var entries = new List<DerivedTypeEntry>();
+			foreach (var attr in typeof(T).GetCustomAttributes<ODataDerivedTypeAttribute>(inherit: false))
 			{
-				if (attr.TypeDiscriminator is string discriminator)
-					map[discriminator] = attr.DerivedType;
+				entries.Add(new DerivedTypeEntry(attr.TypeDiscriminator, attr.DerivedType));
 			}
-			return map;
+			return entries.Count > 0 ? [.. entries] : null;
 		}
 
 		public override T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -76,15 +87,22 @@ namespace Linq2OData.Core.Converters
 			if (node is not JsonObject obj)
 				return null;
 
-			// Polymorphism: if this base type declares derived types, check the @odata.type discriminator
-			if (_derivedTypeMap.Count > 0 &&
-				obj.TryGetPropertyValue("@odata.type", out var discriminatorNode) &&
-				discriminatorNode?.GetValue<string>() is string discriminator &&
-				_derivedTypeMap.TryGetValue(discriminator, out var actualType) &&
-				actualType != typeof(T))
+			// Handle polymorphic types: check for OData type discriminator and deserialize as derived type
+			if (_derivedTypes != null && obj.TryGetPropertyValue("@odata.type", out var typeNode))
 			{
-				// Deserialize as the concrete derived type — triggers its own ODataEntityConverter<TDerived>
-				return (T?)obj.Deserialize(actualType, options);
+				var discriminator = typeNode?.GetValue<string>();
+				if (discriminator != null)
+				{
+					var derivedType = _derivedTypes.FirstOrDefault(e => 
+						e.Discriminator.Equals(discriminator, StringComparison.OrdinalIgnoreCase))?.Type;
+
+					if (derivedType != null && derivedType != typeof(T))
+					{
+						// Recursively deserialize as the derived type using its ODataEntityConverter
+						var derivedEntity = obj.Deserialize(derivedType, options);
+						return (T?)derivedEntity;
+					}
+				}
 			}
 
 			var entity = new T();
@@ -100,9 +118,10 @@ namespace Linq2OData.Core.Converters
 					if (propNode is JsonObject navObj && navObj.ContainsKey("__deferred"))
 						continue;
 
+					// Null values in JSON should remain null
 					if (propNode.GetValueKind() == JsonValueKind.Null) continue;
-					// Skip empty expanded collections — nothing to populate
-					if (propNode is JsonArray { Count: 0 }) continue;
+
+					// Empty arrays ([]) should deserialize to empty List<T>, not be skipped
 				}
 
 				// For nav props: triggers this factory recursively for nested entity types (on-demand).
@@ -128,11 +147,12 @@ namespace Linq2OData.Core.Converters
 		}
 
 		private static bool IsEntityType(Type type) =>
-			type.IsClass && typeof(IODataEntitySet).IsAssignableFrom(type);
+			type.IsClass &&
+			type.GetCustomAttribute<ODataEntityAttribute>(inherit: true) != null;
 
 		private static bool IsEntityList(Type type) =>
 			type.IsGenericType &&
 			type.GetGenericTypeDefinition() == typeof(List<>) &&
-			typeof(IODataEntitySet).IsAssignableFrom(type.GetGenericArguments()[0]);
+			IsEntityType(type.GetGenericArguments()[0]);
 	}
 }

@@ -6,14 +6,10 @@
 #nullable enable
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
-
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
-/// <summary>
-/// ODataName: Trip
-/// </summary>
 
-
+[ODataEntity]
 public partial class Trip  : ITripKeys
 {
     [ODataMember("TripId")]
@@ -35,8 +31,10 @@ public partial class Trip  : ITripKeys
     
     //Navigations
     [ODataMember("Photos", true)]
+    [JsonIgnore]
     public List<Photo>? Photos { get; set; }
     [ODataMember("PlanItems", true)]
+    [JsonIgnore]
     public List<PlanItem>? PlanItems { get; set; }
 
  public string __Key => $"TripId={TripId}"; 

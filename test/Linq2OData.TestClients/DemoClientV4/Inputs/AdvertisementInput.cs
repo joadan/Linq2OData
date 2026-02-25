@@ -6,28 +6,21 @@
 #nullable enable
 
 using Linq2OData.Core;
-
 namespace DemoClientV4.ODataDemo;
 
-/// <summary>
-/// OdataName: Advertisement
-/// </summary>
 public partial class AdvertisementInput : ODataInputBase
 {
-	// IsEnumType: False
-    public Guid? ID 
+	public Guid? ID 
 	{
 		get => GetValue<Guid?>("ID");
 		set => SetValue("ID", value);
 	}
-	// IsEnumType: False
-    public string? Name 
+	public string? Name 
 	{
 		get => GetValue<string?>("Name");
 		set => SetValue("Name", value);
 	}
-	// IsEnumType: False
-    public DateTimeOffset? AirDate 
+	public DateTimeOffset? AirDate 
 	{
 		get => GetValue<DateTimeOffset?>("AirDate");
 		set => SetValue("AirDate", value);

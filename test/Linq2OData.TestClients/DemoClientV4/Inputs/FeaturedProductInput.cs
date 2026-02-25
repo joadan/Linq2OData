@@ -6,12 +6,8 @@
 #nullable enable
 
 using Linq2OData.Core;
-
 namespace DemoClientV4.ODataDemo;
 
-/// <summary>
-/// OdataName: FeaturedProduct
-/// </summary>
 public partial class FeaturedProductInput : ODataInputBase
 {
 

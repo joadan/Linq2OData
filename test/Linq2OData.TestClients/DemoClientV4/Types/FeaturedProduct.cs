@@ -6,12 +6,8 @@
 #nullable enable
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
-
 namespace DemoClientV4.ODataDemo;
 
-/// <summary>
-/// ODataName: FeaturedProduct
-/// </summary>
 
 [ODataEntitySet("Products/ODataDemo.FeaturedProduct")]
 public partial class FeaturedProduct : Product, IDemoClientV4EntitySet
@@ -19,6 +15,7 @@ public partial class FeaturedProduct : Product, IDemoClientV4EntitySet
     
     //Navigations
     [ODataMember("Advertisement", true)]
+    [JsonIgnore]
     public Advertisement? Advertisement { get; set; }
 
 
