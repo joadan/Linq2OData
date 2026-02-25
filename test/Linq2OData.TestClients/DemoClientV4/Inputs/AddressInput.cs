@@ -6,40 +6,31 @@
 #nullable enable
 
 using Linq2OData.Core;
-
 namespace DemoClientV4.ODataDemo;
 
-/// <summary>
-/// OdataName: Address
-/// </summary>
 public partial class AddressInput : ODataInputBase
 {
-	// IsEnumType: False
-    public string? Street 
+	public string? Street 
 	{
 		get => GetValue<string?>("Street");
 		set => SetValue("Street", value);
 	}
-	// IsEnumType: False
-    public string? City 
+	public string? City 
 	{
 		get => GetValue<string?>("City");
 		set => SetValue("City", value);
 	}
-	// IsEnumType: False
-    public string? State 
+	public string? State 
 	{
 		get => GetValue<string?>("State");
 		set => SetValue("State", value);
 	}
-	// IsEnumType: False
-    public string? ZipCode 
+	public string? ZipCode 
 	{
 		get => GetValue<string?>("ZipCode");
 		set => SetValue("ZipCode", value);
 	}
-	// IsEnumType: False
-    public string? Country 
+	public string? Country 
 	{
 		get => GetValue<string?>("Country");
 		set => SetValue("Country", value);

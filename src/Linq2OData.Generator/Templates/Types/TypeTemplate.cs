@@ -59,14 +59,14 @@ namespace Linq2OData.Generator.Templates.Types
             this.Write(";\r\n\r\n");
             
             #line 13 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GetDerivedAttributes()));
-            
+            this.Write(this.ToStringHelper.ToStringWithCulture(GetPolymorphicMetadata()));
+
             #line default
             #line hidden
             this.Write("\r\n");
             
             #line 14 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GetEntitySetAttribute()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(GetEntitySetAttribute() + GetEntityAttribute()));
             
             #line default
             #line hidden

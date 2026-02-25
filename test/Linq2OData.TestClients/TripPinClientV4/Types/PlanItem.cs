@@ -6,19 +6,15 @@
 #nullable enable
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
-
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
-/// <summary>
-/// ODataName: PlanItem
-/// </summary>
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "@odata.type", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]
-[JsonDerivedType(typeof(PlanItem))]
-[JsonDerivedType(typeof(PublicTransportation), "#Microsoft.OData.SampleService.Models.TripPin.PublicTransportation")]
-[JsonDerivedType(typeof(Event), "#Microsoft.OData.SampleService.Models.TripPin.Event")]
-[JsonDerivedType(typeof(Flight), "#Microsoft.OData.SampleService.Models.TripPin.Flight")]
+[ODataPolymorphic]
+[ODataDerivedType(typeof(PublicTransportation), "#Microsoft.OData.SampleService.Models.TripPin.PublicTransportation")]
+[ODataDerivedType(typeof(Event), "#Microsoft.OData.SampleService.Models.TripPin.Event")]
+[ODataDerivedType(typeof(Flight), "#Microsoft.OData.SampleService.Models.TripPin.Flight")]
+[ODataDerivedType(typeof(PlanItem), "#Microsoft.OData.SampleService.Models.TripPin.PlanItem")]
 
-
+[ODataEntity]
 public partial class PlanItem  : IPlanItemKeys
 {
     [ODataMember("PlanItemId")]

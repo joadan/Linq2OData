@@ -6,34 +6,26 @@
 #nullable enable
 
 using Linq2OData.Core;
-
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
-/// <summary>
-/// OdataName: Airport
-/// </summary>
 public partial class AirportInput : ODataInputBase
 {
-	// IsEnumType: False
-    public string? IcaoCode 
+	public string? IcaoCode 
 	{
 		get => GetValue<string?>("IcaoCode");
 		set => SetValue("IcaoCode", value);
 	}
-	// IsEnumType: False
-    public string? Name 
+	public string? Name 
 	{
 		get => GetValue<string?>("Name");
 		set => SetValue("Name", value);
 	}
-	// IsEnumType: False
-    public string? IataCode 
+	public string? IataCode 
 	{
 		get => GetValue<string?>("IataCode");
 		set => SetValue("IataCode", value);
 	}
-	// IsEnumType: False
-    public AirportLocationInput? Location 
+	public AirportLocationInput? Location 
 	{
 		get => GetValue<AirportLocationInput?>("Location");
 		set => SetValue("Location", value);

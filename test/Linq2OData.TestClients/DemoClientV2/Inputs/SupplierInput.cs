@@ -6,34 +6,26 @@
 #nullable enable
 
 using Linq2OData.Core;
-
 namespace DemoClientV2.ODataDemo;
 
-/// <summary>
-/// OdataName: Supplier
-/// </summary>
 public partial class SupplierInput : ODataInputBase
 {
-	// IsEnumType: False
-    public int? ID 
+	public int? ID 
 	{
 		get => GetValue<int?>("ID");
 		set => SetValue("ID", value);
 	}
-	// IsEnumType: False
-    public string? Name 
+	public string? Name 
 	{
 		get => GetValue<string?>("Name");
 		set => SetValue("Name", value);
 	}
-	// IsEnumType: False
-    public AddressInput? Address 
+	public AddressInput? Address 
 	{
 		get => GetValue<AddressInput?>("Address");
 		set => SetValue("Address", value);
 	}
-	// IsEnumType: False
-    public int? Concurrency 
+	public int? Concurrency 
 	{
 		get => GetValue<int?>("Concurrency");
 		set => SetValue("Concurrency", value);

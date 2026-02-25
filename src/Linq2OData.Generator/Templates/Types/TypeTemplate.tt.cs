@@ -62,6 +62,13 @@ namespace Linq2OData.Generator.Templates.Types
             return "";
         }
 
+        private string GetEntityAttribute()
+        {
+            if (!entityType.IsEntitySet && entityType.KeyProperties.Any())
+                return "[ODataEntity]";
+            return "";
+        }
+
         private string GetEntitySetInterface()
         {
             if (entityType.IsEntitySet)
@@ -73,21 +80,25 @@ namespace Linq2OData.Generator.Templates.Types
         }
 
 
-        private string GetDerivedAttributes()
+        private string GetPolymorphicMetadata()
         {
             if (!derivedTypes.Any())
             {
                 return string.Empty;
             }
 
+            // Generate ODataPolymorphic attribute with derived type mappings
+            // Our custom converter will read this to handle polymorphism without STJ's [JsonPolymorphic]
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"[JsonPolymorphic(TypeDiscriminatorPropertyName = \"@odata.type\", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]");
-            sb.AppendLine($"[JsonDerivedType(typeof({entityType.ClassName}))]");
+            sb.AppendLine($"[ODataPolymorphic]");
             foreach (var derivedType in derivedTypes)
             {
                 var typeNs = derivedType.SchemaNamespace ?? metadataNamespace;
-                sb.AppendLine($"[JsonDerivedType(typeof({derivedType.ClassName}), \"#{typeNs}.{derivedType.Name}\")]");
+                sb.AppendLine($"[ODataDerivedType(typeof({derivedType.ClassName}), \"#{typeNs}.{derivedType.Name}\")]");
             }
+            // Also add the base type itself
+            var baseTypeNs = entityType.SchemaNamespace ?? metadataNamespace;
+            sb.AppendLine($"[ODataDerivedType(typeof({entityType.ClassName}), \"#{baseTypeNs}.{entityType.Name}\")]");
             return sb.ToString();
         }
 

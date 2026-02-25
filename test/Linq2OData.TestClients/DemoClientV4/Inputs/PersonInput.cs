@@ -6,22 +6,16 @@
 #nullable enable
 
 using Linq2OData.Core;
-
 namespace DemoClientV4.ODataDemo;
 
-/// <summary>
-/// OdataName: Person
-/// </summary>
 public partial class PersonInput : ODataInputBase
 {
-	// IsEnumType: False
-    public int? ID 
+	public int? ID 
 	{
 		get => GetValue<int?>("ID");
 		set => SetValue("ID", value);
 	}
-	// IsEnumType: False
-    public string? Name 
+	public string? Name 
 	{
 		get => GetValue<string?>("Name");
 		set => SetValue("Name", value);

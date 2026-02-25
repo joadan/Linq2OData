@@ -6,12 +6,8 @@
 #nullable enable
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
-
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
-/// <summary>
-/// ODataName: Event
-/// </summary>
 
 
 public partial class Event : PlanItem

@@ -6,52 +6,41 @@
 #nullable enable
 
 using Linq2OData.Core;
-
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
-/// <summary>
-/// OdataName: Person
-/// </summary>
 public partial class PersonInput : ODataInputBase
 {
-	// IsEnumType: False
-    public string? UserName 
+	public string? UserName 
 	{
 		get => GetValue<string?>("UserName");
 		set => SetValue("UserName", value);
 	}
-	// IsEnumType: False
-    public string? FirstName 
+	public string? FirstName 
 	{
 		get => GetValue<string?>("FirstName");
 		set => SetValue("FirstName", value);
 	}
-	// IsEnumType: False
-    public string? LastName 
+	public string? LastName 
 	{
 		get => GetValue<string?>("LastName");
 		set => SetValue("LastName", value);
 	}
-	// IsEnumType: False
-    public List<string>? Emails 
+	public List<string>? Emails 
 	{
 		get => GetValue<List<string>?>("Emails");
 		set => SetValue("Emails", value);
 	}
-	// IsEnumType: False
-    public List<LocationInput>? AddressInfo 
+	public List<LocationInput>? AddressInfo 
 	{
 		get => GetValue<List<LocationInput>?>("AddressInfo");
 		set => SetValue("AddressInfo", value);
 	}
-	// IsEnumType: True
-    public PersonGender? Gender 
+	public PersonGender? Gender 
 	{
 		get => GetValue<PersonGender?>("Gender");
 		set => SetValue("Gender", value);
 	}
-	// IsEnumType: False
-    public long? Concurrency 
+	public long? Concurrency 
 	{
 		get => GetValue<long?>("Concurrency");
 		set => SetValue("Concurrency", value);

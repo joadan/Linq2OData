@@ -6,16 +6,12 @@
 #nullable enable
 using Linq2OData.Core;
 using System.Text.Json.Serialization;
-
 namespace DemoClientV4.ODataDemo;
 
-/// <summary>
-/// ODataName: Person
-/// </summary>
-[JsonPolymorphic(TypeDiscriminatorPropertyName = "@odata.type", UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToBaseType)]
-[JsonDerivedType(typeof(Person))]
-[JsonDerivedType(typeof(Customer), "#ODataDemo.Customer")]
-[JsonDerivedType(typeof(Employee), "#ODataDemo.Employee")]
+[ODataPolymorphic]
+[ODataDerivedType(typeof(Customer), "#ODataDemo.Customer")]
+[ODataDerivedType(typeof(Employee), "#ODataDemo.Employee")]
+[ODataDerivedType(typeof(Person), "#ODataDemo.Person")]
 
 [ODataEntitySet("Persons")]
 public partial class Person  : IDemoClientV4EntitySet, IPersonKeys
@@ -27,6 +23,7 @@ public partial class Person  : IDemoClientV4EntitySet, IPersonKeys
     
     //Navigations
     [ODataMember("PersonDetail", true)]
+    [JsonIgnore]
     public PersonDetail? PersonDetail { get; set; }
 
  public string __Key => $"ID={ID}"; 

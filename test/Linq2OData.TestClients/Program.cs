@@ -16,13 +16,13 @@ namespace Linq2OData.TestClients
         {
             Console.WriteLine("Here we go!");
 
-           //  await GenerateDemoClientV2Async();
-           //  await GenerateDemoClientV4Async();
-           // await GenerateTripPinClientAsync();
+            //await GenerateDemoClientV2Async();
+            //await GenerateDemoClientV4Async();
+            //await GenerateTripPinClientAsync();
 
             //GenerateLargeClientAsync();
 
-             await TestTripPinAsync();
+            await TestTripPinAsync();
             // await TestV4ClientAsync();
         }
 
@@ -37,26 +37,44 @@ namespace Linq2OData.TestClients
 
             try
             {
+                Console.WriteLine("Starting query...");
 
                 var result = await tripPinClient
                     .Query<TripPin.Microsoft.OData.SampleService.Models.TripPin.Person>()
                     .Top(10)
                     .Filter(e => e.Gender != TripPin.Microsoft.OData.SampleService.Models.TripPin.PersonGender.Male)
                     .Expand(e => e.Trips!.Select(e => e.PlanItems))
-                       .ExecuteAsync();
+                    .ExecuteAsync();
 
-                Console.WriteLine($"Success! Got {result?.Count} people with {result?[0].Trips?.Count} trips");
+                Console.WriteLine($"Success! Got {result?.Count} people");
+
+                if (result != null && result.Count > 0)
+                {
+                    Console.WriteLine($"First person: {result[0].UserName}");
+                    Console.WriteLine($"First person Trips count: {result[0].Trips?.Count ?? 0}");
+
+                    if (result[0].Trips != null && result[0].Trips.Count > 0)
+                    {
+                        Console.WriteLine($"First trip name: {result[0].Trips[0].Name}");
+                        Console.WriteLine($"First trip PlanItems count: {result[0].Trips[0].PlanItems?.Count ?? 0}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("No trips found for first person");
+                    }
+                }
             }
             catch (Exception ex)
             {
-                var t = ex;
+                Console.WriteLine($"Exception Type: {ex.GetType().Name}");
+                Console.WriteLine($"Exception Message: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                }
                 throw;
             }
-
-
-             
-
-      
         }
 
         private static async Task TestV2ClientAsync()
