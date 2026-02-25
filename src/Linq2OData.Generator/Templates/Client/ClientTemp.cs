@@ -28,23 +28,30 @@ namespace Linq2OData.Generator.Templates.Client
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("\r\nusing Linq2OData.Core;\r\nusing Linq2OData.Core.Builders;\r\n\r\nnamespace ");
+            this.Write("\r\nusing Linq2OData.Core;\r\nusing Linq2OData.Core.Builders;\r\n");
+            foreach (var usingNs in GetFunctionUsingDirectives())
+            {
+                this.Write("using ");
+                this.Write(this.ToStringHelper.ToStringWithCulture(usingNs));
+                this.Write(";\r\n");
+            }
+            this.Write("namespace ");
             
-            #line 10 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
+            #line 10 "ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.Namespace));
             
             #line default
             #line hidden
             this.Write(";\r\n\r\npublic interface ");
             
-            #line 12 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
+            #line 12 "ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.InterfaceName));
             
             #line default
             #line hidden
             this.Write(" : IODataEntitySet {}\r\n\r\npublic class ");
             
-            #line 14 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
+            #line 14 "ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.Name));
             
             #line default
@@ -52,7 +59,7 @@ namespace Linq2OData.Generator.Templates.Client
             this.Write(" \r\n{\r\n    private Linq2OData.Core.ODataClient odataClient;\r\n    public Linq2OData" +
                     ".Core.ODataClient ODataClient => odataClient;\r\n\r\n    public ");
             
-            #line 19 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
+            #line 19 "ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.Name));
             
             #line default
@@ -60,21 +67,21 @@ namespace Linq2OData.Generator.Templates.Client
             this.Write("(HttpClient httpClient) \r\n    {\r\n         odataClient = new Linq2OData.Core.OData" +
                     "Client(httpClient, ");
             
-            #line 21 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
+            #line 21 "ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GetODataVersionParameter()));
             
             #line default
             #line hidden
             this.Write("); \r\n    }\r\n\r\n    public List<ODataService> Services => ");
             
-            #line 24 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
+            #line 24 "ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.ServicesName));
             
             #line default
             #line hidden
             this.Write(".Services();\r\n\r\n    public GetBuilder<T> Get<T>(Action<T> keySetter) where T : ");
             
-            #line 26 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
+            #line 26 "ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.InterfaceName));
             
             #line default
@@ -82,7 +89,7 @@ namespace Linq2OData.Generator.Templates.Client
             this.Write(", new() \r\n    {\r\n        return new GetBuilder<T>(odataClient, keySetter);\r\n    }" +
                     "\r\n\r\n    public QueryBuilder<T> Query<T>() where T :  ");
             
-            #line 31 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
+            #line 31 "ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.InterfaceName));
             
             #line default
@@ -90,7 +97,7 @@ namespace Linq2OData.Generator.Templates.Client
             this.Write(", new() \r\n    {\r\n        return new QueryBuilder<T>(odataClient);\r\n    }\r\n    pub" +
                     "lic DeleteBuilder<T> Delete<T>(Action<T> keySetter) where T : ");
             
-            #line 35 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
+            #line 35 "ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.InterfaceName));
             
             #line default
@@ -98,7 +105,7 @@ namespace Linq2OData.Generator.Templates.Client
             this.Write(", new() \r\n    {\r\n        return new DeleteBuilder<T>(odataClient, keySetter);\r\n  " +
                     "  }\r\n\r\n    public UpdateBuilder<T> Update<T>(Action<T> keySetter) where T : ");
             
-            #line 40 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
+            #line 40 "ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.InterfaceName));
             
             #line default
@@ -106,12 +113,101 @@ namespace Linq2OData.Generator.Templates.Client
             this.Write(", new()\r\n    {\r\n        return new UpdateBuilder<T>(odataClient, keySetter);\r\n   " +
                     " }\r\n\r\n    public CreateBuilder<T> Create<T>() where T : ");
             
-            #line 45 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientTemp.tt"
+            #line 45 "ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.InterfaceName));
             
             #line default
             #line hidden
-            this.Write(", new()\r\n    {\r\n        return new CreateBuilder<T>(odataClient);\r\n    }\r\n}\r\n\r\n");
+            this.Write(", new()\r\n    {\r\n        return new CreateBuilder<T>(odataClient);\r\n    }\r\n");
+
+            foreach (var clientMetadata in request.Metadata)
+            {
+                foreach (var func in clientMetadata.Metadata.Functions)
+                {
+                    if (func.HttpMethod == "GET")
+                    {
+                        if (func.CSharpReturnType == "void")
+                        {
+                            this.Write("    public async Task ");
+                            this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpMethodName));
+                            this.Write("Async(");
+                            this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpParameters));
+                            this.Write("CancellationToken cancellationToken = default)\r\n    {\r\n        await odataClient.InvokeFunctionAsync<object>($\"");
+                            this.Write(this.ToStringHelper.ToStringWithCulture(func.FunctionUrlTemplate));
+                            this.Write("\", cancellationToken);\r\n    }\r\n");
+                        }
+                        else
+                        {
+                            this.Write("    public async Task<");
+                            this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpReturnType));
+                            this.Write("?> ");
+                            this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpMethodName));
+                            this.Write("Async(");
+                            this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpParameters.Length > 0 ? func.CSharpParameters + ", " : ""));
+                            this.Write("CancellationToken cancellationToken = default)\r\n    {\r\n        var result = await odataClient.InvokeFunctionAsync<");
+                            this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpReturnType));
+                            this.Write(">($\"");
+                            this.Write(this.ToStringHelper.ToStringWithCulture(func.FunctionUrlTemplate));
+                            this.Write("\", cancellationToken);\r\n        return result?.Data;\r\n    }\r\n");
+                        }
+                    }
+                    else
+                    {
+                        if (func.CSharpReturnType == "void")
+                        {
+                            this.Write("    public async Task ");
+                            this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpMethodName));
+                            this.Write("Async(");
+                            this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpParameters.Length > 0 ? func.CSharpParameters + ", " : ""));
+                            this.Write("CancellationToken cancellationToken = default)\r\n    {\r\n");
+                            if (func.Parameters.Any())
+                            {
+                                this.Write("        var parameters = new Dictionary<string, object?> { ");
+                                this.Write(this.ToStringHelper.ToStringWithCulture(GetActionParameterDict(func)));
+                                this.Write(" };\r\n        await odataClient.InvokeActionAsync(\"");
+                                this.Write(this.ToStringHelper.ToStringWithCulture(func.Name));
+                                this.Write("\", parameters, cancellationToken);\r\n    }\r\n");
+                            }
+                            else
+                            {
+                                this.Write("        await odataClient.InvokeActionAsync(\"");
+                                this.Write(this.ToStringHelper.ToStringWithCulture(func.Name));
+                                this.Write("\", null, cancellationToken);\r\n    }\r\n");
+                            }
+                        }
+                        else
+                        {
+                            this.Write("    public async Task<");
+                            this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpReturnType));
+                            this.Write("?> ");
+                            this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpMethodName));
+                            this.Write("Async(");
+                            this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpParameters.Length > 0 ? func.CSharpParameters + ", " : ""));
+                            this.Write("CancellationToken cancellationToken = default)\r\n    {\r\n");
+                            if (func.Parameters.Any())
+                            {
+                                this.Write("        var parameters = new Dictionary<string, object?> { ");
+                                this.Write(this.ToStringHelper.ToStringWithCulture(GetActionParameterDict(func)));
+                                this.Write(" };\r\n        var result = await odataClient.InvokeActionAsync<");
+                                this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpReturnType));
+                                this.Write(">(\"");
+                                this.Write(this.ToStringHelper.ToStringWithCulture(func.Name));
+                                this.Write("\", parameters, cancellationToken);\r\n        return result?.Data;\r\n    }\r\n");
+                            }
+                            else
+                            {
+                                this.Write("        var result = await odataClient.InvokeActionAsync<");
+                                this.Write(this.ToStringHelper.ToStringWithCulture(func.CSharpReturnType));
+                                this.Write(">(\"");
+                                this.Write(this.ToStringHelper.ToStringWithCulture(func.Name));
+                                this.Write("\", null, cancellationToken);\r\n        return result?.Data;\r\n    }\r\n");
+                            }
+                        }
+                    }
+                }
+            }
+
+            this.Write("}\r\n\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }

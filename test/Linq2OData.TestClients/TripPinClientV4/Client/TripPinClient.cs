@@ -7,7 +7,7 @@
 
 using Linq2OData.Core;
 using Linq2OData.Core.Builders;
-
+using TripPin.Microsoft.OData.SampleService.Models.TripPin;
 namespace TripPin;
 
 public interface ITripPinEntitySet : IODataEntitySet {}
@@ -46,6 +46,15 @@ public class TripPinClient
     public CreateBuilder<T> Create<T>() where T : ITripPinEntitySet, new()
     {
         return new CreateBuilder<T>(odataClient);
+    }
+    public async Task ResetDataSourceAsync(CancellationToken cancellationToken = default)
+    {
+        await odataClient.InvokeActionAsync("ResetDataSource", null, cancellationToken);
+    }
+    public async Task<Airport?> GetNearestAirportAsync(double @lat, double @lon, CancellationToken cancellationToken = default)
+    {
+        var result = await odataClient.InvokeFunctionAsync<Airport>($"GetNearestAirport(lat={@lat},lon={@lon})", cancellationToken);
+        return result?.Data;
     }
 }
 
