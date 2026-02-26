@@ -9,7 +9,7 @@ using System.Text.Json.Serialization;
 namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 
 
-
+[ODataEntity]
 public partial class Flight : PublicTransportation
 {
     [ODataMember("FlightNumber")]

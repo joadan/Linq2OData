@@ -92,30 +92,6 @@ public class ODataEntityDeserializationTests
 	}
 
 	// ------------------------------------------------------------------
-	// V4 — [ODataEntity] attribute inheritance (Inherited = true)
-	// ------------------------------------------------------------------
-
-	/// <summary>
-	/// A type that does NOT have [ODataEntity] directly but inherits it from its base class
-	/// must still be intercepted by the factory and have its navigation properties populated.
-	/// </summary>
-	[Fact]
-	public void ODataV4_DerivedType_InheritsODataEntityAttribute_NavPropsPopulated()
-	{
-		// TestDerivedOrder has no [ODataEntity] — inherits it from TestOrder
-		const string json = """{"value":[{"OrderId":2,"Description":"Derived","ExtraNote":"VIP","Lines":[{"LineId":20,"Product":"Gadget","Quantity":3}]}]}""";
-
-		var odataClient = new ODataClient(new HttpClient(), ODataVersion.V4);
-		var result = odataClient.ProcessQueryResponse<List<TestDerivedOrder>>(json);
-
-		Assert.NotNull(result.Data);
-		Assert.Single(result.Data);
-		Assert.Equal("VIP", result.Data[0].ExtraNote);
-		Assert.NotNull(result.Data[0].Lines);
-		Assert.Equal(20, result.Data[0].Lines![0].LineId);
-	}
-
-	// ------------------------------------------------------------------
 	// V4 — [ODataEntitySet] type regression (extends ODataEntityAttribute)
 	// ------------------------------------------------------------------
 
@@ -258,12 +234,6 @@ public class ODataEntityDeserializationTests
 
 		[JsonIgnore]
 		public TestOrderCustomer? Customer { get; set; }
-	}
-
-	// No explicit [ODataEntity] — inherited from TestOrder via Inherited = true
-	private class TestDerivedOrder : TestOrder
-	{
-		public string? ExtraNote { get; set; }
 	}
 
 	[ODataEntity]

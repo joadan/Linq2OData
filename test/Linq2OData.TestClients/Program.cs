@@ -1,4 +1,5 @@
 ﻿//using DemoClientV4.ODataDemo;
+using DemoClientV4.ODataDemo;
 using Linq2OData.Core.Metadata;
 using Linq2OData.Generator.Models;
 
@@ -22,8 +23,8 @@ namespace Linq2OData.TestClients
 
             //GenerateLargeClientAsync();
 
-            await TestTripPinAsync();
-            // await TestV4ClientAsync();
+        //    await TestTripPinAsync();
+             await TestV4ClientAsync();
         }
 
         private static async Task TestTripPinAsync()
@@ -101,24 +102,24 @@ namespace Linq2OData.TestClients
 
         }
 
-        //private static async Task TestV4ClientAsync()
-        //{
-        //    var httpClient = new HttpClient
-        //    {
-        //        BaseAddress = new Uri(demoUrlV4)
-        //    };
+        private static async Task TestV4ClientAsync()
+        {
+            var httpClient = new HttpClient
+            {
+                BaseAddress = new Uri(demoUrlV4)
+            };
 
-        //    var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
+            var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
 
-        //    var queryResult = await clientV4
-        //    .Get<Product>(e => e.ID = 4)
-        //    .Expand(e => e.Categories)
-        //    .Expand(e => e.Supplier)
-        //    .ExecuteAsync();
+            var queryResult = await clientV4
+            .Get<Product>(e => e.ID = 4)
+            .Expand(e => e.Categories)
+            .Expand(e => e.Supplier)
+            .ExecuteAsync();
 
-        //    var r = queryResult;
+            var r = queryResult;
 
-        //}
+        }
 
 
 
