@@ -8,6 +8,7 @@ public class ClientRequest
 {
     public required string Name { get; set; }
     public required string Namespace { get; set; }
+    public bool IncludeServiceMetadata { get; set; } = true;
 
     public List<ClientMetadata> Metadata { get; set; } = [];
 

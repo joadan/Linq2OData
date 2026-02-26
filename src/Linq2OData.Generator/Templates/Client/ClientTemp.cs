@@ -72,16 +72,21 @@ namespace Linq2OData.Generator.Templates.Client
             
             #line default
             #line hidden
-            this.Write("); \r\n    }\r\n\r\n    public List<ODataService> Services => ");
+            this.Write("); \r\n    }\r\n");
+            if (request.IncludeServiceMetadata)
+            {
+                this.Write("\r\n    public List<ODataService> Services => ");
+                
+                #line 26 "ClientTemp.tt"
+                this.Write(this.ToStringHelper.ToStringWithCulture(request.ServicesName));
+                
+                #line default
+                #line hidden
+                this.Write(".Services();\r\n");
+            }
+            this.Write("\r\n    public GetBuilder<T> Get<T>(Action<T> keySetter) where T : ");
             
-            #line 24 "ClientTemp.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(request.ServicesName));
-            
-            #line default
-            #line hidden
-            this.Write(".Services();\r\n\r\n    public GetBuilder<T> Get<T>(Action<T> keySetter) where T : ");
-            
-            #line 26 "ClientTemp.tt"
+            #line 30 "ClientTemp.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(request.InterfaceName));
             
             #line default
