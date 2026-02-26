@@ -30,7 +30,7 @@ public partial class PlanItem  : IPlanItemKeys
     
     //Navigations
 
- public string __Key => $"PlanItemId={PlanItemId}"; 
+ public string __Key => $"{PlanItemId}"; 
 
 
 }

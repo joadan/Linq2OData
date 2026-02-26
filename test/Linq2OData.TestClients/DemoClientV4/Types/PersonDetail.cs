@@ -30,7 +30,7 @@ public partial class PersonDetail  : IDemoClientV4EntitySet, IPersonDetailKeys
     [JsonIgnore]
     public Person? Person { get; set; }
 
- public string __Key => $"PersonID={PersonID}"; 
+ public string __Key => $"{PersonID}"; 
 
 
 }

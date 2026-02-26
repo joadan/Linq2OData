@@ -35,7 +35,7 @@ public partial class Product  : IDemoClientV2EntitySet, IProductKeys
     [JsonIgnore]
     public Supplier? Supplier { get; set; }
 
- public string __Key => $"ID={ID}"; 
+ public string __Key => $"{ID}"; 
 
 
 }

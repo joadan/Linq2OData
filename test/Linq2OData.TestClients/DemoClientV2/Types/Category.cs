@@ -22,7 +22,7 @@ public partial class Category  : IDemoClientV2EntitySet, ICategoryKeys
     [JsonIgnore]
     public List<Product>? Products { get; set; }
 
- public string __Key => $"ID={ID}"; 
+ public string __Key => $"{ID}"; 
 
 
 }
