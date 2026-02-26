@@ -23,7 +23,8 @@ namespace Linq2OData.Core.Converters
 		public override bool CanConvert(Type typeToConvert) =>
 			typeToConvert.IsClass &&
 			!typeToConvert.IsAbstract &&
-			typeToConvert.GetCustomAttribute<ODataEntityAttribute>(inherit: true) != null;
+			(typeToConvert.GetCustomAttribute<ODataEntityAttribute>(inherit: false) != null ||
+			 typeToConvert.GetCustomAttribute<ODataEntitySetAttribute>(inherit: false) != null);
 
 		public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options) =>
 			(JsonConverter)Activator.CreateInstance(
@@ -148,7 +149,8 @@ namespace Linq2OData.Core.Converters
 
 		private static bool IsEntityType(Type type) =>
 			type.IsClass &&
-			type.GetCustomAttribute<ODataEntityAttribute>(inherit: true) != null;
+			(type.GetCustomAttribute<ODataEntityAttribute>(inherit: false) != null ||
+			 type.GetCustomAttribute<ODataEntitySetAttribute>(inherit: false) != null);
 
 		private static bool IsEntityList(Type type) =>
 			type.IsGenericType &&

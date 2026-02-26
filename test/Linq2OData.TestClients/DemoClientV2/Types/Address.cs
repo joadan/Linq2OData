@@ -9,7 +9,7 @@ using System.Text.Json.Serialization;
 namespace DemoClientV2.ODataDemo;
 
 
-
+[ODataEntity]
 public partial class Address 
 {
     [ODataMember("Street")]

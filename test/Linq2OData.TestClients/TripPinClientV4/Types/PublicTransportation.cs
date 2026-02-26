@@ -12,7 +12,7 @@ namespace TripPin.Microsoft.OData.SampleService.Models.TripPin;
 [ODataDerivedType(typeof(Flight), "#Microsoft.OData.SampleService.Models.TripPin.Flight")]
 [ODataDerivedType(typeof(PublicTransportation), "#Microsoft.OData.SampleService.Models.TripPin.PublicTransportation")]
 
-
+[ODataEntity]
 public partial class PublicTransportation : PlanItem
 {
     [ODataMember("SeatNumber")]

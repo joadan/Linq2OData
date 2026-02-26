@@ -64,7 +64,7 @@ namespace Linq2OData.Generator.Templates.Types
 
         private string GetEntityAttribute()
         {
-            if (!entityType.IsEntitySet && entityType.KeyProperties.Any())
+            if (!entityType.IsEntitySet)
                 return "[ODataEntity]";
             return "";
         }

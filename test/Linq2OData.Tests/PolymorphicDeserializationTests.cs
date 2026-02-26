@@ -272,6 +272,7 @@ public class PolymorphicDeserializationTests
 		public string? Name { get; set; }
 	}
 
+	[ODataEntity]
 	public class DerivedAnimal : BaseAnimal
 	{
 		public DerivedAnimal() { }
@@ -284,6 +285,7 @@ public class PolymorphicDeserializationTests
 		public Owner? Owner { get; set; }
 	}
 
+	[ODataEntity]
 	public class AnotherDerivedAnimal : BaseAnimal
 	{
 		public AnotherDerivedAnimal() { }
@@ -292,6 +294,7 @@ public class PolymorphicDeserializationTests
 		public string? Species { get; set; }
 	}
 
+	[ODataEntity]
 	public class GrandchildAnimal : DerivedAnimal
 	{
 		public GrandchildAnimal() { }
