@@ -550,6 +550,91 @@ global using System.Threading.Tasks;
     }
 
     [Fact]
+    public void GenerateClient_WithIncludeServiceMetadataFalse_ShouldNotGenerateHelperFile()
+    {
+        // Arrange
+        var request = new ClientRequest
+        {
+            Name = "ODataDemoClient",
+            Namespace = "MyApp.OData",
+            IncludeServiceMetadata = false,
+        };
+        request.AddMetadata(odataDemoMetadataV4);
+
+        var generator = new ClientGenerator(request);
+
+        // Act
+        var files = generator.GenerateClient();
+
+        // Assert - no helper file generated
+        var helperFile = files.FirstOrDefault(f => f.FileName == "ODataDemoClientHelpers.cs" && f.FolderPath == "Client");
+        Assert.Null(helperFile);
+
+        // Assert - Services property not in client file
+        var clientFile = files.First(f => f.FolderPath == "Client" && f.FileName == "ODataDemoClient.cs");
+        Assert.DoesNotContain("public List<ODataService> Services", clientFile.Content);
+    }
+
+    [Fact]
+    public void GenerateClient_WithIncludeServiceMetadataTrue_ShouldGenerateHelperFileAndServicesProperty()
+    {
+        // Arrange
+        var request = new ClientRequest
+        {
+            Name = "ODataDemoClient",
+            Namespace = "MyApp.OData",
+            IncludeServiceMetadata = true,
+        };
+        request.AddMetadata(odataDemoMetadataV4);
+
+        var generator = new ClientGenerator(request);
+
+        // Act
+        var files = generator.GenerateClient();
+
+        // Assert - helper file is generated
+        var helperFile = files.FirstOrDefault(f => f.FileName == "ODataDemoClientHelpers.cs" && f.FolderPath == "Client");
+        Assert.NotNull(helperFile);
+
+        // Assert - Services property is in client file
+        var clientFile = files.First(f => f.FolderPath == "Client" && f.FileName == "ODataDemoClient.cs");
+        Assert.Contains("public List<ODataService> Services", clientFile.Content);
+    }
+
+    [Fact]
+    public void GenerateClient_WithIncludeServiceMetadataFalse_ShouldCompileSuccessfully()
+    {
+        // Arrange
+        var request = new ClientRequest
+        {
+            Name = "ODataDemoClient",
+            Namespace = "MyApp.OData",
+            IncludeServiceMetadata = false,
+        };
+        request.AddMetadata(odataDemoMetadataV4);
+
+        var generator = new ClientGenerator(request);
+        var files = generator.GenerateClient();
+
+        // Act - Compile the generated code using Roslyn
+        var compilation = CompileGeneratedCode(files);
+
+        // Assert
+        var diagnostics = compilation.GetDiagnostics()
+            .Where(d => d.Severity == DiagnosticSeverity.Error)
+            .ToList();
+
+        if (diagnostics.Any())
+        {
+            var errors = string.Join("\n", diagnostics.Select(d =>
+                $"{d.Id}: {d.GetMessage()} at {d.Location.GetLineSpan()}"));
+            Assert.Fail($"Compilation failed with {diagnostics.Count} error(s):\n{errors}");
+        }
+
+        Assert.Empty(diagnostics);
+    }
+
+    [Fact]
     public void GenerateClient_WithFunctionsAndActions_ShouldGenerateMethods()
     {
         // Arrange

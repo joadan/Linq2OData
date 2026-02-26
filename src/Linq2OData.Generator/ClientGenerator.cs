@@ -75,9 +75,11 @@ public class ClientGenerator(ClientRequest request)
         var templateText = new ClientTemp(request, (ODataVersion)version!).TransformText();
         AddFile("Client", request.Name + ".cs", templateText);
 
-        var templateHelperText = new ClientHelperTemplate(request).TransformText();
-        AddFile("Client", request.Name + "Helpers.cs", templateHelperText);
-
+        if (request.IncludeServiceMetadata)
+        {
+            var templateHelperText = new ClientHelperTemplate(request).TransformText();
+            AddFile("Client", request.Name + "Helpers.cs", templateHelperText);
+        }
     }
 
     private void GenerateTypesCode()
