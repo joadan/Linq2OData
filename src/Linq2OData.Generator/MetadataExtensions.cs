@@ -119,12 +119,14 @@ internal static class MetadataExtensions
             {
                 if (!entityType.KeyProperties.Any()) { return string.Empty; }
 
-                var keysResult = entityType.KeyProperties.Select(p =>
-                {
-                    return $"{p.KeyResult}";
-                });
+                var keys = entityType.KeyProperties.ToList();
 
-                return string.Join(",", keysResult);
+                if (keys.Count == 1)
+                {
+                    return keys[0].KeyValueOnly;
+                }
+
+                return string.Join(",", keys.Select(p => p.KeyResult));
             }
         }
     }
@@ -158,6 +160,22 @@ internal static class MetadataExtensions
                 else
                 {
                     return $"{property.Name}={{{property.Name}}}";
+                }
+
+            }
+        }
+
+        internal string KeyValueOnly
+        {
+            get
+            {
+                if (property.DataType.Equals("edm.string", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return $"'{{{property.Name}}}'";
+                }
+                else
+                {
+                    return $"{{{property.Name}}}";
                 }
 
             }

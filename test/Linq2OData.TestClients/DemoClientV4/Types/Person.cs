@@ -26,7 +26,7 @@ public partial class Person  : IDemoClientV4EntitySet, IPersonKeys
     [JsonIgnore]
     public PersonDetail? PersonDetail { get; set; }
 
- public string __Key => $"ID={ID}"; 
+ public string __Key => $"{ID}"; 
 
 
 }

@@ -19,7 +19,7 @@ public partial class Airline  : ITripPinEntitySet, IAirlineKeys
     
     //Navigations
 
- public string __Key => $"AirlineCode='{AirlineCode}'"; 
+ public string __Key => $"'{AirlineCode}'"; 
 
 
 }

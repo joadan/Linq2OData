@@ -23,8 +23,8 @@ namespace Linq2OData.TestClients
 
             //GenerateLargeClientAsync();
 
-        //    await TestTripPinAsync();
-             await TestV4ClientAsync();
+           //     await TestTripPinAsync();
+            await TestV4ClientAsync();
         }
 
         private static async Task TestTripPinAsync()
