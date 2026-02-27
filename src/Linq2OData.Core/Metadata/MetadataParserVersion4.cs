@@ -101,6 +101,7 @@ internal static class MetadataParserVersion4
             metadata.Services.Add(new ODataEntityContainer
             {
                 Name = entityContainer.Attribute("Name")?.Value,
+                Namespace = containerSchema.Attribute("Namespace")?.Value,
                 EntitySets = new List<ODataEntitySet>(metadata.EntitySets),
                 Singletons = new List<ODataSingleton>(metadata.Singletons),
                 Functions = new List<ODataFunction>(metadata.Functions)

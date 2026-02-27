@@ -177,6 +177,7 @@ public class ODataEnumMember
 public class ODataEntityContainer
 {
     public string? Name { get; set; }
+    public string? Namespace { get; set; }
     public List<ODataEntitySet> EntitySets { get; set; } = [];
     public List<ODataSingleton> Singletons { get; set; } = [];
     public List<ODataFunction> Functions { get; set; } = [];

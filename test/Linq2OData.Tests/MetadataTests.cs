@@ -1403,6 +1403,7 @@ namespace Linq2OData.Tests
             Assert.NotEmpty(metadata.Services);
             var service = metadata.Services.First();
             Assert.Equal("API_SALES_QUOTATION_SRV_Entities", service.Name);
+            Assert.Equal("API_SALES_QUOTATION_SRV", service.Namespace);
             Assert.NotEmpty(service.EntitySets);
             Assert.NotEmpty(service.Functions);
         }
@@ -1417,6 +1418,7 @@ namespace Linq2OData.Tests
             Assert.NotEmpty(metadata.Services);
             var service = metadata.Services.First();
             Assert.Equal("DemoService", service.Name);
+            Assert.Equal("ODataDemo", service.Namespace);
             Assert.NotEmpty(service.EntitySets);
             // EntitySets in Services should match the top-level EntitySets
             Assert.Equal(metadata.EntitySets.Count, service.EntitySets.Count);
@@ -1432,10 +1434,24 @@ namespace Linq2OData.Tests
             Assert.NotEmpty(metadata.Services);
             var service = metadata.Services.First();
             Assert.Equal("Container", service.Name);
+            Assert.Equal("Trippin", service.Namespace);
             Assert.NotEmpty(service.EntitySets);
             Assert.NotEmpty(service.Singletons);
             // EntitySets in Services should match the top-level EntitySets
             Assert.Equal(metadata.EntitySets.Count, service.EntitySets.Count);
+        }
+
+        [Fact]
+        public void ParseComplexMetadataV4_ShouldPopulateServicesWithNamespace()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(complexMetadataV4);
+
+            // Assert
+            Assert.NotEmpty(metadata.Services);
+            var service = metadata.Services.First();
+            Assert.Equal("MainContainer", service.Name);
+            Assert.Equal("Company.Billing", service.Namespace);
         }
 
         #endregion
