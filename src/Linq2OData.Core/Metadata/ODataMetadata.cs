@@ -9,7 +9,7 @@ public class ODataMetadata
     public List<ODataEntityType> EntityTypes { get; set; } = [];
     public List<ODataEnumType> EnumTypes { get; set; } = [];
     public List<ODataFunction> Functions { get; set; } = [];
-    public List<ODataEntityContainer> Services { get; set; } = [];
+    public List<ODataSchema> Schemas { get; set; } = [];
 
     public IEnumerable<ODataEntityType> GetDerivedTypes(string entityTypeName)
     {
@@ -174,10 +174,10 @@ public class ODataEnumMember
     public required int Value { get; set; }
 }
 
-public class ODataEntityContainer
+public class ODataSchema
 {
-    public string? Name { get; set; }
     public string? Namespace { get; set; }
+    public string? ContainerName { get; set; }
     public List<ODataEntitySet> EntitySets { get; set; } = [];
     public List<ODataSingleton> Singletons { get; set; } = [];
     public List<ODataFunction> Functions { get; set; } = [];

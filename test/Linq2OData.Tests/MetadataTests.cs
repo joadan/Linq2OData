@@ -1391,67 +1391,67 @@ namespace Linq2OData.Tests
 
         #endregion
 
-        #region Services (ODataEntityContainer) tests
+        #region Schemas (ODataSchema) tests
 
         [Fact]
-        public void ParseSalesQuotationMetadataV2_ShouldPopulateServices()
+        public void ParseSalesQuotationMetadataV2_ShouldPopulateSchemas()
         {
             // Act
             var metadata = MetadataParser.Parse(sapSalesQuotationMetadataV2);
 
             // Assert
-            Assert.NotEmpty(metadata.Services);
-            var service = metadata.Services.First();
-            Assert.Equal("API_SALES_QUOTATION_SRV_Entities", service.Name);
-            Assert.Equal("API_SALES_QUOTATION_SRV", service.Namespace);
-            Assert.NotEmpty(service.EntitySets);
-            Assert.NotEmpty(service.Functions);
+            Assert.NotEmpty(metadata.Schemas);
+            var schema = metadata.Schemas.First();
+            Assert.Equal("API_SALES_QUOTATION_SRV_Entities", schema.ContainerName);
+            Assert.Equal("API_SALES_QUOTATION_SRV", schema.Namespace);
+            Assert.NotEmpty(schema.EntitySets);
+            Assert.NotEmpty(schema.Functions);
         }
 
         [Fact]
-        public void ParseODataDemoV2_ShouldPopulateServices()
+        public void ParseODataDemoV2_ShouldPopulateSchemas()
         {
             // Act
             var metadata = MetadataParser.Parse(odataDemoMetadataV2);
 
             // Assert
-            Assert.NotEmpty(metadata.Services);
-            var service = metadata.Services.First();
-            Assert.Equal("DemoService", service.Name);
-            Assert.Equal("ODataDemo", service.Namespace);
-            Assert.NotEmpty(service.EntitySets);
-            // EntitySets in Services should match the top-level EntitySets
-            Assert.Equal(metadata.EntitySets.Count, service.EntitySets.Count);
+            Assert.NotEmpty(metadata.Schemas);
+            var schema = metadata.Schemas.First();
+            Assert.Equal("DemoService", schema.ContainerName);
+            Assert.Equal("ODataDemo", schema.Namespace);
+            Assert.NotEmpty(schema.EntitySets);
+            // EntitySets in Schemas should match the top-level EntitySets
+            Assert.Equal(metadata.EntitySets.Count, schema.EntitySets.Count);
         }
 
         [Fact]
-        public void ParseTrippinMetadataV4_ShouldPopulateServices()
+        public void ParseTrippinMetadataV4_ShouldPopulateSchemas()
         {
             // Act
             var metadata = MetadataParser.Parse(trippinMetadataV4);
 
             // Assert
-            Assert.NotEmpty(metadata.Services);
-            var service = metadata.Services.First();
-            Assert.Equal("Container", service.Name);
-            Assert.Equal("Trippin", service.Namespace);
-            Assert.NotEmpty(service.EntitySets);
-            Assert.NotEmpty(service.Singletons);
-            // EntitySets in Services should match the top-level EntitySets
-            Assert.Equal(metadata.EntitySets.Count, service.EntitySets.Count);
+            Assert.NotEmpty(metadata.Schemas);
+            var schema = metadata.Schemas.First();
+            Assert.Equal("Container", schema.ContainerName);
+            Assert.Equal("Trippin", schema.Namespace);
+            Assert.NotEmpty(schema.EntitySets);
+            Assert.NotEmpty(schema.Singletons);
+            // EntitySets in Schemas should match the top-level EntitySets
+            Assert.Equal(metadata.EntitySets.Count, schema.EntitySets.Count);
         }
 
         [Fact]
-        public void ParseComplexMetadataV4_ShouldPopulateServicesWithNamespace()
+        public void ParseComplexMetadataV4_ShouldPopulateSchemasWithNamespace()
         {
             // Act
             var metadata = MetadataParser.Parse(complexMetadataV4);
 
             // Assert
-            Assert.NotEmpty(metadata.Services);
-            var service = metadata.Services.First();
-            Assert.Equal("MainContainer", service.Name);
-            Assert.Equal("Company.Billing", service.Namespace);
+            Assert.NotEmpty(metadata.Schemas);
+            var schema = metadata.Schemas.First();
+            Assert.Equal("MainContainer", schema.ContainerName);
+            Assert.Equal("Company.Billing", schema.Namespace);
         }
 
         #endregion

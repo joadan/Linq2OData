@@ -98,9 +98,9 @@ internal static class MetadataParserVersion4
             metadata.Singletons = ParseSingletons(entityContainer, edm, metadata.EntityTypes, aliasMap);
             metadata.Functions = ParseActionImports(entityContainer, edm, metadata.Namespace, schemas);
 
-            metadata.Services.Add(new ODataEntityContainer
+            metadata.Schemas.Add(new ODataSchema
             {
-                Name = entityContainer.Attribute("Name")?.Value,
+                ContainerName = entityContainer.Attribute("Name")?.Value,
                 Namespace = containerSchema.Attribute("Namespace")?.Value,
                 EntitySets = new List<ODataEntitySet>(metadata.EntitySets),
                 Singletons = new List<ODataSingleton>(metadata.Singletons),
