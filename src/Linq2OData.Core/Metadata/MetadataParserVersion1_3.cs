@@ -71,6 +71,14 @@ internal static class MetadataParserVersion1_3
         {
             metadata.EntitySets = ParseEntitySets(entityContainer, currentEdmNamespace, metadata.Namespace, metadata.EntityTypes);
             metadata.Functions = ParseFunctionImports(entityContainer, currentEdmNamespace, m, metadata.Namespace);
+
+            metadata.Services.Add(new ODataEntityContainer
+            {
+                Name = entityContainer.Attribute("Name")?.Value,
+                EntitySets = new List<ODataEntitySet>(metadata.EntitySets),
+                Singletons = new List<ODataSingleton>(metadata.Singletons),
+                Functions = new List<ODataFunction>(metadata.Functions)
+            });
         }
 
         // Parse Associations to determine navigation cardinality

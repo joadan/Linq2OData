@@ -1390,5 +1390,54 @@ namespace Linq2OData.Tests
         }
 
         #endregion
+
+        #region Services (ODataEntityContainer) tests
+
+        [Fact]
+        public void ParseSalesQuotationMetadataV2_ShouldPopulateServices()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(sapSalesQuotationMetadataV2);
+
+            // Assert
+            Assert.NotEmpty(metadata.Services);
+            var service = metadata.Services.First();
+            Assert.Equal("API_SALES_QUOTATION_SRV_Entities", service.Name);
+            Assert.NotEmpty(service.EntitySets);
+            Assert.NotEmpty(service.Functions);
+        }
+
+        [Fact]
+        public void ParseODataDemoV2_ShouldPopulateServices()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV2);
+
+            // Assert
+            Assert.NotEmpty(metadata.Services);
+            var service = metadata.Services.First();
+            Assert.Equal("DemoService", service.Name);
+            Assert.NotEmpty(service.EntitySets);
+            // EntitySets in Services should match the top-level EntitySets
+            Assert.Equal(metadata.EntitySets.Count, service.EntitySets.Count);
+        }
+
+        [Fact]
+        public void ParseTrippinMetadataV4_ShouldPopulateServices()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(trippinMetadataV4);
+
+            // Assert
+            Assert.NotEmpty(metadata.Services);
+            var service = metadata.Services.First();
+            Assert.Equal("Container", service.Name);
+            Assert.NotEmpty(service.EntitySets);
+            Assert.NotEmpty(service.Singletons);
+            // EntitySets in Services should match the top-level EntitySets
+            Assert.Equal(metadata.EntitySets.Count, service.EntitySets.Count);
+        }
+
+        #endregion
     }
 }
