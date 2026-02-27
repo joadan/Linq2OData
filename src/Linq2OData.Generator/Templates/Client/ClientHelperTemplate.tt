@@ -15,7 +15,7 @@ public static class <#= request.ServicesName #>
 <# foreach (var clientMetadata in request.Metadata) { #>
    public static ODataService <#= clientMetadata.ServiceName #>()
     {
-        return new ODataService { Namespace = "<#= clientMetadata.Metadata.Namespace #>", ServicePath="<#= clientMetadata.ServicePath ?? "" #>", Metadata = JsonSerializer.Deserialize<ODataMetadata>(<#= clientMetadata.JsonName #>)! };
+        return new ODataService { Namespace = "<#= clientMetadata.Metadata.Schemas.FirstOrDefault()?.Namespace ?? "" #>", ServicePath="<#= clientMetadata.ServicePath ?? "" #>", Metadata = JsonSerializer.Deserialize<ODataMetadata>(<#= clientMetadata.JsonName #>)! };
     }
 <# } #>
 

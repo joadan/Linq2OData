@@ -60,7 +60,7 @@ namespace Linq2OData.Generator.Templates.Client
             this.Write("()\r\n    {\r\n        return new ODataService { Namespace = \"");
             
             #line 18 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Client\ClientHelperTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(clientMetadata.Metadata.Namespace));
+            this.Write(this.ToStringHelper.ToStringWithCulture(clientMetadata.Metadata.Schemas.FirstOrDefault()?.Namespace ?? ""));
             
             #line default
             #line hidden

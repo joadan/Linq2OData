@@ -38,24 +38,29 @@ namespace Linq2OData.Generator.Templates.Client
             foreach (var clientMetadata in request.Metadata)
             {
                 var metadata = clientMetadata.Metadata;
-                var typeToNsMap = metadata.EntityTypes.ToDictionary(
-                    et => et.Name,
-                    et => request.Namespace + "." + (et.SchemaNamespace ?? metadata.Namespace)
-                );
+                var typeToNsMap = metadata.Schemas
+                    .SelectMany(s => s.EntityTypes.Select(et => (Schema: s, EntityType: et)))
+                    .ToDictionary(
+                        x => x.EntityType.Name,
+                        x => request.Namespace + "." + (x.EntityType.SchemaNamespace ?? x.Schema.Namespace)
+                    );
 
-                foreach (var func in metadata.Functions)
+                foreach (var schema in metadata.Schemas)
                 {
-                    // Collect return type namespace
-                    AddTypeNamespace(func.CSharpReturnType, func.ReturnType, typeToNsMap, namespaces);
-
-                    // Collect parameter type namespaces
-                    foreach (var param in func.Parameters)
+                    foreach (var func in schema.Functions)
                     {
-                        if (!param.DataType.StartsWith("Edm."))
+                        // Collect return type namespace
+                        AddTypeNamespace(func.CSharpReturnType, func.ReturnType, typeToNsMap, namespaces);
+
+                        // Collect parameter type namespaces
+                        foreach (var param in func.Parameters)
                         {
-                            var typeName = param.DataType.Contains('.') ? param.DataType.Split('.').Last() : param.DataType;
-                            if (typeToNsMap.TryGetValue(typeName, out var ns))
-                                namespaces.Add(ns);
+                            if (!param.DataType.StartsWith("Edm."))
+                            {
+                                var typeName = param.DataType.Contains('.') ? param.DataType.Split('.').Last() : param.DataType;
+                                if (typeToNsMap.TryGetValue(typeName, out var ns))
+                                    namespaces.Add(ns);
+                            }
                         }
                     }
                 }

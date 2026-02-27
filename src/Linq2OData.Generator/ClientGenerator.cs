@@ -31,7 +31,7 @@ public class ClientGenerator(ClientRequest request)
 
             if (version != null && requestMetadata.Metadata.ODataVersion != version)
             {
-                throw new Exception($"All metadata documents must have the same OData version. Current is {version.ToString()}, trying to add {requestMetadata.Metadata.Namespace}: {requestMetadata.Metadata.ODataVersion}");
+                throw new Exception($"All metadata documents must have the same OData version. Current is {version.ToString()}, trying to add {requestMetadata.Metadata.ODataVersion}");
             }
             else
             {
@@ -89,26 +89,31 @@ public class ClientGenerator(ClientRequest request)
             var metadata = clientMetadata.Metadata;
 
             // Map from simple type name → full C# namespace for cross-schema using directives
-            var typeToNsMap = metadata.EntityTypes.ToDictionary(
-                et => et.Name,
-                et => request.Namespace + "." + (et.SchemaNamespace ?? metadata.Namespace)
-            );
+            var typeToNsMap = metadata.Schemas
+                .SelectMany(s => s.EntityTypes.Select(et => (Schema: s, EntityType: et)))
+                .ToDictionary(
+                    x => x.EntityType.Name,
+                    x => request.Namespace + "." + (x.EntityType.SchemaNamespace ?? x.Schema.Namespace)
+                );
 
-            // Generate enums
-            foreach (var enumType in metadata.EnumTypes)
+            foreach (var schema in metadata.Schemas)
             {
-                var enumNs = request.Namespace + "." + (enumType.SchemaNamespace ?? metadata.Namespace);
-                var enumText = new Templates.Types.EnumTemplate(enumType, enumNs).TransformText();
-                AddFile("Enums", enumType.Name + ".cs", enumText);
-            }
+                // Generate enums
+                foreach (var enumType in schema.EnumTypes)
+                {
+                    var enumNs = request.Namespace + "." + (enumType.SchemaNamespace ?? schema.Namespace);
+                    var enumText = new Templates.Types.EnumTemplate(enumType, enumNs).TransformText();
+                    AddFile("Enums", enumType.Name + ".cs", enumText);
+                }
 
-            // Generate entity and complex types
-            foreach (var entityType in metadata.EntityTypes)
-            {
-                var typeNs = request.Namespace + "." + (entityType.SchemaNamespace ?? metadata.Namespace);
-                var schemaNamespace = entityType.SchemaNamespace ?? metadata.Namespace;
-                var classText = new TypeTemplate(entityType, typeNs, clientMetadata.ServicePath, request.InterfaceName, metadata.GetAllDerivedTypes(entityType.Name), schemaNamespace, (ODataVersion)version!, typeToNsMap).TransformText();
-                AddFile("Types", entityType.ClassName + ".cs", classText);
+                // Generate entity and complex types
+                foreach (var entityType in schema.EntityTypes)
+                {
+                    var typeNs = request.Namespace + "." + (entityType.SchemaNamespace ?? schema.Namespace);
+                    var schemaNamespace = entityType.SchemaNamespace ?? schema.Namespace;
+                    var classText = new TypeTemplate(entityType, typeNs, clientMetadata.ServicePath, request.InterfaceName, schema.GetAllDerivedTypes(entityType.Name), schemaNamespace, (ODataVersion)version!, typeToNsMap).TransformText();
+                    AddFile("Types", entityType.ClassName + ".cs", classText);
+                }
             }
         }
     }
@@ -119,16 +124,21 @@ public class ClientGenerator(ClientRequest request)
         {
             var metadata = clientMetadata.Metadata;
 
-            var typeToNsMap = metadata.EntityTypes.ToDictionary(
-                et => et.Name,
-                et => request.Namespace + "." + (et.SchemaNamespace ?? metadata.Namespace)
-            );
+            var typeToNsMap = metadata.Schemas
+                .SelectMany(s => s.EntityTypes.Select(et => (Schema: s, EntityType: et)))
+                .ToDictionary(
+                    x => x.EntityType.Name,
+                    x => request.Namespace + "." + (x.EntityType.SchemaNamespace ?? x.Schema.Namespace)
+                );
 
-            foreach (var entityType in metadata.EntityTypes)
+            foreach (var schema in metadata.Schemas)
             {
-                var typeNs = request.Namespace + "." + (entityType.SchemaNamespace ?? metadata.Namespace);
-                var classText = new InputTemplate(entityType, typeNs, typeToNsMap).TransformText();
-                AddFile("Inputs", entityType.InputName + ".cs", classText);
+                foreach (var entityType in schema.EntityTypes)
+                {
+                    var typeNs = request.Namespace + "." + (entityType.SchemaNamespace ?? schema.Namespace);
+                    var classText = new InputTemplate(entityType, typeNs, typeToNsMap).TransformText();
+                    AddFile("Inputs", entityType.InputName + ".cs", classText);
+                }
             }
         }
     }

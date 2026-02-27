@@ -52,43 +52,37 @@ internal static class MetadataParserVersion1_3
             return metadata;
 
         var currentEdmNamespace = schema.Name.Namespace;
-        metadata.Namespace = schema.Attribute("Namespace")?.Value ?? string.Empty;
+        var schemaNamespace = schema.Attribute("Namespace")?.Value ?? string.Empty;
+
+        var odataSchema = new ODataSchema { Namespace = schemaNamespace };
 
         // Parse EnumTypes (V2 also supports EnumType, though less common)
-        metadata.EnumTypes = ParseEnumTypes(schema, currentEdmNamespace);
+        odataSchema.EnumTypes = ParseEnumTypes(schema, currentEdmNamespace);
 
         // Parse EntityTypes
-        metadata.EntityTypes = ParseEntityTypes(schema, currentEdmNamespace, sap);
+        odataSchema.EntityTypes = ParseEntityTypes(schema, currentEdmNamespace, sap);
 
         //Add ComplexTypes as EntityTypes
-        metadata.EntityTypes.AddRange(ParseComplexTypes(schema, currentEdmNamespace, sap));
-
-     
+        odataSchema.EntityTypes.AddRange(ParseComplexTypes(schema, currentEdmNamespace, sap));
 
         // Parse EntityContainer to get EntitySets and Functions
         var entityContainer = schema.Descendants(currentEdmNamespace + "EntityContainer").FirstOrDefault();
         if (entityContainer != null)
         {
-            metadata.EntitySets = ParseEntitySets(entityContainer, currentEdmNamespace, metadata.Namespace, metadata.EntityTypes);
-            metadata.Functions = ParseFunctionImports(entityContainer, currentEdmNamespace, m, metadata.Namespace);
-
-            metadata.Schemas.Add(new ODataSchema
-            {
-                ContainerName = entityContainer.Attribute("Name")?.Value,
-                Namespace = metadata.Namespace,
-                EntitySets = new List<ODataEntitySet>(metadata.EntitySets),
-                Singletons = new List<ODataSingleton>(metadata.Singletons),
-                Functions = new List<ODataFunction>(metadata.Functions)
-            });
+            odataSchema.ContainerName = entityContainer.Attribute("Name")?.Value;
+            odataSchema.EntitySets = ParseEntitySets(entityContainer, currentEdmNamespace, schemaNamespace, odataSchema.EntityTypes);
+            odataSchema.Functions = ParseFunctionImports(entityContainer, currentEdmNamespace, m, schemaNamespace);
         }
 
         // Parse Associations to determine navigation cardinality
-        ParseAssociations(schema, currentEdmNamespace, metadata.EntityTypes);
+        ParseAssociations(schema, currentEdmNamespace, odataSchema.EntityTypes);
 
-        metadata.SetEntityPaths();
+        odataSchema.SetEntityPaths(odataSchema.EntityTypes);
 
         // Mark properties that use enum types
-        MarkEnumProperties(metadata);
+        MarkEnumProperties(odataSchema);
+
+        metadata.Schemas.Add(odataSchema);
 
         return metadata;
     }
@@ -422,15 +416,15 @@ internal static class MetadataParserVersion1_3
         }
     }
 
-    private static void MarkEnumProperties(ODataMetadata metadata)
+    private static void MarkEnumProperties(ODataSchema odataSchema)
     {
         // Create a set of fully qualified enum type names for quick lookup
         var enumTypeNames = new HashSet<string>(
-            metadata.EnumTypes.Select(e => $"{metadata.Namespace}.{e.Name}")
+            odataSchema.EnumTypes.Select(e => $"{odataSchema.Namespace}.{e.Name}")
         );
 
         // Mark properties that reference enum types
-        foreach (var entityType in metadata.EntityTypes)
+        foreach (var entityType in odataSchema.EntityTypes)
         {
             foreach (var property in entityType.Properties)
             {

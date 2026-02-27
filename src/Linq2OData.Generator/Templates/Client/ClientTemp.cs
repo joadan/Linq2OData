@@ -127,7 +127,9 @@ namespace Linq2OData.Generator.Templates.Client
 
             foreach (var clientMetadata in request.Metadata)
             {
-                foreach (var singleton in clientMetadata.Metadata.Singletons)
+                foreach (var schema in clientMetadata.Metadata.Schemas)
+                {
+                foreach (var singleton in schema.Singletons)
                 {
                     this.Write("    public SingletonBuilder<");
                     this.Write(this.ToStringHelper.ToStringWithCulture(singleton.EntityType.ClassName));
@@ -139,7 +141,7 @@ namespace Linq2OData.Generator.Templates.Client
                     this.Write(this.ToStringHelper.ToStringWithCulture(GetSingletonPath(clientMetadata, singleton)));
                     this.Write("\");\r\n    }\r\n");
                 }
-                foreach (var func in clientMetadata.Metadata.Functions)
+                foreach (var func in schema.Functions)
                 {
                     if (func.HttpMethod == "GET")
                     {
@@ -222,7 +224,8 @@ namespace Linq2OData.Generator.Templates.Client
                         }
                     }
                 }
-            }
+                } // end foreach schema
+            } // end foreach clientMetadata
 
             this.Write("}\r\n\r\n");
             return this.GenerationEnvironment.ToString();

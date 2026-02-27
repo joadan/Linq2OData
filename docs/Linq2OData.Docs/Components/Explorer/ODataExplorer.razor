@@ -41,7 +41,7 @@ else
         <Tabs>
             <Tab Title="EntitySets">
 
-                <Table Item="ODataEntitySet" Items="metadata.EntitySets">
+                <Table Item="ODataEntitySet" Items="metadata.Schemas.SelectMany(s => s.EntitySets).ToList()">
                     <Column Item="ODataEntitySet" Property="e => e.Name" Sortable Searchable />
                     <Column Item="ODataEntitySet" Property="e => e.EntityTypeName" Sortable Searchable />
 
