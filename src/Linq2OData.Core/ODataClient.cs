@@ -113,7 +113,7 @@ namespace Linq2OData.Core
         {
             string json = JsonSerializer.Serialize(input, jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var request = new HttpRequestMessage(new HttpMethod("MERGE"), $"{entitysetName}({keyExpression})")
+            var request = new HttpRequestMessage(HttpMethod.Patch, $"{entitysetName}({keyExpression})")
             {
                 Content = new StringContent(json, Encoding.UTF8, "application/json")
             };
