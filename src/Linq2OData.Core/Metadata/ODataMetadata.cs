@@ -3,63 +3,7 @@
 public class ODataMetadata
 {
     public ODataVersion ODataVersion { get; set; }
-    public string Namespace { get; set; } = string.Empty;
-    public List<ODataEntitySet> EntitySets { get; set; } = [];
-    public List<ODataSingleton> Singletons { get; set; } = [];
-    public List<ODataEntityType> EntityTypes { get; set; } = [];
-    public List<ODataEnumType> EnumTypes { get; set; } = [];
-    public List<ODataFunction> Functions { get; set; } = [];
-
-    public IEnumerable<ODataEntityType> GetDerivedTypes(string entityTypeName)
-    {
-        var baseEntity = EntityTypes.FirstOrDefault(et => et.Name == entityTypeName);
-        var qualifiedName = baseEntity?.SchemaNamespace != null
-            ? $"{baseEntity.SchemaNamespace}.{entityTypeName}"
-            : $"{Namespace}.{entityTypeName}";
-        return EntityTypes.Where(et => et.BaseType == qualifiedName);
-    }
-
-    public IEnumerable<ODataEntityType> GetAllDerivedTypes(string entityTypeName)
-    {
-        var directChildren = GetDerivedTypes(entityTypeName).ToList();
-        var allDescendants = new List<ODataEntityType>(directChildren);
-
-        foreach (var child in directChildren)
-        {
-            allDescendants.AddRange(GetAllDerivedTypes(child.Name));
-        }
-
-        return allDescendants;
-    }
-
-    internal void SetEntityPaths()
-    {
-        foreach (var entitySet in EntitySets)
-        {
-            entitySet.EntityType.EntityPath = entitySet.Name;
-            SetEntityDerivedPaths(entitySet.EntityType);
-        }
-
-        foreach (var singleton in Singletons)
-        {
-            singleton.EntityType.IsSingleton = true;
-            // Only set EntityPath for singletons if the entity type isn't already in an entity set
-            if (string.IsNullOrWhiteSpace(singleton.EntityType.EntityPath))
-            {
-                singleton.EntityType.EntityPath = singleton.Name;
-            }
-        }
-    }
-
-    internal void SetEntityDerivedPaths(ODataEntityType entityType)
-    {
-        foreach (var derivedType in GetDerivedTypes(entityType.Name))
-        {
-            var schemaNamespace = derivedType.SchemaNamespace ?? Namespace;
-            derivedType.EntityPath = $"{entityType.EntityPath}/{schemaNamespace}.{derivedType.Name}";
-            SetEntityDerivedPaths(derivedType);
-        }
-    }
+    public List<ODataSchema> Schemas { get; set; } = [];
 }
 
 public class ODataEntitySet
@@ -171,5 +115,80 @@ public class ODataEnumMember
 {
     public required string Name { get; set; }
     public required int Value { get; set; }
+}
+
+public class ODataSchema
+{
+    public string Namespace { get; set; } = string.Empty;
+    public string? ContainerName { get; set; }
+    public List<ODataEntitySet> EntitySets { get; set; } = [];
+    public List<ODataSingleton> Singletons { get; set; } = [];
+    public List<ODataEntityType> EntityTypes { get; set; } = [];
+    public List<ODataEnumType> EnumTypes { get; set; } = [];
+    public List<ODataFunction> Functions { get; set; } = [];
+
+    public IEnumerable<ODataEntityType> GetDerivedTypes(string entityTypeName)
+    {
+        var baseEntity = EntityTypes.FirstOrDefault(et => et.Name == entityTypeName);
+        var qualifiedName = baseEntity?.SchemaNamespace != null
+            ? $"{baseEntity.SchemaNamespace}.{entityTypeName}"
+            : $"{Namespace}.{entityTypeName}";
+        return EntityTypes.Where(et => et.BaseType == qualifiedName);
+    }
+
+    public IEnumerable<ODataEntityType> GetAllDerivedTypes(string entityTypeName)
+    {
+        var directChildren = GetDerivedTypes(entityTypeName).ToList();
+        var allDescendants = new List<ODataEntityType>(directChildren);
+
+        foreach (var child in directChildren)
+        {
+            allDescendants.AddRange(GetAllDerivedTypes(child.Name));
+        }
+
+        return allDescendants;
+    }
+
+    internal void SetEntityPaths(IReadOnlyList<ODataEntityType> allEntityTypes)
+    {
+        // Pre-build a lookup from qualified base-type name → derived types to avoid O(n²)
+        var derivedByBase = allEntityTypes
+            .Where(et => et.BaseType != null)
+            .GroupBy(et => et.BaseType!)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        foreach (var entitySet in EntitySets)
+        {
+            entitySet.EntityType.EntityPath = entitySet.Name;
+            SetEntityDerivedPaths(entitySet.EntityType, derivedByBase);
+        }
+
+        foreach (var singleton in Singletons)
+        {
+            singleton.EntityType.IsSingleton = true;
+            // Only set EntityPath for singletons if the entity type isn't already in an entity set
+            if (string.IsNullOrWhiteSpace(singleton.EntityType.EntityPath))
+            {
+                singleton.EntityType.EntityPath = singleton.Name;
+            }
+        }
+    }
+
+    internal void SetEntityDerivedPaths(ODataEntityType entityType, Dictionary<string, List<ODataEntityType>> derivedByBase)
+    {
+        var qualifiedName = entityType.SchemaNamespace != null
+            ? $"{entityType.SchemaNamespace}.{entityType.Name}"
+            : $"{Namespace}.{entityType.Name}";
+
+        if (!derivedByBase.TryGetValue(qualifiedName, out var derivedTypes))
+            return;
+
+        foreach (var derivedType in derivedTypes)
+        {
+            var schemaNamespace = derivedType.SchemaNamespace ?? Namespace;
+            derivedType.EntityPath = $"{entityType.EntityPath}/{schemaNamespace}.{derivedType.Name}";
+            SetEntityDerivedPaths(derivedType, derivedByBase);
+        }
+    }
 }
 

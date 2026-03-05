@@ -53,55 +53,64 @@ internal static class MetadataParserVersion4
         XNamespace edmx = "http://docs.oasis-open.org/odata/ns/edmx";
         XNamespace edm = "http://docs.oasis-open.org/odata/ns/edm";
 
-        var schemas = doc.Descendants(edm + "Schema").ToList();
-        if (schemas.Count == 0)
+        var xmlSchemas = doc.Descendants(edm + "Schema").ToList();
+        if (xmlSchemas.Count == 0)
             return metadata;
 
         // Build alias→namespace map from all schemas
-        var aliasMap = BuildAliasMap(schemas);
+        var aliasMap = BuildAliasMap(xmlSchemas);
 
-        // The schema containing the EntityContainer is the primary schema
-        var containerSchema = schemas.FirstOrDefault(s => s.Descendants(edm + "EntityContainer").Any())
-                              ?? schemas[0];
-
-        metadata.Namespace = containerSchema.Attribute("Namespace")?.Value ?? string.Empty;
-
-        // Parse every schema, tagging each type with its SchemaNamespace
-        foreach (var schema in schemas)
+        // Create one ODataSchema per XML <Schema> element, populating types/enums
+        var odataSchemas = new List<ODataSchema>();
+        foreach (var xmlSchema in xmlSchemas)
         {
-            var schemaNamespace = schema.Attribute("Namespace")?.Value ?? string.Empty;
+            var schemaNamespace = xmlSchema.Attribute("Namespace")?.Value ?? string.Empty;
+            var odataSchema = new ODataSchema { Namespace = schemaNamespace };
 
-            foreach (var enumType in ParseEnumTypes(schema, edm))
+            foreach (var enumType in ParseEnumTypes(xmlSchema, edm))
             {
                 enumType.SchemaNamespace = schemaNamespace;
-                metadata.EnumTypes.Add(enumType);
+                odataSchema.EnumTypes.Add(enumType);
             }
 
-            foreach (var entityType in ParseEntityTypes(schema, edm, aliasMap))
+            foreach (var entityType in ParseEntityTypes(xmlSchema, edm, aliasMap))
             {
                 entityType.SchemaNamespace = schemaNamespace;
-                metadata.EntityTypes.Add(entityType);
+                odataSchema.EntityTypes.Add(entityType);
             }
 
-            foreach (var complexType in ParseComplexTypes(schema, edm))
+            foreach (var complexType in ParseComplexTypes(xmlSchema, edm))
             {
                 complexType.SchemaNamespace = schemaNamespace;
-                metadata.EntityTypes.Add(complexType);
+                odataSchema.EntityTypes.Add(complexType);
             }
+
+            odataSchemas.Add(odataSchema);
         }
 
-        // Parse EntityContainer (entity sets + function/action imports)
-        var entityContainer = containerSchema.Descendants(edm + "EntityContainer").FirstOrDefault();
-        if (entityContainer != null)
+        // Collect all entity types across schemas for cross-schema lookups
+        var allEntityTypes = odataSchemas.SelectMany(s => s.EntityTypes).ToList();
+
+        // Parse EntityContainer into the schema that owns it
+        var containerXmlSchema = xmlSchemas.FirstOrDefault(s => s.Descendants(edm + "EntityContainer").Any());
+        if (containerXmlSchema != null)
         {
-            metadata.EntitySets = ParseEntitySets(entityContainer, edm, metadata.Namespace, metadata.EntityTypes, aliasMap);
-            metadata.Singletons = ParseSingletons(entityContainer, edm, metadata.EntityTypes, aliasMap);
-            metadata.Functions = ParseActionImports(entityContainer, edm, metadata.Namespace, schemas);
+            var entityContainer = containerXmlSchema.Descendants(edm + "EntityContainer").FirstOrDefault()!;
+            var containerNamespace = containerXmlSchema.Attribute("Namespace")?.Value ?? string.Empty;
+            var containerOdataSchema = odataSchemas.First(s => s.Namespace == containerNamespace);
+
+            containerOdataSchema.ContainerName = entityContainer.Attribute("Name")?.Value;
+            containerOdataSchema.EntitySets = ParseEntitySets(entityContainer, edm, containerNamespace, allEntityTypes, aliasMap);
+            containerOdataSchema.Singletons = ParseSingletons(entityContainer, edm, allEntityTypes, aliasMap);
+            containerOdataSchema.Functions = ParseActionImports(entityContainer, edm, containerNamespace, xmlSchemas);
+
+            containerOdataSchema.SetEntityPaths(allEntityTypes);
         }
 
-        metadata.SetEntityPaths();
+        MarkEnumProperties(odataSchemas);
 
-        MarkEnumProperties(metadata);
+        foreach (var odataSchema in odataSchemas)
+            metadata.Schemas.Add(odataSchema);
 
         return metadata;
     }
@@ -525,34 +534,20 @@ internal static class MetadataParserVersion4
         return functions;
     }
 
-    private static void MarkEnumProperties(ODataMetadata metadata)
+    private static void MarkEnumProperties(IReadOnlyList<ODataSchema> odataSchemas)
     {
-        //// Create a set of fully qualified enum type names for quick lookup
-        //var enumTypeNames = new HashSet<string>(
-        //    metadata.EnumTypes.Select(e => $"{metadata.Namespace}.{e.Name}")
-        //);
-
         var enumTypeNames = new HashSet<string>(
-      metadata.EnumTypes.Select(e => $"{e.Name}")
-  );
+            odataSchemas.SelectMany(s => s.EnumTypes).Select(e => e.Name)
+        );
 
-        // Mark properties that reference enum types
-        foreach (var entityType in metadata.EntityTypes)
+        var allEntityTypes = odataSchemas.SelectMany(s => s.EntityTypes);
+        foreach (var entityType in allEntityTypes)
         {
-           
-            foreach (var property in entityType.Properties.Where(e => !e.DataType.StartsWith("Edm.")))
+            foreach (var property in entityType.Properties.Where(p => !p.DataType.StartsWith("Edm.")))
             {
-
-                // Since DataType now contains the inner type directly for both
-                // collection and non-collection properties, we just check it directly
                 if (enumTypeNames.Contains(StripNamespace(property.DataType)))
-                {
                     property.IsEnumType = true;
-                }
             }
         }
-
-
-
     }
 }

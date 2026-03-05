@@ -54,7 +54,7 @@ internal static class MetadataExtensions
 
     extension(ClientMetadata navigation)
     {
-        internal string NamespaceName => $"{navigation.Metadata.Namespace.Replace(".", "_")}";
+        internal string NamespaceName => $"{navigation.Metadata.Schemas.FirstOrDefault()?.Namespace?.Replace(".", "_") ?? ""}";
         internal string JsonName => $"{navigation.NamespaceName}_Json";
         internal string HelperName => $"{navigation.NamespaceName}_Helper";
         internal string ServiceName => $"{navigation.NamespaceName}_Service";

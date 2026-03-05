@@ -32,10 +32,10 @@ namespace Linq2OData.Tests
 
             // Assert
             Assert.NotNull(metadata);
-            Assert.NotEmpty(metadata.EntityTypes);
+            Assert.NotEmpty(metadata.Schemas[0].EntityTypes);
             
             // Verify the A_SalesQuotationType entity exists
-            var salesQuotationEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "A_SalesQuotationType");
+            var salesQuotationEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "A_SalesQuotationType");
             Assert.NotNull(salesQuotationEntity);
             Assert.Equal("Sales Quotation Header", salesQuotationEntity.Label);
             
@@ -59,11 +59,11 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(sapSalesQuotationMetadataV2);
 
             // Assert - Verify services are parsed
-            Assert.NotNull(metadata.Functions);
-            Assert.NotEmpty(metadata.Functions);
+            Assert.NotNull(metadata.Schemas[0].Functions);
+            Assert.NotEmpty(metadata.Schemas[0].Functions);
             
             // Verify releaseApprovalRequest service
-            var releaseService = metadata.Functions.FirstOrDefault(s => s.Name == "releaseApprovalRequest");
+            var releaseService = metadata.Schemas[0].Functions.FirstOrDefault(s => s.Name == "releaseApprovalRequest");
             Assert.NotNull(releaseService);
             Assert.Equal("API_SALES_QUOTATION_SRV.FunctionResult", releaseService.ReturnType);
             Assert.Equal("POST", releaseService.HttpMethod);
@@ -77,7 +77,7 @@ namespace Linq2OData.Tests
             Assert.Equal("In", salesQuotationParam.Mode);
             
             // Verify rejectApprovalRequest service
-            var rejectService = metadata.Functions.FirstOrDefault(s => s.Name == "rejectApprovalRequest");
+            var rejectService = metadata.Schemas[0].Functions.FirstOrDefault(s => s.Name == "rejectApprovalRequest");
             Assert.NotNull(rejectService);
             Assert.Equal("API_SALES_QUOTATION_SRV.FunctionResult", rejectService.ReturnType);
             Assert.Equal("POST", rejectService.HttpMethod);
@@ -91,26 +91,26 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(sapSalesQuotationMetadataV2);
 
             // Assert - Verify entity sets are parsed
-            Assert.NotNull(metadata.EntitySets);
-            Assert.NotEmpty(metadata.EntitySets);
+            Assert.NotNull(metadata.Schemas[0].EntitySets);
+            Assert.NotEmpty(metadata.Schemas[0].EntitySets);
             
             // Verify A_SalesQuotation entity set
-            var salesQuotationSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "A_SalesQuotation");
+            var salesQuotationSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "A_SalesQuotation");
             Assert.NotNull(salesQuotationSet);
             Assert.Equal("A_SalesQuotationType", salesQuotationSet.EntityTypeName);
             
             // Verify A_SalesQuotationItem entity set
-            var salesQuotationItemSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "A_SalesQuotationItem");
+            var salesQuotationItemSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "A_SalesQuotationItem");
             Assert.NotNull(salesQuotationItemSet);
             Assert.Equal("A_SalesQuotationItemType", salesQuotationItemSet.EntityTypeName);
             
             // Verify A_SalesQuotationPartner entity set
-            var partnerSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "A_SalesQuotationPartner");
+            var partnerSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "A_SalesQuotationPartner");
             Assert.NotNull(partnerSet);
             Assert.Equal("A_SalesQuotationPartnerType", partnerSet.EntityTypeName);
             
             // Verify count (should have 14 entity sets based on the XML)
-            Assert.Equal(14, metadata.EntitySets.Count);
+            Assert.Equal(14, metadata.Schemas[0].EntitySets.Count);
         }
 
         [Fact]
@@ -122,9 +122,9 @@ namespace Linq2OData.Tests
 
             // Assert - Verify version and namespace are parsed
             Assert.Equal(ODataVersion.V2, metadata.ODataVersion);
-            Assert.NotNull(metadata.Namespace);
-            Assert.NotEmpty(metadata.Namespace);
-            Assert.Equal("API_SALES_QUOTATION_SRV", metadata.Namespace);
+            Assert.NotNull(metadata.Schemas[0].Namespace);
+            Assert.NotEmpty(metadata.Schemas[0].Namespace);
+            Assert.Equal("API_SALES_QUOTATION_SRV", metadata.Schemas[0].Namespace);
         }
 
         [Fact]
@@ -136,14 +136,14 @@ namespace Linq2OData.Tests
 
             // Assert
             Assert.NotNull(metadata);
-            Assert.NotEmpty(metadata.EntityTypes);
+            Assert.NotEmpty(metadata.Schemas[0].EntityTypes);
             
             // Verify namespace and version
-            Assert.Equal("ODataDemo", metadata.Namespace);
+            Assert.Equal("ODataDemo", metadata.Schemas[0].Namespace);
             Assert.Equal(ODataVersion.V2, metadata.ODataVersion);
             
             // Verify entity types count
-            Assert.Equal(4, metadata.EntityTypes.Count);
+            Assert.Equal(4, metadata.Schemas[0].EntityTypes.Count);
         }
 
         [Fact]
@@ -154,7 +154,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV2);
 
             // Assert - Verify Product entity
-            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            var productEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Product");
             Assert.NotNull(productEntity);
             
             // Verify key
@@ -198,7 +198,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV2);
 
             // Assert - Verify Category entity
-            var categoryEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Category");
+            var categoryEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Category");
             Assert.NotNull(categoryEntity);
             
             // Verify key
@@ -232,7 +232,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV2);
 
             // Assert - Verify Supplier entity
-            var supplierEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Supplier");
+            var supplierEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Supplier");
             Assert.NotNull(supplierEntity);
             
             // Verify key
@@ -267,18 +267,18 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV2);
 
             // Assert - Verify entity sets
-            Assert.NotNull(metadata.EntitySets);
-            Assert.Equal(3, metadata.EntitySets.Count);
+            Assert.NotNull(metadata.Schemas[0].EntitySets);
+            Assert.Equal(3, metadata.Schemas[0].EntitySets.Count);
             
-            var productsSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Products");
+            var productsSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "Products");
             Assert.NotNull(productsSet);
             Assert.Equal("Product", productsSet.EntityTypeName);
             
-            var categoriesSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Categories");
+            var categoriesSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "Categories");
             Assert.NotNull(categoriesSet);
             Assert.Equal("Category", categoriesSet.EntityTypeName);
             
-            var suppliersSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Suppliers");
+            var suppliersSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "Suppliers");
             Assert.NotNull(suppliersSet);
             Assert.Equal("Supplier", suppliersSet.EntityTypeName);
         }
@@ -291,10 +291,10 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV2);
 
             // Assert - Verify function import
-            Assert.NotNull(metadata.Functions);
-            Assert.Single(metadata.Functions);
+            Assert.NotNull(metadata.Schemas[0].Functions);
+            Assert.Single(metadata.Schemas[0].Functions);
             
-            var getProductsFunc = metadata.Functions.FirstOrDefault(f => f.Name == "GetProductsByRating");
+            var getProductsFunc = metadata.Schemas[0].Functions.FirstOrDefault(f => f.Name == "GetProductsByRating");
             Assert.NotNull(getProductsFunc);
             Assert.Equal("Collection(ODataDemo.Product)", getProductsFunc.ReturnType);
             Assert.Equal("GET", getProductsFunc.HttpMethod);
@@ -315,7 +315,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV2);
 
             // Assert - Verify navigation multiplicity
-            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            var productEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Product");
             Assert.NotNull(productEntity);
             
             // Product to Category is 0..1 (ZeroOrOne)
@@ -324,7 +324,7 @@ namespace Linq2OData.Tests
             Assert.Equal(ODataNavigationType.ZeroOrOne, categoryNav.NavigationType);
             
             // Category to Products is * (Many)
-            var categoryEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Category");
+            var categoryEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Category");
             Assert.NotNull(categoryEntity);
             var productsNav = categoryEntity.Navigations.FirstOrDefault(n => n.Name == "Products");
             Assert.NotNull(productsNav);
@@ -342,7 +342,7 @@ namespace Linq2OData.Tests
             // Assert
             Assert.NotNull(metadata);
             Assert.Equal(ODataVersion.V3, metadata.ODataVersion);
-            Assert.Equal("ODataDemo", metadata.Namespace);
+            Assert.Equal("ODataDemo", metadata.Schemas[0].Namespace);
         }
 
         [Fact]
@@ -352,11 +352,11 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV3);
 
             // Assert
-            Assert.NotNull(metadata.EntityTypes);
-            Assert.NotEmpty(metadata.EntityTypes);
+            Assert.NotNull(metadata.Schemas[0].EntityTypes);
+            Assert.NotEmpty(metadata.Schemas[0].EntityTypes);
 
             // Verify Product entity exists
-            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            var productEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Product");
             Assert.NotNull(productEntity);
 
             // Verify key
@@ -400,12 +400,12 @@ namespace Linq2OData.Tests
             // Assert
 
             // Verify base type - Product
-            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            var productEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Product");
             Assert.NotNull(productEntity);
             Assert.Null(productEntity.BaseType);
 
             // Verify derived type - FeaturedProduct
-            var featuredProductEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "FeaturedProduct");
+            var featuredProductEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "FeaturedProduct");
             Assert.NotNull(featuredProductEntity);
             Assert.Equal("ODataDemo.Product", featuredProductEntity.BaseType);
 
@@ -416,12 +416,12 @@ namespace Linq2OData.Tests
             Assert.Equal(ODataNavigationType.ZeroOrOne, advertisementNav.NavigationType);
 
             // Verify Person base type
-            var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
+            var personEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Person");
             Assert.NotNull(personEntity);
             Assert.Null(personEntity.BaseType);
 
             // Verify Customer derives from Person
-            var customerEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Customer");
+            var customerEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Customer");
             Assert.NotNull(customerEntity);
             Assert.Equal("ODataDemo.Person", customerEntity.BaseType);
 
@@ -431,7 +431,7 @@ namespace Linq2OData.Tests
             Assert.False(totalExpenseProperty.Nullable);
 
             // Verify Employee derives from Person
-            var employeeEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Employee");
+            var employeeEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Employee");
             Assert.NotNull(employeeEntity);
             Assert.Equal("ODataDemo.Person", employeeEntity.BaseType);
 
@@ -453,7 +453,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV3);
 
             // Assert
-            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            var productEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Product");
             Assert.NotNull(productEntity);
 
             // Verify Product has multiple navigation properties
@@ -485,7 +485,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV3);
 
             // Assert
-            var addressType = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Address");
+            var addressType = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Address");
             Assert.NotNull(addressType);
 
             // Verify Address complex type properties
@@ -519,7 +519,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV3);
 
             // Assert
-            var supplierEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Supplier");
+            var supplierEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Supplier");
             Assert.NotNull(supplierEntity);
 
             // Verify Supplier has Location property with GeographyPoint type
@@ -546,7 +546,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV3);
 
             // Assert
-            var categoryEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Category");
+            var categoryEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Category");
             Assert.NotNull(categoryEntity);
 
             // Verify key
@@ -577,7 +577,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV3);
 
             // Assert
-            var personDetailEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "PersonDetail");
+            var personDetailEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "PersonDetail");
             Assert.NotNull(personDetailEntity);
 
             // Verify key
@@ -621,7 +621,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV3);
 
             // Assert
-            var advertisementEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Advertisement");
+            var advertisementEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Advertisement");
             Assert.NotNull(advertisementEntity);
 
             // Verify key is GUID
@@ -656,42 +656,42 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV3);
 
             // Assert
-            Assert.NotNull(metadata.EntitySets);
-            Assert.Equal(7, metadata.EntitySets.Count);
+            Assert.NotNull(metadata.Schemas[0].EntitySets);
+            Assert.Equal(7, metadata.Schemas[0].EntitySets.Count);
 
             // Verify Products entity set
-            var productsSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Products");
+            var productsSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "Products");
             Assert.NotNull(productsSet);
             Assert.Equal("Product", productsSet.EntityTypeName);
             Assert.NotNull(productsSet.EntityType);
 
             // Verify ProductDetails entity set
-            var productDetailsSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "ProductDetails");
+            var productDetailsSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "ProductDetails");
             Assert.NotNull(productDetailsSet);
             Assert.Equal("ProductDetail", productDetailsSet.EntityTypeName);
 
             // Verify Categories entity set
-            var categoriesSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Categories");
+            var categoriesSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "Categories");
             Assert.NotNull(categoriesSet);
             Assert.Equal("Category", categoriesSet.EntityTypeName);
 
             // Verify Suppliers entity set
-            var suppliersSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Suppliers");
+            var suppliersSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "Suppliers");
             Assert.NotNull(suppliersSet);
             Assert.Equal("Supplier", suppliersSet.EntityTypeName);
 
             // Verify Persons entity set
-            var personsSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Persons");
+            var personsSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "Persons");
             Assert.NotNull(personsSet);
             Assert.Equal("Person", personsSet.EntityTypeName);
 
             // Verify PersonDetails entity set
-            var personDetailsSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "PersonDetails");
+            var personDetailsSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "PersonDetails");
             Assert.NotNull(personDetailsSet);
             Assert.Equal("PersonDetail", personDetailsSet.EntityTypeName);
 
             // Verify Advertisements entity set
-            var advertisementsSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Advertisements");
+            var advertisementsSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "Advertisements");
             Assert.NotNull(advertisementsSet);
             Assert.Equal("Advertisement", advertisementsSet.EntityTypeName);
         }
@@ -703,10 +703,10 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV3);
 
             // Assert
-            Assert.NotNull(metadata.Functions);
-            Assert.Single(metadata.Functions);
+            Assert.NotNull(metadata.Schemas[0].Functions);
+            Assert.Single(metadata.Schemas[0].Functions);
 
-            var getProductsByRatingFunc = metadata.Functions.FirstOrDefault(f => f.Name == "GetProductsByRating");
+            var getProductsByRatingFunc = metadata.Schemas[0].Functions.FirstOrDefault(f => f.Name == "GetProductsByRating");
             Assert.NotNull(getProductsByRatingFunc);
             Assert.Equal("Collection(ODataDemo.Product)", getProductsByRatingFunc.ReturnType);
             Assert.Equal("GET", getProductsByRatingFunc.HttpMethod);
@@ -725,7 +725,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV3);
 
             // Assert
-            var productDetailEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "ProductDetail");
+            var productDetailEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "ProductDetail");
             Assert.NotNull(productDetailEntity);
 
             // Verify key
@@ -756,25 +756,25 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV3);
 
             // Assert - V3 has more entity types due to inheritance
-            Assert.NotNull(metadata.EntityTypes);
+            Assert.NotNull(metadata.Schemas[0].EntityTypes);
 
             // Count base types: Product, Category, Supplier, Person, ProductDetail, PersonDetail, Advertisement, Address
             // Count derived types: FeaturedProduct, Customer, Employee
             // Total should be 11 (8 base + 3 derived)
-            Assert.True(metadata.EntityTypes.Count >= 11, $"Expected at least 11 entity types, but found {metadata.EntityTypes.Count}");
+            Assert.True(metadata.Schemas[0].EntityTypes.Count >= 11, $"Expected at least 11 entity types, but found {metadata.Schemas[0].EntityTypes.Count}");
 
             // Verify specific entity types exist
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "FeaturedProduct"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Category"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Supplier"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Customer"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Employee"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "ProductDetail"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "PersonDetail"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Advertisement"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Address"));
+            Assert.NotNull(metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Product"));
+            Assert.NotNull(metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "FeaturedProduct"));
+            Assert.NotNull(metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Category"));
+            Assert.NotNull(metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Supplier"));
+            Assert.NotNull(metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Person"));
+            Assert.NotNull(metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Customer"));
+            Assert.NotNull(metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Employee"));
+            Assert.NotNull(metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "ProductDetail"));
+            Assert.NotNull(metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "PersonDetail"));
+            Assert.NotNull(metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Advertisement"));
+            Assert.NotNull(metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Address"));
         }
 
         [Fact]
@@ -784,7 +784,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV3);
 
             // Assert - Verify associations are correctly parsed through navigation properties
-            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            var productEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Product");
             Assert.NotNull(productEntity);
 
             // Product has associations: Product_Categories, Product_Supplier, Product_ProductDetail
@@ -817,7 +817,7 @@ namespace Linq2OData.Tests
             // Assert
             Assert.NotNull(metadata);
             Assert.Equal(ODataVersion.V4, metadata.ODataVersion);
-            Assert.Equal("ODataDemo", metadata.Namespace);
+            Assert.Equal("ODataDemo", metadata.Schemas[0].Namespace);
         }
 
         [Fact]
@@ -827,11 +827,11 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV4);
 
             // Assert
-            Assert.NotNull(metadata.EntityTypes);
-            Assert.NotEmpty(metadata.EntityTypes);
+            Assert.NotNull(metadata.Schemas[0].EntityTypes);
+            Assert.NotEmpty(metadata.Schemas[0].EntityTypes);
             
             // Verify Product entity exists
-            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            var productEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Product");
             Assert.NotNull(productEntity);
             
             // Verify key
@@ -861,7 +861,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV4);
 
             // Assert
-            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            var productEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Product");
             Assert.NotNull(productEntity);
             
             // Verify navigation properties
@@ -893,7 +893,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV4);
 
             // Assert
-            var addressType = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Address");
+            var addressType = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Address");
             Assert.NotNull(addressType);
             
             // Verify Address complex type properties
@@ -915,23 +915,23 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV4);
 
             // Assert
-            Assert.NotNull(metadata.EntitySets);
-            Assert.NotEmpty(metadata.EntitySets);
-            Assert.Equal(7, metadata.EntitySets.Count);
+            Assert.NotNull(metadata.Schemas[0].EntitySets);
+            Assert.NotEmpty(metadata.Schemas[0].EntitySets);
+            Assert.Equal(7, metadata.Schemas[0].EntitySets.Count);
             
             // Verify Products entity set
-            var productsSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Products");
+            var productsSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "Products");
             Assert.NotNull(productsSet);
             Assert.Equal("Product", productsSet.EntityTypeName);
             Assert.NotNull(productsSet.EntityType);
             
             // Verify Categories entity set
-            var categoriesSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Categories");
+            var categoriesSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "Categories");
             Assert.NotNull(categoriesSet);
             Assert.Equal("Category", categoriesSet.EntityTypeName);
             
             // Verify Suppliers entity set
-            var suppliersSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Suppliers");
+            var suppliersSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "Suppliers");
             Assert.NotNull(suppliersSet);
             Assert.Equal("Supplier", suppliersSet.EntityTypeName);
         }
@@ -943,11 +943,11 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV4);
 
             // Assert
-            Assert.NotNull(metadata.Functions);
-            Assert.Single(metadata.Functions);
+            Assert.NotNull(metadata.Schemas[0].Functions);
+            Assert.Single(metadata.Schemas[0].Functions);
             
             // Verify IncreaseSalaries action
-            var increaseSalariesAction = metadata.Functions.FirstOrDefault(f => f.Name == "IncreaseSalaries");
+            var increaseSalariesAction = metadata.Schemas[0].Functions.FirstOrDefault(f => f.Name == "IncreaseSalaries");
             Assert.NotNull(increaseSalariesAction);
             Assert.Equal("POST", increaseSalariesAction.HttpMethod);
             
@@ -965,7 +965,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV4);
 
             // Assert - Verify derived types exist
-            var featuredProductEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "FeaturedProduct");
+            var featuredProductEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "FeaturedProduct");
             Assert.NotNull(featuredProductEntity);
             
             // FeaturedProduct should have its own navigation property
@@ -974,7 +974,7 @@ namespace Linq2OData.Tests
             Assert.Equal("Advertisement", advertisementNav.ToEntity);
             
             // Verify Customer (derived from Person)
-            var customerEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Customer");
+            var customerEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Customer");
             Assert.NotNull(customerEntity);
             
             var totalExpenseProperty = customerEntity.Properties.FirstOrDefault(p => p.Name == "TotalExpense");
@@ -982,7 +982,7 @@ namespace Linq2OData.Tests
             Assert.Equal("Edm.Decimal", totalExpenseProperty.DataType);
             
             // Verify Employee (derived from Person)
-            var employeeEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Employee");
+            var employeeEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Employee");
             Assert.NotNull(employeeEntity);
             
             var employeeIdProperty = employeeEntity.Properties.FirstOrDefault(p => p.Name == "EmployeeID");
@@ -999,26 +999,26 @@ namespace Linq2OData.Tests
             // Assert - Verify BaseType is correctly parsed for derived entities
             
             // FeaturedProduct derives from Product
-            var featuredProductEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "FeaturedProduct");
+            var featuredProductEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "FeaturedProduct");
             Assert.NotNull(featuredProductEntity);
             Assert.Equal("ODataDemo.Product", featuredProductEntity.BaseType);
             
             // Customer derives from Person
-            var customerEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Customer");
+            var customerEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Customer");
             Assert.NotNull(customerEntity);
             Assert.Equal("ODataDemo.Person", customerEntity.BaseType);
             
             // Employee derives from Person
-            var employeeEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Employee");
+            var employeeEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Employee");
             Assert.NotNull(employeeEntity);
             Assert.Equal("ODataDemo.Person", employeeEntity.BaseType);
             
             // Verify base types don't have BaseType set
-            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            var productEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Product");
             Assert.NotNull(productEntity);
             Assert.Null(productEntity.BaseType);
             
-            var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
+            var personEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Person");
             Assert.NotNull(personEntity);
             Assert.Null(personEntity.BaseType);
         }
@@ -1034,11 +1034,11 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(trippinMetadataV4);
 
             // Assert
-            Assert.NotNull(metadata.EnumTypes);
-            Assert.Equal(2, metadata.EnumTypes.Count);
+            Assert.NotNull(metadata.Schemas[0].EnumTypes);
+            Assert.Equal(2, metadata.Schemas[0].EnumTypes.Count);
 
             // Verify PersonGender enum
-            var personGenderEnum = metadata.EnumTypes.FirstOrDefault(e => e.Name == "PersonGender");
+            var personGenderEnum = metadata.Schemas[0].EnumTypes.FirstOrDefault(e => e.Name == "PersonGender");
             Assert.NotNull(personGenderEnum);
             Assert.Equal(3, personGenderEnum.Members.Count);
 
@@ -1055,7 +1055,7 @@ namespace Linq2OData.Tests
             Assert.Equal(2, unknownMember.Value);
 
             // Verify Feature enum
-            var featureEnum = metadata.EnumTypes.FirstOrDefault(e => e.Name == "Feature");
+            var featureEnum = metadata.Schemas[0].EnumTypes.FirstOrDefault(e => e.Name == "Feature");
             Assert.NotNull(featureEnum);
             Assert.Equal(4, featureEnum.Members.Count);
 
@@ -1075,7 +1075,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(trippinMetadataV4);
 
             // Assert
-            var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
+            var personEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Person");
             Assert.NotNull(personEntity);
 
             // Verify Gender property with PersonGender enum type
@@ -1100,16 +1100,16 @@ namespace Linq2OData.Tests
             // Assert
             Assert.NotNull(metadata);
             Assert.Equal(ODataVersion.V4, metadata.ODataVersion);
-            Assert.Equal("Trippin", metadata.Namespace);
+            Assert.Equal("Trippin", metadata.Schemas[0].Namespace);
 
             // Verify entity types exist
-            Assert.NotEmpty(metadata.EntityTypes);
-            var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
+            Assert.NotEmpty(metadata.Schemas[0].EntityTypes);
+            var personEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Person");
             Assert.NotNull(personEntity);
 
             // Verify entity sets
-            Assert.NotEmpty(metadata.EntitySets);
-            var peopleSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "People");
+            Assert.NotEmpty(metadata.Schemas[0].EntitySets);
+            var peopleSet = metadata.Schemas[0].EntitySets.FirstOrDefault(es => es.Name == "People");
             Assert.NotNull(peopleSet);
             Assert.Equal("Person", peopleSet.EntityTypeName);
         }
@@ -1125,7 +1125,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(trippinMetadataV4);
 
             // Assert
-            var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
+            var personEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Person");
             Assert.NotNull(personEntity);
 
             // Verify collection properties have IsCollection = true and DataType contains inner type
@@ -1165,7 +1165,7 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(odataDemoMetadataV2);
 
             // Assert
-            var productEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Product");
+            var productEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Product");
             Assert.NotNull(productEntity);
 
             // Verify all properties are non-collection (ODataDemo V2 has no collection properties)
@@ -1197,8 +1197,10 @@ namespace Linq2OData.Tests
 
             Assert.NotNull(metadata);
             Assert.Equal(ODataVersion.V4, metadata.ODataVersion);
-            // Primary namespace is the one that owns the EntityContainer
-            Assert.Equal("Company.Billing", metadata.Namespace);
+            // Both schemas are present; the one with the EntityContainer is Company.Billing
+            Assert.Equal(2, metadata.Schemas.Count);
+            Assert.Contains(metadata.Schemas, s => s.Namespace == "Company.Core");
+            Assert.Contains(metadata.Schemas, s => s.Namespace == "Company.Billing");
         }
 
         [Fact]
@@ -1208,16 +1210,17 @@ namespace Linq2OData.Tests
 
             // Company.Core: Person, Employee, Customer + Address (complex)
             // Company.Billing: Document, Invoice, InvoiceLine + Money (complex)
-            Assert.Equal(8, metadata.EntityTypes.Count);
+            var allEntityTypes = metadata.Schemas.SelectMany(s => s.EntityTypes).ToList();
+            Assert.Equal(8, allEntityTypes.Count);
 
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Employee"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Customer"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Address"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Document"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Invoice"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "InvoiceLine"));
-            Assert.NotNull(metadata.EntityTypes.FirstOrDefault(e => e.Name == "Money"));
+            Assert.NotNull(allEntityTypes.FirstOrDefault(e => e.Name == "Person"));
+            Assert.NotNull(allEntityTypes.FirstOrDefault(e => e.Name == "Employee"));
+            Assert.NotNull(allEntityTypes.FirstOrDefault(e => e.Name == "Customer"));
+            Assert.NotNull(allEntityTypes.FirstOrDefault(e => e.Name == "Address"));
+            Assert.NotNull(allEntityTypes.FirstOrDefault(e => e.Name == "Document"));
+            Assert.NotNull(allEntityTypes.FirstOrDefault(e => e.Name == "Invoice"));
+            Assert.NotNull(allEntityTypes.FirstOrDefault(e => e.Name == "InvoiceLine"));
+            Assert.NotNull(allEntityTypes.FirstOrDefault(e => e.Name == "Money"));
         }
 
         [Fact]
@@ -1225,16 +1228,17 @@ namespace Linq2OData.Tests
         {
             var metadata = MetadataParser.Parse(complexMetadataV4);
 
-            var employee = metadata.EntityTypes.First(e => e.Name == "Employee");
+            var allEntityTypes = metadata.Schemas.SelectMany(s => s.EntityTypes).ToList();
+            var employee = allEntityTypes.First(e => e.Name == "Employee");
             Assert.Equal("Company.Core", employee.SchemaNamespace);
 
-            var invoice = metadata.EntityTypes.First(e => e.Name == "Invoice");
+            var invoice = allEntityTypes.First(e => e.Name == "Invoice");
             Assert.Equal("Company.Billing", invoice.SchemaNamespace);
 
-            var address = metadata.EntityTypes.First(e => e.Name == "Address");
+            var address = allEntityTypes.First(e => e.Name == "Address");
             Assert.Equal("Company.Core", address.SchemaNamespace);
 
-            var money = metadata.EntityTypes.First(e => e.Name == "Money");
+            var money = allEntityTypes.First(e => e.Name == "Money");
             Assert.Equal("Company.Billing", money.SchemaNamespace);
         }
 
@@ -1243,15 +1247,16 @@ namespace Linq2OData.Tests
         {
             var metadata = MetadataParser.Parse(complexMetadataV4);
 
+            var allEntityTypes = metadata.Schemas.SelectMany(s => s.EntityTypes).ToList();
             // "Core.Person" alias in XML → resolved to "Company.Core.Person"
-            var employee = metadata.EntityTypes.First(e => e.Name == "Employee");
+            var employee = allEntityTypes.First(e => e.Name == "Employee");
             Assert.Equal("Company.Core.Person", employee.BaseType);
 
-            var customer = metadata.EntityTypes.First(e => e.Name == "Customer");
+            var customer = allEntityTypes.First(e => e.Name == "Customer");
             Assert.Equal("Company.Core.Person", customer.BaseType);
 
             // Full namespace, no alias to resolve
-            var invoice = metadata.EntityTypes.First(e => e.Name == "Invoice");
+            var invoice = allEntityTypes.First(e => e.Name == "Invoice");
             Assert.Equal("Company.Billing.Document", invoice.BaseType);
         }
 
@@ -1260,8 +1265,9 @@ namespace Linq2OData.Tests
         {
             var metadata = MetadataParser.Parse(complexMetadataV4);
 
-            Assert.Single(metadata.EnumTypes);
-            var personType = metadata.EnumTypes.First(e => e.Name == "PersonType");
+            // EnumTypes are in the Company.Core schema (Schemas[0])
+            Assert.Single(metadata.Schemas[0].EnumTypes);
+            var personType = metadata.Schemas[0].EnumTypes.First(e => e.Name == "PersonType");
             Assert.Equal("Company.Core", personType.SchemaNamespace);
             Assert.Equal(2, personType.Members.Count);
         }
@@ -1271,20 +1277,22 @@ namespace Linq2OData.Tests
         {
             var metadata = MetadataParser.Parse(complexMetadataV4);
 
-            Assert.Equal(3, metadata.EntitySets.Count);
+            // EntitySets are in the Company.Billing schema (Schemas[1])
+            var billingSchema = metadata.Schemas.First(s => s.Namespace == "Company.Billing");
+            Assert.Equal(3, billingSchema.EntitySets.Count);
 
             // EntitySet EntityType="Core.Employee" → alias resolved → entity type found
-            var employeesSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Employees");
+            var employeesSet = billingSchema.EntitySets.FirstOrDefault(es => es.Name == "Employees");
             Assert.NotNull(employeesSet);
             Assert.Equal("Employee", employeesSet.EntityTypeName);
             Assert.NotNull(employeesSet.EntityType);
 
-            var customersSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Customers");
+            var customersSet = billingSchema.EntitySets.FirstOrDefault(es => es.Name == "Customers");
             Assert.NotNull(customersSet);
             Assert.Equal("Customer", customersSet.EntityTypeName);
             Assert.NotNull(customersSet.EntityType);
 
-            var invoicesSet = metadata.EntitySets.FirstOrDefault(es => es.Name == "Invoices");
+            var invoicesSet = billingSchema.EntitySets.FirstOrDefault(es => es.Name == "Invoices");
             Assert.NotNull(invoicesSet);
             Assert.Equal("Invoice", invoicesSet.EntityTypeName);
             Assert.NotNull(invoicesSet.EntityType);
@@ -1295,8 +1303,9 @@ namespace Linq2OData.Tests
         {
             var metadata = MetadataParser.Parse(complexMetadataV4);
 
+            var allEntityTypes = metadata.Schemas.SelectMany(s => s.EntityTypes).ToList();
             // Invoice (Billing) → Customer (Core) and Employee (Core)
-            var invoice = metadata.EntityTypes.First(e => e.Name == "Invoice");
+            var invoice = allEntityTypes.First(e => e.Name == "Invoice");
             var customerNav = invoice.Navigations.FirstOrDefault(n => n.Name == "Customer");
             Assert.NotNull(customerNav);
             Assert.Equal("Customer", customerNav.ToEntity);
@@ -1307,7 +1316,7 @@ namespace Linq2OData.Tests
             Assert.Equal("Employee", employeeNav.ToEntity);
 
             // Employee (Core) → Invoices (Billing)
-            var employee = metadata.EntityTypes.First(e => e.Name == "Employee");
+            var employee = allEntityTypes.First(e => e.Name == "Employee");
             var invoicesNav = employee.Navigations.FirstOrDefault(n => n.Name == "Invoices");
             Assert.NotNull(invoicesNav);
             Assert.Equal("Invoice", invoicesNav.ToEntity);
@@ -1319,8 +1328,10 @@ namespace Linq2OData.Tests
         {
             var metadata = MetadataParser.Parse(complexMetadataV4);
 
-            Assert.Single(metadata.Functions);
-            var func = metadata.Functions.First();
+            // Functions are in the Company.Billing schema (Schemas[1])
+            var billingSchema = metadata.Schemas.First(s => s.Namespace == "Company.Billing");
+            Assert.Single(billingSchema.Functions);
+            var func = billingSchema.Functions.First();
             Assert.Equal("GetInvoicesByAmount", func.Name);
             Assert.Equal("GET", func.HttpMethod);
             Assert.Single(func.Parameters);
@@ -1333,14 +1344,15 @@ namespace Linq2OData.Tests
         {
             var metadata = MetadataParser.Parse(complexMetadataV4);
 
+            var allEntityTypes = metadata.Schemas.SelectMany(s => s.EntityTypes).ToList();
             // Entity sets set EntityPath on the entity types
-            var employee = metadata.EntityTypes.First(e => e.Name == "Employee");
+            var employee = allEntityTypes.First(e => e.Name == "Employee");
             Assert.Equal("Employees", employee.EntityPath);
 
-            var customer = metadata.EntityTypes.First(e => e.Name == "Customer");
+            var customer = allEntityTypes.First(e => e.Name == "Customer");
             Assert.Equal("Customers", customer.EntityPath);
 
-            var invoice = metadata.EntityTypes.First(e => e.Name == "Invoice");
+            var invoice = allEntityTypes.First(e => e.Name == "Invoice");
             Assert.Equal("Invoices", invoice.EntityPath);
         }
 
@@ -1349,7 +1361,8 @@ namespace Linq2OData.Tests
         {
             var metadata = MetadataParser.Parse(complexMetadataV4);
 
-            var person = metadata.EntityTypes.First(e => e.Name == "Person");
+            // Person is in Company.Core schema (Schemas[0])
+            var person = metadata.Schemas[0].EntityTypes.First(e => e.Name == "Person");
             var personTypeProp = person.Properties.FirstOrDefault(p => p.Name == "PersonType");
             Assert.NotNull(personTypeProp);
             Assert.True(personTypeProp.IsEnumType);
@@ -1366,10 +1379,10 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(trippinMetadataV4);
 
             // Assert
-            Assert.NotNull(metadata.Singletons);
-            Assert.NotEmpty(metadata.Singletons);
+            Assert.NotNull(metadata.Schemas[0].Singletons);
+            Assert.NotEmpty(metadata.Schemas[0].Singletons);
 
-            var meSingleton = metadata.Singletons.FirstOrDefault(s => s.Name == "Me");
+            var meSingleton = metadata.Schemas[0].Singletons.FirstOrDefault(s => s.Name == "Me");
             Assert.NotNull(meSingleton);
             Assert.Equal("Person", meSingleton.EntityTypeName);
             Assert.NotNull(meSingleton.EntityType);
@@ -1382,11 +1395,75 @@ namespace Linq2OData.Tests
             var metadata = MetadataParser.Parse(trippinMetadataV4);
 
             // Assert - Person type used by both People EntitySet and Me Singleton
-            var personEntity = metadata.EntityTypes.FirstOrDefault(e => e.Name == "Person");
+            var personEntity = metadata.Schemas[0].EntityTypes.FirstOrDefault(e => e.Name == "Person");
             Assert.NotNull(personEntity);
             Assert.True(personEntity.IsSingleton);
             // EntityPath should remain "People" (from EntitySet, not overwritten by singleton)
             Assert.Equal("People", personEntity.EntityPath);
+        }
+
+        #endregion
+
+        #region Schemas (ODataSchema) tests
+
+        [Fact]
+        public void ParseSalesQuotationMetadataV2_ShouldPopulateSchemas()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(sapSalesQuotationMetadataV2);
+
+            // Assert
+            Assert.NotEmpty(metadata.Schemas);
+            var schema = metadata.Schemas.First();
+            Assert.Equal("API_SALES_QUOTATION_SRV_Entities", schema.ContainerName);
+            Assert.Equal("API_SALES_QUOTATION_SRV", schema.Namespace);
+            Assert.NotEmpty(schema.EntitySets);
+            Assert.NotEmpty(schema.Functions);
+        }
+
+        [Fact]
+        public void ParseODataDemoV2_ShouldPopulateSchemas()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(odataDemoMetadataV2);
+
+            // Assert
+            Assert.NotEmpty(metadata.Schemas);
+            var schema = metadata.Schemas.First();
+            Assert.Equal("DemoService", schema.ContainerName);
+            Assert.Equal("ODataDemo", schema.Namespace);
+            Assert.NotEmpty(schema.EntitySets);
+            // EntitySets are in the schema object itself (no separate top-level list)
+        }
+
+        [Fact]
+        public void ParseTrippinMetadataV4_ShouldPopulateSchemas()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(trippinMetadataV4);
+
+            // Assert
+            Assert.NotEmpty(metadata.Schemas);
+            var schema = metadata.Schemas.First();
+            Assert.Equal("Container", schema.ContainerName);
+            Assert.Equal("Trippin", schema.Namespace);
+            Assert.NotEmpty(schema.EntitySets);
+            Assert.NotEmpty(schema.Singletons);
+            // EntitySets are in the schema object itself (no separate top-level list)
+        }
+
+        [Fact]
+        public void ParseComplexMetadataV4_ShouldPopulateSchemasWithNamespace()
+        {
+            // Act
+            var metadata = MetadataParser.Parse(complexMetadataV4);
+
+            // Assert
+            Assert.NotEmpty(metadata.Schemas);
+            // The schema with the EntityContainer is Company.Billing
+            var schema = metadata.Schemas.First(s => !string.IsNullOrEmpty(s.ContainerName));
+            Assert.Equal("MainContainer", schema.ContainerName);
+            Assert.Equal("Company.Billing", schema.Namespace);
         }
 
         #endregion

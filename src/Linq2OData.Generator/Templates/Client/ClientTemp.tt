@@ -51,13 +51,14 @@ public class <#= request.Name #>
         return new CreateBuilder<T>(odataClient);
     }
 <# foreach (var clientMetadata in request.Metadata) { #>
-<# foreach (var singleton in clientMetadata.Metadata.Singletons) { #>
+<# foreach (var schema in clientMetadata.Metadata.Schemas) { #>
+<# foreach (var singleton in schema.Singletons) { #>
     public SingletonBuilder<<#= singleton.EntityType.ClassName #>> <#= singleton.Name #>()
     {
         return new SingletonBuilder<<#= singleton.EntityType.ClassName #>>(odataClient, "<#= GetSingletonPath(clientMetadata, singleton) #>");
     }
 <# } #>
-<# foreach (var func in clientMetadata.Metadata.Functions) { #>
+<# foreach (var func in schema.Functions) { #>
 <# if (func.HttpMethod == "GET") { #>
 <# if (func.CSharpReturnType == "void") { #>
     public async Task <#= func.CSharpMethodName #>Async(<#= func.CSharpParameters #>CancellationToken cancellationToken = default)
@@ -93,6 +94,7 @@ public class <#= request.Name #>
 <# } #>
         return result?.Data;
     }
+<# } #>
 <# } #>
 <# } #>
 <# } #>

@@ -36,7 +36,7 @@
                 <Tabs>
                     @foreach (var clientMetadata in request.Metadata)
                     {
-                        <Tab Title="@(clientMetadata.Metadata.Namespace)">
+                        <Tab Title="@(clientMetadata.Metadata.Schemas.FirstOrDefault()?.Namespace ?? "")">
 
                             <DataGrid class="mb-3">
 
@@ -49,7 +49,7 @@
                                 </DataGridItem>
 
                                 <DataGridItem Title="Namespace">
-                                    @clientMetadata.Metadata.Namespace
+                                    @clientMetadata.Metadata.Schemas.FirstOrDefault()?.Namespace
                                 </DataGridItem>
                                 
                             </DataGrid>
@@ -58,7 +58,7 @@
                             <Tabs>
                                 <Tab Title="EntitySets">
                                     <ChildContent>
-                                        <Table Item="ODataEntitySet" Items="@clientMetadata.Metadata.EntitySets">
+                                        <Table Item="ODataEntitySet" Items="@clientMetadata.Metadata.Schemas.SelectMany(s => s.EntitySets).ToList()">
 
                                             <ChildContent>
 
@@ -73,7 +73,7 @@
                                 </Tab>
                                 <Tab Title="Types">
                                     <ChildContent>
-                                        <Table Item="ODataEntityType" Items="@clientMetadata.Metadata.EntityTypes">
+                                        <Table Item="ODataEntityType" Items="@clientMetadata.Metadata.Schemas.SelectMany(s => s.EntityTypes).ToList()">
 
                                             <ChildContent>
                                                 <Column Item="ODataEntityType" Property="e => e.Name" Searchable Sortable >
@@ -108,7 +108,7 @@
 
                                 <Tab Title="Enums">
                                     <ChildContent>
-                                        <Table Item="ODataEnumType" Items="@clientMetadata.Metadata.EnumTypes">
+                                        <Table Item="ODataEnumType" Items="@clientMetadata.Metadata.Schemas.SelectMany(s => s.EnumTypes).ToList()">
 
                                             <ChildContent>
                                                 <Column Item="ODataEnumType" Property="e => e.Name" Searchable Sortable />
@@ -137,7 +137,7 @@
 
                                 <Tab Title="Functions">
                                     <ChildContent>
-                                        <Table Item="ODataFunction" Items="@clientMetadata.Metadata.Functions">
+                                        <Table Item="ODataFunction" Items="@clientMetadata.Metadata.Schemas.SelectMany(s => s.Functions).ToList()">
 
                                             <ChildContent>
                                                 <Column Item="ODataFunction" Property="e => e.Name" Searchable Sortable />
