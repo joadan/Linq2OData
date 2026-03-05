@@ -29,6 +29,12 @@ public class MicrosoftDateTimeOffsetConverter
             throw new JsonException($"Invalid date format: {value}");
 
         var milliseconds = long.Parse(match.Groups[1].Value);
+
+        if (milliseconds < MicrosoftDateTimeHelper.MinMilliseconds)
+            return DateTimeOffset.MinValue;
+        if (milliseconds > MicrosoftDateTimeHelper.MaxMilliseconds)
+            return DateTimeOffset.MaxValue;
+
         return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds);
     }
 

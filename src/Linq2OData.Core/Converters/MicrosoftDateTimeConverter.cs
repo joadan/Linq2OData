@@ -11,6 +11,9 @@ internal static class MicrosoftDateTimeHelper
         new Regex(@"^/Date\((\-?\d+)(?:[+-]\d{4})?\)/$",
                   RegexOptions.Compiled);
 
+    internal const long MinMilliseconds = -62135596800000L;
+    internal const long MaxMilliseconds = 253402300799999L;
+
     internal static DateTime ParseDateTime(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -21,6 +24,11 @@ internal static class MicrosoftDateTimeHelper
             throw new JsonException($"Invalid date format: {value}");
 
         var milliseconds = long.Parse(match.Groups[1].Value);
+
+        if (milliseconds < MinMilliseconds)
+            return DateTime.MinValue;
+        if (milliseconds > MaxMilliseconds)
+            return DateTime.MaxValue;
 
         // IMPORTANT: treat as UTC (matches old .NET behavior)
         return DateTimeOffset
