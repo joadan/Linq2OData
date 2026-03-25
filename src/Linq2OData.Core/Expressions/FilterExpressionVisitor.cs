@@ -623,18 +623,24 @@ namespace Linq2OData.Core.Expressions
         {
             foreach (var accessName in memberAccessNames)
             {
-                var property = value.GetType().GetProperty(accessName);
-                if (property == null)
+                var type = value.GetType();
+                var property = type.GetProperty(accessName);
+                if (property != null)
                 {
-                    throw new NotSupportedException($"Property '{accessName}' not found on type '{value.GetType().Name}'");
+                    var nextValue = property.GetValue(value);
+                    if (nextValue == null) return null;
+                    value = nextValue;
                 }
+                else
+                {
+                    var field = type.GetField(accessName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    if (field == null)
+                        throw new NotSupportedException($"Property or field '{accessName}' not found on type '{type.Name}'");
 
-                var nextValue = property.GetValue(value);
-                if (nextValue == null)
-                {
-                    return null;
+                    var nextValue = field.GetValue(value);
+                    if (nextValue == null) return null;
+                    value = nextValue;
                 }
-                value = nextValue;
             }
             return value;
         }

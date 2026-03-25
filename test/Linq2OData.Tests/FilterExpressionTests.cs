@@ -260,6 +260,24 @@ public class FilterExpressionTests
         Assert.Equal("(Stock ge 10)", result);
     }
 
+    [Fact]
+    public void ODataFilterVisitor_ConstantAsObject_GeneratesCorrectFilter()
+    {
+
+        var product = new TestProduct { ID = 10, Name = "Test", Price = 9.99m, Stock = 100, IsAvailable = true, CreatedDate = DateTime.Now, LastModified = DateTimeOffset.Now, OpenTime = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), OpenDate = DateOnly.FromDateTime(DateTime.Today) };
+
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Stock >= product.ID;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(Stock ge 10)", result);
+    }
+
+
     #endregion
 
     #region Boolean Tests
