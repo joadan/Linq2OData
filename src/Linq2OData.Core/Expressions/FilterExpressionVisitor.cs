@@ -385,6 +385,22 @@ namespace Linq2OData.Core.Expressions
             return c;
         }
 
+        protected override Expression VisitNew(NewExpression n)
+        {
+            try
+            {
+                var lambda = Expression.Lambda(n);
+                var compiled = lambda.Compile();
+                var value = compiled.DynamicInvoke();
+                AppendByValueType(value, sb);
+                return n;
+            }
+            catch
+            {
+                throw new NotSupportedException($"The constructor for '{n.Type.Name}' is not supported");
+            }
+        }
+
         protected override Expression VisitMember(MemberExpression m)
         {
             // Handle string.Length property on entity properties
@@ -578,6 +594,14 @@ namespace Linq2OData.Core.Expressions
                     {
                         sb.Append(FilterHelper.ToODataFilter(dateTimeOffset, odataVersion));
                     }
+                    else if (value is TimeOnly timeOnly)
+                    {
+                        sb.Append(FilterHelper.ToODataFilter(timeOnly, odataVersion));
+                    }
+                    else if (value is DateOnly dateOnly)
+                    {
+                        sb.Append(FilterHelper.ToODataFilter(dateOnly, odataVersion));
+                    }
                     else
                     {
                         throw new NotSupportedException($"The constant for '{value}' is not supported");
@@ -599,18 +623,24 @@ namespace Linq2OData.Core.Expressions
         {
             foreach (var accessName in memberAccessNames)
             {
-                var property = value.GetType().GetProperty(accessName);
-                if (property == null)
+                var type = value.GetType();
+                var property = type.GetProperty(accessName);
+                if (property != null)
                 {
-                    throw new NotSupportedException($"Property '{accessName}' not found on type '{value.GetType().Name}'");
+                    var nextValue = property.GetValue(value);
+                    if (nextValue == null) return null;
+                    value = nextValue;
                 }
+                else
+                {
+                    var field = type.GetField(accessName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    if (field == null)
+                        throw new NotSupportedException($"Property or field '{accessName}' not found on type '{type.Name}'");
 
-                var nextValue = property.GetValue(value);
-                if (nextValue == null)
-                {
-                    return null;
+                    var nextValue = field.GetValue(value);
+                    if (nextValue == null) return null;
+                    value = nextValue;
                 }
-                value = nextValue;
             }
             return value;
         }

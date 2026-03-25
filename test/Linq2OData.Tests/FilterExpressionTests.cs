@@ -22,6 +22,10 @@ public class FilterExpressionTests
         public DateTime? DiscontinuedDate { get; set; }
         public DateTimeOffset LastModified { get; set; }
         public DateTimeOffset? LastChecked { get; set; }
+        public TimeOnly OpenTime { get; set; }
+        public TimeOnly? CloseTime { get; set; }
+        public DateOnly OpenDate { get; set; }
+        public DateOnly? CloseDate { get; set; }
         public TestCategory? Category { get; set; }
         public string __Key => $"ID={ID}";
     }
@@ -255,6 +259,24 @@ public class FilterExpressionTests
         // Assert
         Assert.Equal("(Stock ge 10)", result);
     }
+
+    [Fact]
+    public void ODataFilterVisitor_ConstantAsObject_GeneratesCorrectFilter()
+    {
+
+        var product = new TestProduct { ID = 10, Name = "Test", Price = 9.99m, Stock = 100, IsAvailable = true, CreatedDate = DateTime.Now, LastModified = DateTimeOffset.Now, OpenTime = TimeOnly.FromTimeSpan(TimeSpan.FromHours(9)), OpenDate = DateOnly.FromDateTime(DateTime.Today) };
+
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Stock >= product.ID;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(Stock ge 10)", result);
+    }
+
 
     #endregion
 
@@ -1416,6 +1438,207 @@ public class FilterExpressionTests
 
         // Assert
         Assert.Equal("((Gender eq Trippin.TestPersonGender'Male') and (FavoriteFeature ne Trippin.TestFeature'Feature4'))", result);
+    }
+
+    #endregion
+
+    #region DateOnly Tests
+
+    [Fact]
+    public void ODataFilterVisitor_DateOnlyConstant_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var openDate = new DateOnly(2024, 6, 15);
+        Expression<Func<TestProduct, bool>> expression = p => p.OpenDate == openDate;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(OpenDate eq date'2024-06-15')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_DateOnlyConstant_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var openDate = new DateOnly(2024, 6, 15);
+        Expression<Func<TestProduct, bool>> expression = p => p.OpenDate == openDate;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("(OpenDate eq date'2024-06-15')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_DateOnlyGreaterThan_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var cutoff = new DateOnly(2024, 1, 1);
+        Expression<Func<TestProduct, bool>> expression = p => p.OpenDate > cutoff;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(OpenDate gt date'2024-01-01')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_DateOnlyLessThan_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var cutoff = new DateOnly(2024, 12, 31);
+        Expression<Func<TestProduct, bool>> expression = p => p.OpenDate < cutoff;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(OpenDate lt date'2024-12-31')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_NullableDateOnly_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var closeDate = new DateOnly(2024, 9, 30);
+        Expression<Func<TestProduct, bool>> expression = p => p.CloseDate == closeDate;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(CloseDate eq date'2024-09-30')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_DateOnlyInlineConstant_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.OpenDate >= new DateOnly(2024, 3, 1);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(OpenDate ge date'2024-03-01')", result);
+    }
+
+    #endregion
+
+    #region TimeOnly Tests
+
+    [Fact]
+    public void ODataFilterVisitor_TimeOnlyConstant_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var openTime = new TimeOnly(9, 0, 0);
+        Expression<Func<TestProduct, bool>> expression = p => p.OpenTime == openTime;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(OpenTime eq time'09:00:00')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_TimeOnlyConstant_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var openTime = new TimeOnly(9, 0, 0);
+        Expression<Func<TestProduct, bool>> expression = p => p.OpenTime == openTime;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("(OpenTime eq time'09:00:00')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_TimeOnlyGreaterThan_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var cutoff = new TimeOnly(17, 30, 0);
+        Expression<Func<TestProduct, bool>> expression = p => p.OpenTime > cutoff;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(OpenTime gt time'17:30:00')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_TimeOnlyLessThan_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var cutoff = new TimeOnly(12, 0, 0);
+        Expression<Func<TestProduct, bool>> expression = p => p.OpenTime < cutoff;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(OpenTime lt time'12:00:00')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_TimeOnlyWithSeconds_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var closeTime = new TimeOnly(23, 59, 59);
+        Expression<Func<TestProduct, bool>> expression = p => p.OpenTime <= closeTime;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(OpenTime le time'23:59:59')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_NullableTimeOnly_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var closeTime = new TimeOnly(18, 0, 0);
+        Expression<Func<TestProduct, bool>> expression = p => p.CloseTime == closeTime;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(CloseTime eq time'18:00:00')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_TimeOnlyInlineConstant_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.OpenTime >= new TimeOnly(8, 30, 0);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(OpenTime ge time'08:30:00')", result);
     }
 
     #endregion

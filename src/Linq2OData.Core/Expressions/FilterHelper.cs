@@ -60,6 +60,16 @@ public static class FilterHelper
         }
     }
 
+    public static string ToODataFilter(TimeOnly time, ODataVersion version)
+    {
+        return $"time'{time:HH:mm:ss}'";
+    }
+
+    public static string ToODataFilter(DateOnly date, ODataVersion version)
+    {
+        return $"date'{date:yyyy-MM-dd}'";
+    }
+
 
 
 }
