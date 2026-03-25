@@ -385,6 +385,22 @@ namespace Linq2OData.Core.Expressions
             return c;
         }
 
+        protected override Expression VisitNew(NewExpression n)
+        {
+            try
+            {
+                var lambda = Expression.Lambda(n);
+                var compiled = lambda.Compile();
+                var value = compiled.DynamicInvoke();
+                AppendByValueType(value, sb);
+                return n;
+            }
+            catch
+            {
+                throw new NotSupportedException($"The constructor for '{n.Type.Name}' is not supported");
+            }
+        }
+
         protected override Expression VisitMember(MemberExpression m)
         {
             // Handle string.Length property on entity properties
@@ -577,6 +593,14 @@ namespace Linq2OData.Core.Expressions
                     if (value is DateTimeOffset dateTimeOffset)
                     {
                         sb.Append(FilterHelper.ToODataFilter(dateTimeOffset, odataVersion));
+                    }
+                    else if (value is TimeOnly timeOnly)
+                    {
+                        sb.Append(FilterHelper.ToODataFilter(timeOnly, odataVersion));
+                    }
+                    else if (value is DateOnly dateOnly)
+                    {
+                        sb.Append(FilterHelper.ToODataFilter(dateOnly, odataVersion));
                     }
                     else
                     {
