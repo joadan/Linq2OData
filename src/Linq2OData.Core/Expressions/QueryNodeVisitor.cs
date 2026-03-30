@@ -153,8 +153,11 @@ namespace Linq2OData.Core.Expressions
                 }
 
                 // Visit the method arguments (typically lambdas)
-                // Skip the first argument if it's the source (for extension methods)
-                var startIndex = (node.Object == null && node.Arguments.Count > 0 && node.Arguments[0] == sourceMember) ? 1 : 0;
+                // Skip the first argument if it's the source (for extension methods).
+                // Also skip if it's a MethodCallExpression that was already visited in the early
+                // else block above (e.g. the inner Select in .Select(...).ToList()).
+                var startIndex = (node.Object == null && node.Arguments.Count > 0 &&
+                    (node.Arguments[0] == sourceMember || node.Arguments[0] is MethodCallExpression)) ? 1 : 0;
                 for (int i = startIndex; i < node.Arguments.Count; i++)
                 {
                     Visit(node.Arguments[i]);

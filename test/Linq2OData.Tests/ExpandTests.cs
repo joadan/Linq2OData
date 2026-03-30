@@ -781,6 +781,51 @@ public class ExpandTests
 
     #endregion
 
+    #region Collection Select with ToList
+
+    [Fact]
+    public void Select_WithToListOnNavigationProperty_V2_DoesNotDuplicateExpand()
+    {
+        // Regression: when a nav-property collection is projected via .Select(...).ToList(),
+        // the inner Select MethodCallExpression was visited twice in VisitMethodCall —
+        // once by the early "visit chained source" path and once by the normal arguments loop.
+        // The second visit placed the nav-property as a child of itself, producing
+        // $expand=OrderItems/OrderItems instead of $expand=OrderItems.
+        var visitor = new QueryNodeVisitor();
+        Expression<Func<List<TestOrder>, List<TestOrder>>> expression = list =>
+            list.Select(o => new TestOrder
+            {
+                ID = o.ID,
+                OrderItems = o.OrderItems!.Select(i => new TestOrderItem { Quantity = i.Quantity }).ToList()
+            }).ToList();
+
+        var node = visitor.Parse(expression);
+        var result = node.GetSelectExpand(ODataVersion.V2);
+
+        Assert.Equal("ID,OrderItems", result.select);
+        Assert.Equal("OrderItems", result.expand);
+    }
+
+    [Fact]
+    public void Select_WithToListOnNavigationProperty_V4_DoesNotDuplicateExpand()
+    {
+        var visitor = new QueryNodeVisitor();
+        Expression<Func<List<TestOrder>, List<TestOrder>>> expression = list =>
+            list.Select(o => new TestOrder
+            {
+                ID = o.ID,
+                OrderItems = o.OrderItems!.Select(i => new TestOrderItem { Quantity = i.Quantity }).ToList()
+            }).ToList();
+
+        var node = visitor.Parse(expression);
+        var result = node.GetSelectExpand(ODataVersion.V4);
+
+        Assert.Equal("ID", result.select);
+        Assert.Equal("OrderItems($select=Quantity)", result.expand);
+    }
+
+    #endregion
+
     #region OData Version Comparison Tests
 
     [Fact]

@@ -1,5 +1,5 @@
 ﻿//using DemoClientV4.ODataDemo;
-using DemoClientV4.ODataDemo;
+//using DemoClientV4.ODataDemo;
 using Linq2OData.Core.Metadata;
 using Linq2OData.Generator.Models;
 
@@ -17,14 +17,15 @@ namespace Linq2OData.TestClients
         {
             Console.WriteLine("Here we go!");
 
-            //await GenerateDemoClientV2Async();
+            // await GenerateDemoClientV2Async();
             //await GenerateDemoClientV4Async();
             //await GenerateTripPinClientAsync();
 
             //GenerateLargeClientAsync();
 
-           //     await TestTripPinAsync();
-            await TestV4ClientAsync();
+            //     await TestTripPinAsync();
+            //await TestV4ClientAsync();
+            await TestV2ClientAsync();
         }
 
         private static async Task TestTripPinAsync()
@@ -90,11 +91,17 @@ namespace Linq2OData.TestClients
 
             var kalle = clientV2.Services;
 
-            var queryResult = await clientV2
-               .Query<DemoClientV2.ODataDemo.Product>()
-               .Filter(e => e.ID != 1)
-               .Expand(expand => expand.Category!.Products)
-               .ExecuteAsync();
+            //var queryResult = await clientV2
+            //   .Query<DemoClientV2.ODataDemo.Product>()
+            //   .Filter(e => e.ID != 1)
+            //   .Select(e => e.Select(e => new DemoClientV2.ODataDemo.Product { Name = e.Name, Price = e.Price, Supplier = new DemoClientV2.ODataDemo.Supplier { Name = e.Name } }))
+            //   .ExecuteAsync();
+
+            var query = clientV2
+            .Query<DemoClientV2.ODataDemo.Supplier>()
+            .Select(e => e.Select(e => new DemoClientV2.ODataDemo.Supplier { Name = e.Name, Products = e.Products!.Select(p => new DemoClientV2.ODataDemo.Product { Name = p.Name }).ToList() }));
+         
+            var queryResult = await query.ExecuteAsync();
 
 
             var r = queryResult;
@@ -112,7 +119,7 @@ namespace Linq2OData.TestClients
             var clientV4 = new DemoClientV4.ODataDemoClientV4(httpClient);
 
             var queryResult = await clientV4
-            .Get<Product>(e => e.ID = 4)
+            .Get<DemoClientV4.ODataDemo.Product>(e => e.ID = 4)
             .Expand(e => e.Categories)
             .Expand(e => e.Supplier)
             .ExecuteAsync();
@@ -185,7 +192,7 @@ namespace Linq2OData.TestClients
 
         private static void GenerateLargeClientAsync()
         {
-           
+
             var metadata = File.ReadAllText("Metadata/LargeMetadata.xml");
 
 
@@ -212,8 +219,8 @@ namespace Linq2OData.TestClients
 
             var files = generator.GenerateClient(Path.Combine(projectDirectory, "LargeClientV4"));
 
-          //  var files = generator.GenerateClient();
-          
+            //  var files = generator.GenerateClient();
+
         }
 
 
