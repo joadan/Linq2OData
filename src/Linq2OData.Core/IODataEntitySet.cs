@@ -7,6 +7,6 @@ namespace Linq2OData.Core
    
     public interface IODataEntitySet
     {
-        public string __Key { get; }
+        public string _Key { get; }
     }
 }

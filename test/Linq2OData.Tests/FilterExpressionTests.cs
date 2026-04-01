@@ -27,7 +27,7 @@ public class FilterExpressionTests
         public DateOnly OpenDate { get; set; }
         public DateOnly? CloseDate { get; set; }
         public TestCategory? Category { get; set; }
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Categories")]
@@ -35,7 +35,7 @@ public class FilterExpressionTests
     {
         public int ID { get; set; }
         public string? Name { get; set; }
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     // Entities where C# property names differ from OData attribute names
@@ -57,7 +57,7 @@ public class FilterExpressionTests
         [ODataMember("ArticleCategory", isComplex: true)]
         public TestArticleCategory? CSharpCategory { get; set; }
 
-        public string __Key => $"ArticleId={CSharpId}";
+        public string _Key => $"ArticleId={CSharpId}";
     }
 
     [ODataEntitySet("ArticleCategories")]
@@ -69,7 +69,7 @@ public class FilterExpressionTests
         [ODataMember("CategoryName")]
         public string? CSharpName { get; set; }
 
-        public string __Key => $"CategoryId={CSharpId}";
+        public string _Key => $"CategoryId={CSharpId}";
     }
 
     #region ODataMemberAttribute Name Tests
@@ -1365,7 +1365,7 @@ public class FilterExpressionTests
         public TestPersonGender Gender { get; set; }
         public TestPersonGender? NullableGender { get; set; }
         public TestFeature FavoriteFeature { get; set; }
-        public string __Key => $"UserName='{UserName}'";
+        public string _Key => $"UserName='{UserName}'";
     }
 
     [Fact]

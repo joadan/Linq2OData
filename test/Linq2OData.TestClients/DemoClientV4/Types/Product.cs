@@ -41,7 +41,7 @@ public partial class Product  : IDemoClientV4EntitySet, IProductKeys
     [JsonIgnore]
     public ProductDetail? ProductDetail { get; set; }
 
- public string __Key => $"{ID}"; 
+ public string _Key => $"{ID}"; 
 
 
 }

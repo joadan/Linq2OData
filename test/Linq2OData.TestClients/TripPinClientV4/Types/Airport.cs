@@ -23,7 +23,7 @@ public partial class Airport  : ITripPinEntitySet, IAirportKeys
     
     //Navigations
 
- public string __Key => $"'{IcaoCode}'"; 
+ public string _Key => $"'{IcaoCode}'"; 
 
 
 }

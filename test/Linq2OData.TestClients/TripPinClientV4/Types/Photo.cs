@@ -19,7 +19,7 @@ public partial class Photo  : ITripPinEntitySet, IPhotoKeys
     
     //Navigations
 
- public string __Key => $"{Id}"; 
+ public string _Key => $"{Id}"; 
 
 
 }

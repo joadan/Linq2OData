@@ -260,7 +260,7 @@ public class ODataEntityDeserializationTests
 		[JsonIgnore]
 		public List<TestOrder>? Orders { get; set; }
 
-		public string __Key => $"CustomerId={CustomerId}";
+		public string _Key => $"CustomerId={CustomerId}";
 	}
 
 	private class TestPlainClass

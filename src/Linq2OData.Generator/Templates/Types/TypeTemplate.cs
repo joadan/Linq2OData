@@ -161,7 +161,7 @@ namespace Linq2OData.Generator.Templates.Types
             
             #line default
             #line hidden
-            this.Write(" public string __Key => $\"");
+            this.Write(" public string _Key => $\"");
             
             #line 30 "C:\Code\Github\Linq2OData\src\Linq2OData.Generator\Templates\Types\TypeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(entityType.KeyResultString));

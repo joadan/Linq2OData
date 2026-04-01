@@ -38,7 +38,7 @@ public partial class Person  : ITripPinEntitySet, IPersonKeys
     [JsonIgnore]
     public Photo? Photo { get; set; }
 
- public string __Key => $"'{UserName}'"; 
+ public string _Key => $"'{UserName}'"; 
 
 
 }

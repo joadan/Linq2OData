@@ -245,7 +245,7 @@ public class ODataClientIntegrationTests
         public string SalesOrder { get; set; } = "";
         public string SalesOrderType { get; set; } = "";
         public List<TestSalesOrderItem>? to_Item { get; set; }
-        public string __Key => $"SalesOrder={SalesOrder}";
+        public string _Key => $"SalesOrder={SalesOrder}";
     }
 
     private class TestSalesOrderItem : IODataEntitySet
@@ -253,7 +253,7 @@ public class ODataClientIntegrationTests
         public string SalesOrder { get; set; } = "";
         public string SalesOrderItem { get; set; } = "";
         public string Material { get; set; } = "";
-        public string __Key => $"SalesOrder={SalesOrder},SalesOrderItem={SalesOrderItem}";
+        public string _Key => $"SalesOrder={SalesOrder},SalesOrderItem={SalesOrderItem}";
     }
 
     // Test entity for single navigation property tests
@@ -273,14 +273,14 @@ public class ODataClientIntegrationTests
         [System.Text.Json.Serialization.JsonConverter(typeof(ODataNavigationPropertyConverter<TestSupplier>))]
         public TestSupplier? Supplier { get; set; }
 
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     private class TestCategory : IODataEntitySet
     {
         public int ID { get; set; }
         public string? Name { get; set; }
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     private class TestSupplier : IODataEntitySet
@@ -288,7 +288,7 @@ public class ODataClientIntegrationTests
         public int ID { get; set; }
         public string? Name { get; set; }
         public TestAddress? Address { get; set; }
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     private class TestAddress

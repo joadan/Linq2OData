@@ -20,7 +20,7 @@ public class NestedCollectionExpandTests
         [JsonIgnore]
         public List<TestTrip>? Trips { get; set; }
 
-        public string __Key => $"UserName='{UserName}'";
+        public string _Key => $"UserName='{UserName}'";
     }
 
     [ODataEntity]

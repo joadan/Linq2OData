@@ -27,7 +27,7 @@ public class SelectProjectionTests
         [ODataMember("PersonDetail", isComplex: true)]
         public TestPersonDetail? PersonDetail { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("PersonDetails")]
@@ -48,7 +48,7 @@ public class SelectProjectionTests
         [ODataMember("Person", isComplex: true)]
         public TestPerson? Person { get; set; }
         
-        public string __Key => $"PersonID={PersonID}";
+        public string _Key => $"PersonID={PersonID}";
     }
 
     [ODataEntitySet("Addresses")]
@@ -66,7 +66,7 @@ public class SelectProjectionTests
         [ODataMember("Country", isComplex: true)]
         public TestCountry? Country { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Countries")]
@@ -78,7 +78,7 @@ public class SelectProjectionTests
         [ODataMember("Name")]
         public string? Name { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Products")]
@@ -96,7 +96,7 @@ public class SelectProjectionTests
         [ODataMember("Category", isComplex: true)]
         public TestCategory? Category { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Categories")]
@@ -111,7 +111,7 @@ public class SelectProjectionTests
         [ODataMember("Products", isComplex: true)]
         public List<TestProduct>? Products { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     #region Simple Property Selection Tests
