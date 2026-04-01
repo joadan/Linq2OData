@@ -24,7 +24,7 @@ public class SingletonBuilderTests
 		[ODataMember("Address", isComplex: true)]
 		public TestAddress? Address { get; set; }
 
-		public string __Key => $"ID={ID}";
+		public string _Key => $"ID={ID}";
 	}
 
 	[ODataEntitySet("Addresses")]
@@ -33,7 +33,7 @@ public class SingletonBuilderTests
 		[ODataMember("City")]
 		public string? City { get; set; }
 
-		public string __Key => "";
+		public string _Key => "";
 	}
 
 	private (SingletonBuilder<TestPerson> builder, MockHttpHandler handler) CreateBuilder(

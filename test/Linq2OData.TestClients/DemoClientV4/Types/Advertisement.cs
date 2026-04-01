@@ -24,7 +24,7 @@ public partial class Advertisement  : IDemoClientV4EntitySet, IAdvertisementKeys
     [JsonIgnore]
     public FeaturedProduct? FeaturedProduct { get; set; }
 
- public string __Key => $"{ID}"; 
+ public string _Key => $"{ID}"; 
 
 
 }

@@ -29,7 +29,7 @@ public class ExpandTests
         [ODataMember("OrderItems", isComplex: true)]
         public List<TestOrderItem>? OrderItems { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Customers")]
@@ -53,7 +53,7 @@ public class ExpandTests
         [ODataMember("PrimaryContact", isComplex: true)]
         public TestContact? PrimaryContact { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Addresses")]
@@ -74,7 +74,7 @@ public class ExpandTests
         [ODataMember("Country", isComplex: true)]
         public TestCountry? Country { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Countries")]
@@ -92,7 +92,7 @@ public class ExpandTests
         [ODataMember("Region", isComplex: true)]
         public TestRegion? Region { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Regions")]
@@ -104,7 +104,7 @@ public class ExpandTests
         [ODataMember("Name")]
         public string? Name { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("OrderItems")]
@@ -122,7 +122,7 @@ public class ExpandTests
         [ODataMember("Product", isComplex: true)]
         public TestProduct? Product { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Products")]
@@ -143,7 +143,7 @@ public class ExpandTests
         [ODataMember("Supplier", isComplex: true)]
         public TestSupplier? Supplier { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Categories")]
@@ -158,7 +158,7 @@ public class ExpandTests
         [ODataMember("ParentCategory", isComplex: true)]
         public TestCategory? ParentCategory { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Suppliers")]
@@ -173,7 +173,7 @@ public class ExpandTests
         [ODataMember("Address", isComplex: true)]
         public TestAddress? Address { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Contacts")]
@@ -191,7 +191,7 @@ public class ExpandTests
         [ODataMember("Phone")]
         public string? Phone { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     #region Simple Expand Tests

@@ -37,7 +37,7 @@ public partial class Trip  : ITripKeys
     [JsonIgnore]
     public List<PlanItem>? PlanItems { get; set; }
 
- public string __Key => $"{TripId}"; 
+ public string _Key => $"{TripId}"; 
 
 
 }

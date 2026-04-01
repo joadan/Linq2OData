@@ -25,7 +25,7 @@ public class GetProjectionIntegrationTests
         [ODataMember("PersonDetail", isComplex: true)]
         public TestPersonDetail? PersonDetail { get; set; }
         
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("PersonDetails")]
@@ -43,7 +43,7 @@ public class GetProjectionIntegrationTests
         [ODataMember("Person", isComplex: true)]
         public TestPerson? Person { get; set; }
         
-        public string __Key => $"PersonID={PersonID}";
+        public string _Key => $"PersonID={PersonID}";
     }
 
     [Fact]

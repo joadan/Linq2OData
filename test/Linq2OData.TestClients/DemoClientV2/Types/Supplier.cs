@@ -26,7 +26,7 @@ public partial class Supplier  : IDemoClientV2EntitySet, ISupplierKeys
     [JsonIgnore]
     public List<Product>? Products { get; set; }
 
- public string __Key => $"{ID}"; 
+ public string _Key => $"{ID}"; 
 
 
 }

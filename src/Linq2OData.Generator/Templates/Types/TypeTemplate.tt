@@ -27,7 +27,7 @@ public partial class <#= entityType.ClassName #> <#= BaseTypeAndInterface #>
 <# } #>
 
 <# if (entityType.KeyProperties.Any()) { #>
- public string __Key => $"<#= entityType.KeyResultString #>"; 
+ public string _Key => $"<#= entityType.KeyResultString #>"; 
 <# } #>
 
 

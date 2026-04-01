@@ -58,7 +58,7 @@ public class ActionsAndFunctionsTests
 	{
 		public int ID { get; set; }
 		public string? Name { get; set; }
-		public string __Key => $"ID={ID}";
+		public string _Key => $"ID={ID}";
 	}
 
 	#region InvokeActionAsync (no return type)

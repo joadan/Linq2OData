@@ -20,7 +20,7 @@ public class OrderByExpressionTests
         public decimal Rating { get; set; }
         public DateTime JoinDate { get; set; }
         public TestAddress? Address { get; set; }
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Addresses")]
@@ -29,7 +29,7 @@ public class OrderByExpressionTests
         public int ID { get; set; }
         public string? City { get; set; }
         public string? Country { get; set; }
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     [ODataEntitySet("Products")]
@@ -39,7 +39,7 @@ public class OrderByExpressionTests
         public string? Name { get; set; }
         public decimal Price { get; set; }
         public int Stock { get; set; }
-        public string __Key => $"ID={ID}";
+        public string _Key => $"ID={ID}";
     }
 
     // Entities where C# property names differ from OData attribute names
@@ -58,7 +58,7 @@ public class OrderByExpressionTests
         [ODataMember("ArticleCategory", isComplex: true)]
         public TestArticleCategory? CSharpCategory { get; set; }
 
-        public string __Key => $"ArticleId={CSharpId}";
+        public string _Key => $"ArticleId={CSharpId}";
     }
 
     [ODataEntitySet("ArticleCategories")]
@@ -67,7 +67,7 @@ public class OrderByExpressionTests
         [ODataMember("CategoryName")]
         public string? CSharpName { get; set; }
 
-        public string __Key => $"CategoryName={CSharpName}";
+        public string _Key => $"CategoryName={CSharpName}";
     }
 
     #region ODataMemberAttribute Name Tests
