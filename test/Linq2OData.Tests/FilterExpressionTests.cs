@@ -533,8 +533,8 @@ public class FilterExpressionTests
         var result = visitor.ToFilter(expression, ODataVersion.V2);
 
         // Assert
-        // V2 should convert DateTimeOffset to datetime (without offset)
-        Assert.StartsWith("(LastModified lt datetime'2024-01-15T", result);
+        // V2 should use datetimeoffset syntax for DateTimeOffset values
+        Assert.StartsWith("(LastModified lt datetimeoffset'2024-01-15T", result);
         Assert.EndsWith("')", result);
     }
 
@@ -550,7 +550,7 @@ public class FilterExpressionTests
         var result = visitor.ToFilter(expression, ODataVersion.V2);
 
         // Assert
-        Assert.StartsWith("(LastChecked lt datetime'2024-12-31T", result);
+        Assert.StartsWith("(LastChecked lt datetimeoffset'2024-12-31T", result);
         Assert.EndsWith("')", result);
     }
 

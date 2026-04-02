@@ -50,14 +50,7 @@ public static class FilterHelper
 
     public static string ToODataFilter(DateTimeOffset date, ODataVersion version)
     {
-        if (version == ODataVersion.V2)
-        {
-            return $"datetime'{date:yyyy-MM-ddTHH:mm:ss}'";
-        }
-        else
-        {
-            return $"datetimeoffset'{date:yyyy-MM-ddTHH:mm:ssK}'";
-        }
+        return $"datetimeoffset'{date:yyyy-MM-ddTHH:mm:ssK}'";
     }
 
     public static string ToODataFilter(TimeOnly time, ODataVersion version)
