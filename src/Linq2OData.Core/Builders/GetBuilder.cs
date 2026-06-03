@@ -1,8 +1,6 @@
 ﻿using Linq2OData.Core.Expressions;
 using Linq2OData.Core.ODataResponse;
 using System.Linq.Expressions;
-using System.Reflection.PortableExecutable;
-using static System.Net.WebRequestMethods;
 
 namespace Linq2OData.Core.Builders;
 
