@@ -63,6 +63,19 @@ namespace Linq2OData.Core
             return true;
         }
 
+        public async Task<ODataResponse<bool>> DeleteEntityWithResponseAsync(string entitysetName, string keyExpression)
+        {
+            var response = await httpClient.DeleteAsync($"{entitysetName}({keyExpression})");
+            var headers = CopyResponseHeaders(response);
+            var statusCode = response.StatusCode;
+            if (statusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return new ODataResponse<bool> { Data = false, StatusCode = statusCode, ResponseHeaders = headers };
+            }
+            await ValidateResponseAsync(response);
+            return new ODataResponse<bool> { Data = true, StatusCode = statusCode, ResponseHeaders = headers };
+        }
+
         public async Task<T> CreateEntityAsync<T>(string entitysetName, ODataInputBase input)
         {
             string json = JsonSerializer.Serialize(input, jsonOptions);
@@ -82,6 +95,29 @@ namespace Linq2OData.Core
             return odataResponse!.Data!;
         }
 
+        public async Task<ODataResponse<T>> CreateEntityWithResponseAsync<T>(string entitysetName, ODataInputBase input)
+        {
+            string json = JsonSerializer.Serialize(input, jsonOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync($"{entitysetName}", content);
+
+            await ValidateResponseAsync(response);
+
+            var headers = CopyResponseHeaders(response);
+            var statusCode = response.StatusCode;
+            var rawResponse = await response.Content.ReadAsStringAsync();
+            var odataResponse = ProcessQueryResponse<T>(rawResponse);
+
+            if (odataResponse == null || odataResponse.Data == null)
+            {
+                throw new Exception("Create entity reported success but the response is null.");
+            }
+
+            odataResponse.StatusCode = statusCode;
+            odataResponse.ResponseHeaders = headers;
+            return odataResponse;
+        }
+
         public async Task InvokeActionAsync(string actionPath, object? parameters = null, CancellationToken token = default)
         {
             string json = parameters != null ? JsonSerializer.Serialize(parameters, jsonOptions) : "{}";
@@ -96,8 +132,13 @@ namespace Linq2OData.Core
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync(actionPath, content, token);
             await ValidateResponseAsync(response);
+            var headers = CopyResponseHeaders(response);
+            var statusCode = response.StatusCode;
             var rawResponse = await response.Content.ReadAsStringAsync(token);
-            return ProcessQueryResponse<T>(rawResponse);
+            var result = ProcessQueryResponse<T>(rawResponse);
+            result.StatusCode = statusCode;
+            result.ResponseHeaders = headers;
+            return result;
         }
 
         public async Task<ODataResponse<T>?> InvokeFunctionAsync<T>(string functionPath, CancellationToken token = default)
@@ -105,8 +146,13 @@ namespace Linq2OData.Core
             using var response = await httpClient.GetAsync(functionPath, token);
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound) { return null; }
             await ValidateResponseAsync(response);
+            var headers = CopyResponseHeaders(response);
+            var statusCode = response.StatusCode;
             var rawResponse = await response.Content.ReadAsStringAsync(token);
-            return ProcessQueryResponse<T>(rawResponse);
+            var result = ProcessQueryResponse<T>(rawResponse);
+            result.StatusCode = statusCode;
+            result.ResponseHeaders = headers;
+            return result;
         }
 
         public async Task<bool> UpdateEntityAsync(string entitysetName, string keyExpression, ODataInputBase input)
@@ -126,6 +172,27 @@ namespace Linq2OData.Core
             return true;
         }
 
+        public async Task<ODataResponse<bool>> UpdateEntityWithResponseAsync(string entitysetName, string keyExpression, ODataInputBase input)
+        {
+            string json = JsonSerializer.Serialize(input, jsonOptions);
+            var request = new HttpRequestMessage(HttpMethod.Patch, $"{entitysetName}({keyExpression})")
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            };
+
+            var response = await httpClient.SendAsync(request);
+            var headers = CopyResponseHeaders(response);
+            var statusCode = response.StatusCode;
+            if (statusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return new ODataResponse<bool> { Data = false, StatusCode = statusCode, ResponseHeaders = headers };
+            }
+
+            await ValidateResponseAsync(response);
+
+            return new ODataResponse<bool> { Data = true, StatusCode = statusCode, ResponseHeaders = headers };
+        }
+
 
         public async Task<ODataResponse<List<T>>> QueryEntitySetAsync<T>(string entitySetName, string? select, string? expand = null, string? filter = null, bool? count = null, int? top = null, int? skip = null, string? orderby = null, CancellationToken token = default)
         {
@@ -138,8 +205,13 @@ namespace Linq2OData.Core
                 await ValidateResponseAsync(response);
             }
 
+            var headers = CopyResponseHeaders(response);
+            var statusCode = response.StatusCode;
             var rawResponse = await response.Content.ReadAsStringAsync(token);
-            return ProcessQueryResponse<List<T>>(rawResponse);
+            var result = ProcessQueryResponse<List<T>>(rawResponse);
+            result.StatusCode = statusCode;
+            result.ResponseHeaders = headers;
+            return result;
         }
 
 
@@ -159,8 +231,13 @@ namespace Linq2OData.Core
                 await ValidateResponseAsync(response);
             }
 
+            var headers = CopyResponseHeaders(response);
+            var statusCode = response.StatusCode;
             var rawResponse = await response.Content.ReadAsStringAsync(token);
-            return ProcessQueryResponse<T>(rawResponse);
+            var result = ProcessQueryResponse<T>(rawResponse);
+            result.StatusCode = statusCode;
+            result.ResponseHeaders = headers;
+            return result;
         }
 
         private string GenerateUrl(string entitySetName, string? keyString = null, string? select = null, string? expand = null, string? filter = null, bool? count = null, int? top = null, int? skip = null, string? orderby = null)
@@ -391,6 +468,16 @@ namespace Linq2OData.Core
             }
 
             throw new ODataRequestException($"OData request failed. Status code:{(int)response.StatusCode}. Error:{odataError?.Message}", response.RequestMessage, odataError);
+        }
+
+        private static IDictionary<string, IEnumerable<string>> CopyResponseHeaders(HttpResponseMessage response)
+        {
+            var headers = new Dictionary<string, IEnumerable<string>>(StringComparer.OrdinalIgnoreCase);
+            foreach (var header in response.Headers)
+                headers[header.Key] = header.Value.ToList();
+            foreach (var header in response.Content.Headers)
+                headers[header.Key] = header.Value.ToList();
+            return headers;
         }
     }
 

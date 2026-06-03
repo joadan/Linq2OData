@@ -1,4 +1,5 @@
 using Linq2OData.Core.Expressions;
+using Linq2OData.Core.ODataResponse;
 using System;
 using System.Linq.Expressions;
 
@@ -124,6 +125,15 @@ namespace Linq2OData.Core.Builders
         public Task<List<TEntity>?> ExecuteAsync(CancellationToken cancellationToken = default)
         {
             return queryBuilder.ExecuteAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// Executes the query and returns the full <see cref="ODataResponse{T}"/> including
+        /// HTTP status code and response headers.
+        /// </summary>
+        public Task<ODataResponse<List<TEntity>>> ExecuteResponseAsync(CancellationToken cancellationToken = default)
+        {
+            return queryBuilder.ExecuteResponseAsync(cancellationToken);
         }
 
         /// <summary>

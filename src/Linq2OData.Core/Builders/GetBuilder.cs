@@ -1,4 +1,5 @@
 ﻿using Linq2OData.Core.Expressions;
+using Linq2OData.Core.ODataResponse;
 using System.Linq.Expressions;
 using System.Reflection.PortableExecutable;
 using static System.Net.WebRequestMethods;
@@ -37,6 +38,15 @@ public class GetBuilder<T> where T : IODataEntitySet, new()
         if (result == null) { return default; }
 
         return result.Data;
+    }
+
+    /// <summary>
+    /// Executes the request and returns the full <see cref="ODataResponse{T}"/> including
+    /// HTTP status code and response headers.
+    /// </summary>
+    public async Task<ODataResponse<T>?> ExecuteResponseAsync(CancellationToken cancellationToken = default)
+    {
+        return await odataClient.QueryEntityAsync<T>(EntityPath, keyExpression, select, expand, cancellationToken);
     }
 
     internal QueryNode MergeExpression<TResult>(Expression<Func<T, TResult>> selector)
