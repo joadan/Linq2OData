@@ -1,4 +1,5 @@
 using Linq2OData.Core;
+using Linq2OData.Core.Builders;
 using Linq2OData.Core.ODataResponse;
 using System.Net;
 using System.Text;
@@ -55,6 +56,7 @@ public class ODataResponseMetadataTests
 		return new ODataClient(httpClient, version);
 	}
 
+	[ODataEntitySet("TestEntities")]
 	private class TestEntity : IODataEntitySet
 	{
 		public int ID { get; set; }
@@ -65,6 +67,118 @@ public class ODataResponseMetadataTests
 	private class TestInput : ODataInputBase
 	{
 		public string? Name { get; set; }
+	}
+
+	// -----------------------------------------------------------------------
+	// Builder ExecuteResponseAsync methods
+	// -----------------------------------------------------------------------
+
+	[Fact]
+	public async Task QueryBuilder_ExecuteResponseAsync_ShouldPopulateStatusCodeAndHeaders()
+	{
+		const string json = @"{""value"":[{""ID"":1,""Name"":""A""}]}";
+		var client = CreateClient(ODataVersion.V4, HttpStatusCode.OK, json,
+			new Dictionary<string, string> { { "X-Query-Header", "query-val" } });
+		var builder = new QueryBuilder<TestEntity>(client);
+
+		var result = await builder.ExecuteResponseAsync();
+
+		Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+		Assert.NotNull(result.ResponseHeaders);
+		Assert.True(result.ResponseHeaders!.ContainsKey("X-Query-Header"));
+	}
+
+	[Fact]
+	public async Task GetBuilder_ExecuteResponseAsync_ShouldPopulateStatusCodeAndHeaders()
+	{
+		const string json = @"{""ID"":1,""Name"":""A""}";
+		var client = CreateClient(ODataVersion.V4, HttpStatusCode.OK, json,
+			new Dictionary<string, string> { { "ETag", "\"e1\"" } });
+		var builder = new GetBuilder<TestEntity>(client, x => x.ID = 1);
+
+		var result = await builder.ExecuteResponseAsync();
+
+		Assert.NotNull(result);
+		Assert.Equal(HttpStatusCode.OK, result!.StatusCode);
+		Assert.NotNull(result.ResponseHeaders);
+		Assert.True(result.ResponseHeaders!.ContainsKey("ETag"));
+	}
+
+	[Fact]
+	public async Task SingletonBuilder_ExecuteResponseAsync_ShouldPopulateStatusCodeAndHeaders()
+	{
+		const string json = @"{""ID"":1,""Name"":""A""}";
+		var client = CreateClient(ODataVersion.V4, HttpStatusCode.OK, json,
+			new Dictionary<string, string> { { "X-Singleton-Header", "singleton-val" } });
+		var builder = new SingletonBuilder<TestEntity>(client, "Me");
+
+		var result = await builder.ExecuteResponseAsync();
+
+		Assert.NotNull(result);
+		Assert.Equal(HttpStatusCode.OK, result!.StatusCode);
+		Assert.NotNull(result.ResponseHeaders);
+		Assert.True(result.ResponseHeaders!.ContainsKey("X-Singleton-Header"));
+	}
+
+	[Fact]
+	public async Task CreateBuilder_ExecuteResponseAsync_ShouldPopulateStatusCodeAndHeaders()
+	{
+		const string json = @"{""ID"":99,""Name"":""Created""}";
+		var client = CreateClient(ODataVersion.V4, HttpStatusCode.Created, json,
+			new Dictionary<string, string> { { "Location", "https://example.com/odata/TestEntities(99)" } });
+		var builder = new CreateBuilder<TestEntity>(client);
+
+		var result = await builder.ExecuteResponseAsync(new TestInput { Name = "Created" });
+
+		Assert.Equal(HttpStatusCode.Created, result.StatusCode);
+		Assert.NotNull(result.ResponseHeaders);
+		Assert.True(result.ResponseHeaders!.ContainsKey("Location"));
+	}
+
+	[Fact]
+	public async Task UpdateBuilder_ExecuteResponseAsync_ShouldPopulateStatusCodeAndHeaders()
+	{
+		var client = CreateClient(ODataVersion.V4, HttpStatusCode.NoContent, string.Empty,
+			new Dictionary<string, string> { { "X-Update-Header", "update-val" } });
+		var builder = new UpdateBuilder<TestEntity>(client, x => x.ID = 1);
+
+		var result = await builder.ExecuteResponseAsync(new TestInput { Name = "Updated" });
+
+		Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
+		Assert.True(result.Data);
+		Assert.NotNull(result.ResponseHeaders);
+		Assert.True(result.ResponseHeaders!.ContainsKey("X-Update-Header"));
+	}
+
+	[Fact]
+	public async Task DeleteBuilder_ExecuteResponseAsync_ShouldPopulateStatusCodeAndHeaders()
+	{
+		var client = CreateClient(ODataVersion.V4, HttpStatusCode.NoContent, string.Empty,
+			new Dictionary<string, string> { { "X-Delete-Header", "delete-val" } });
+		var builder = new DeleteBuilder<TestEntity>(client, x => x.ID = 1);
+
+		var result = await builder.ExecuteResponseAsync();
+
+		Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
+		Assert.True(result.Data);
+		Assert.NotNull(result.ResponseHeaders);
+		Assert.True(result.ResponseHeaders!.ContainsKey("X-Delete-Header"));
+	}
+
+	[Fact]
+	public async Task OrderByBuilder_ExecuteResponseAsync_ShouldPopulateStatusCodeAndHeaders()
+	{
+		const string json = @"{""value"":[{""ID"":1,""Name"":""A""}]}";
+		var client = CreateClient(ODataVersion.V4, HttpStatusCode.OK, json,
+			new Dictionary<string, string> { { "X-OrderBy-Header", "orderby-val" } });
+		var queryBuilder = new QueryBuilder<TestEntity>(client);
+		var builder = queryBuilder.OrderBy(x => x.ID);
+
+		var result = await builder.ExecuteResponseAsync();
+
+		Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+		Assert.NotNull(result.ResponseHeaders);
+		Assert.True(result.ResponseHeaders!.ContainsKey("X-OrderBy-Header"));
 	}
 
 	// -----------------------------------------------------------------------
