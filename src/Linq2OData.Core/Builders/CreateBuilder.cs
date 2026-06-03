@@ -1,4 +1,6 @@
-﻿namespace Linq2OData.Core.Builders;
+﻿using Linq2OData.Core.ODataResponse;
+
+namespace Linq2OData.Core.Builders;
 
 
 
@@ -19,6 +21,15 @@ public class CreateBuilder<T> where T : IODataEntitySet, new()
     public async Task<T> ExecuteAsync(ODataInputBase input)
     {
       return  await odataClient.CreateEntityAsync<T>(entityPath,  input);
+    }
+
+    /// <summary>
+    /// Executes the create request and returns the full <see cref="ODataResponse{T}"/> including
+    /// HTTP status code and response headers.
+    /// </summary>
+    public async Task<ODataResponse<T>> ExecuteResponseAsync(ODataInputBase input)
+    {
+        return await odataClient.CreateEntityWithResponseAsync<T>(entityPath, input);
     }
 
 

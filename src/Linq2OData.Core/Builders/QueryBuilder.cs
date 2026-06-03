@@ -1,4 +1,5 @@
 ﻿using Linq2OData.Core.Expressions;
+using Linq2OData.Core.ODataResponse;
 using System.Linq.Expressions;
 
 namespace Linq2OData.Core.Builders;
@@ -159,6 +160,15 @@ public class QueryBuilder<T> where T : IODataEntitySet, new()
     {
         var result = await odataClient.QueryEntitySetAsync<T>(EntityPath, select, expand, filter, count, top, skip, orderby, cancellationToken);
         return result?.Data;
+    }
+
+    /// <summary>
+    /// Executes the query and returns the full <see cref="ODataResponse{T}"/> including
+    /// HTTP status code and response headers.
+    /// </summary>
+    public async Task<ODataResponse<List<T>>> ExecuteResponseAsync(CancellationToken cancellationToken = default)
+    {
+        return await odataClient.QueryEntitySetAsync<T>(EntityPath, select, expand, filter, count, top, skip, orderby, cancellationToken);
     }
 
 
