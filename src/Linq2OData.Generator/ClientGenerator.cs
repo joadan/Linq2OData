@@ -80,6 +80,20 @@ public class ClientGenerator(ClientRequest request)
             var templateHelperText = new ClientHelperTemplate(request).TransformText();
             AddFile("Client", request.Name + "Helpers.cs", templateHelperText);
         }
+
+        GenerateActionsCode();
+    }
+
+    private void GenerateActionsCode()
+    {
+        foreach (var clientMetadata in request.Metadata)
+        {
+            if (!clientMetadata.Metadata.Schemas.Any(s => s.Functions.Any()))
+                continue;
+
+            var actionsText = new ActionsTemplate(request, clientMetadata, (ODataVersion)version!).TransformText();
+            AddFile("Client", clientMetadata.ActionsClassName + ".cs", actionsText);
+        }
     }
 
     private void GenerateTypesCode()

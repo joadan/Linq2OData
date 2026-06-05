@@ -18,12 +18,6 @@ namespace Linq2OData.Generator.Templates.Client
             };
         }
 
-        private static string GetActionParameterDict(ODataFunction func)
-        {
-            var parts = func.Parameters.Select(p => $"{{ \"{p.Name}\", {p.CSharpParameterName} }}");
-            return string.Join(", ", parts);
-        }
-
         private static string GetSingletonPath(ClientMetadata clientMetadata, ODataSingleton singleton)
         {
             if (string.IsNullOrWhiteSpace(clientMetadata.ServicePath))
@@ -31,7 +25,7 @@ namespace Linq2OData.Generator.Templates.Client
             return $"{clientMetadata.ServicePath}/{singleton.Name}";
         }
 
-        private IEnumerable<string> GetFunctionUsingDirectives()
+        private IEnumerable<string> GetSingletonUsingDirectives()
         {
             var namespaces = new HashSet<string>();
 
@@ -47,43 +41,18 @@ namespace Linq2OData.Generator.Templates.Client
 
                 foreach (var schema in metadata.Schemas)
                 {
-                    foreach (var func in schema.Functions)
+                    foreach (var singleton in schema.Singletons)
                     {
-                        // Collect return type namespace
-                        AddTypeNamespace(func.CSharpReturnType, func.ReturnType, typeToNsMap, namespaces);
-
-                        // Collect parameter type namespaces
-                        foreach (var param in func.Parameters)
-                        {
-                            if (!param.DataType.StartsWith("Edm."))
-                            {
-                                var typeName = param.DataType.Contains('.') ? param.DataType.Split('.').Last() : param.DataType;
-                                if (typeToNsMap.TryGetValue(typeName, out var ns))
-                                    namespaces.Add(ns);
-                            }
-                        }
+                        var typeName = singleton.EntityTypeName.Contains('.')
+                            ? singleton.EntityTypeName.Split('.').Last()
+                            : singleton.EntityTypeName;
+                        if (typeToNsMap.TryGetValue(typeName, out var ns))
+                            namespaces.Add(ns);
                     }
                 }
             }
 
             return namespaces.OrderBy(ns => ns);
-        }
-
-        private static void AddTypeNamespace(string csharpReturnType, string? rawReturnType, Dictionary<string, string> typeToNsMap, HashSet<string> namespaces)
-        {
-            if (string.IsNullOrEmpty(rawReturnType) || csharpReturnType == "void")
-                return;
-
-            var rt = rawReturnType;
-            if (rt.StartsWith("Collection(") && rt.EndsWith(")"))
-                rt = rt.Substring("Collection(".Length, rt.Length - "Collection(".Length - 1);
-
-            if (rt.StartsWith("Edm."))
-                return;
-
-            var typeName = rt.Contains('.') ? rt.Split('.').Last() : rt;
-            if (typeToNsMap.TryGetValue(typeName, out var ns))
-                namespaces.Add(ns);
         }
     }
 }

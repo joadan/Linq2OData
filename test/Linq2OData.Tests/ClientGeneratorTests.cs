@@ -649,22 +649,22 @@ global using System.Threading.Tasks;
 
         // Act
         var files = generator.GenerateClient();
-        var clientFile = files.First(f => f.FolderPath == "Client" && f.FileName == "TrippinClient.cs");
+        var actionsFile = files.First(f => f.FolderPath == "Client" && f.FileName == "Trippin_Actions.cs");
 
         // Assert - unbound action with no return type
-        Assert.Contains("public async Task ResetDataSourceAsync(", clientFile.Content);
-        Assert.Contains("await odataClient.InvokeActionAsync(\"ResetDataSource\", null, cancellationToken)", clientFile.Content);
+        Assert.Contains("public async Task ResetDataSourceAsync(", actionsFile.Content);
+        Assert.Contains("await odataClient.InvokeActionAsync(\"ResetDataSource\", null, cancellationToken)", actionsFile.Content);
 
         // Assert - unbound function with no parameters that returns a single entity
-        Assert.Contains("public async Task<Person?> GetPersonWithMostFriendsAsync(", clientFile.Content);
-        Assert.Contains("InvokeFunctionAsync<Person>($\"GetPersonWithMostFriends\"", clientFile.Content);
+        Assert.Contains("public async Task<Person?> GetPersonWithMostFriendsAsync(", actionsFile.Content);
+        Assert.Contains("InvokeFunctionAsync<Person>($\"GetPersonWithMostFriends\"", actionsFile.Content);
 
         // Assert - unbound function with parameters that returns a single entity
-        Assert.Contains("public async Task<Airport?> GetNearestAirportAsync(double @lat, double @lon,", clientFile.Content);
-        Assert.Contains("InvokeFunctionAsync<Airport>($\"GetNearestAirport(lat={@lat},lon={@lon})\"", clientFile.Content);
+        Assert.Contains("public async Task<Airport?> GetNearestAirportAsync(double @lat, double @lon,", actionsFile.Content);
+        Assert.Contains("InvokeFunctionAsync<Airport>($\"GetNearestAirport(lat={@lat},lon={@lon})\"", actionsFile.Content);
 
         // Assert - using directive for referenced types
-        Assert.Contains("using TripPin.Trippin;", clientFile.Content);
+        Assert.Contains("using TripPin.Trippin;", actionsFile.Content);
     }
 
     [Fact]
@@ -714,11 +714,11 @@ global using System.Threading.Tasks;
 
         // Act
         var files = generator.GenerateClient();
-        var clientFile = files.First(f => f.FolderPath == "Client" && f.FileName == "CompanyClient.cs");
+        var actionsFile = files.First(f => f.FolderPath == "Client" && f.FileName == "Company_Core_Actions.cs");
 
         // Assert - function returning a collection
-        Assert.Contains("public async Task<List<Invoice>?> GetInvoicesByAmountAsync(", clientFile.Content);
-        Assert.Contains("InvokeFunctionAsync<List<Invoice>>", clientFile.Content);
+        Assert.Contains("public async Task<List<Invoice>?> GetInvoicesByAmountAsync(", actionsFile.Content);
+        Assert.Contains("InvokeFunctionAsync<List<Invoice>>", actionsFile.Content);
     }
 
     [Fact]

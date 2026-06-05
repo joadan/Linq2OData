@@ -15,10 +15,13 @@ public class ODataDemoClientV4
 {
     private Linq2OData.Core.ODataClient odataClient;
     public Linq2OData.Core.ODataClient ODataClient => odataClient;
+    private ODataDemo_Actions oDataDemo;
+    public ODataDemo_Actions ODataDemo => oDataDemo;
 
     public ODataDemoClientV4(HttpClient httpClient) 
     {
          odataClient = new Linq2OData.Core.ODataClient(httpClient, Linq2OData.Core.ODataVersion.V4); 
+         oDataDemo = new ODataDemo_Actions(odataClient);
     }
 
     public List<ODataService> Services => DemoClientV4Services.Services();
@@ -45,11 +48,6 @@ public class ODataDemoClientV4
     public CreateBuilder<T> Create<T>() where T : IDemoClientV4EntitySet, new()
     {
         return new CreateBuilder<T>(odataClient);
-    }
-    public async Task IncreaseSalariesAsync(int @percentage, CancellationToken cancellationToken = default)
-    {
-        var actionParameters = new Dictionary<string, object?> { { "percentage", @percentage } };
-        await odataClient.InvokeActionAsync("IncreaseSalaries", actionParameters, cancellationToken);
     }
 }
 

@@ -1,0 +1,61 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+using Linq2OData.Core;
+<# foreach (var usingNs in GetUsingDirectives()) { #>
+using <#= usingNs #>;
+<# } #>
+namespace <#= request.Namespace #>;
+
+public partial class <#= clientMetadata.ActionsClassName #>
+{
+    private Linq2OData.Core.ODataClient odataClient;
+
+    public <#= clientMetadata.ActionsClassName #>(Linq2OData.Core.ODataClient odataClient)
+    {
+        this.odataClient = odataClient;
+    }
+<# foreach (var schema in clientMetadata.Metadata.Schemas) { #>
+<# foreach (var func in schema.Functions) { #>
+<# if (func.HttpMethod == "GET") { #>
+<# if (func.CSharpReturnType == "void") { #>
+    public async Task <#= func.CSharpMethodName #>Async(<#= func.CSharpParameters #>CancellationToken cancellationToken = default)
+    {
+        await odataClient.InvokeFunctionAsync<object>($"<#= func.FunctionUrlTemplate #>", cancellationToken);
+    }
+<# } else { #>
+    public async Task<<#= func.CSharpReturnType #>?> <#= func.CSharpMethodName #>Async(<#= func.CSharpParameters.Length > 0 ? func.CSharpParameters + ", " : "" #>CancellationToken cancellationToken = default)
+    {
+        var result = await odataClient.InvokeFunctionAsync<<#= func.CSharpReturnType #>>($"<#= func.FunctionUrlTemplate #>", cancellationToken);
+        return result?.Data;
+    }
+<# } #>
+<# } else { #>
+<# if (func.CSharpReturnType == "void") { #>
+    public async Task <#= func.CSharpMethodName #>Async(<#= func.CSharpParameters.Length > 0 ? func.CSharpParameters + ", " : "" #>CancellationToken cancellationToken = default)
+    {
+<# if (func.Parameters.Any()) { #>
+        var actionParameters = new Dictionary<string, object?> { <#= GetActionParameterDict(func) #> };
+        await odataClient.InvokeActionAsync("<#= func.Name #>", actionParameters, cancellationToken);
+<# } else { #>
+        await odataClient.InvokeActionAsync("<#= func.Name #>", null, cancellationToken);
+<# } #>
+    }
+<# } else { #>
+    public async Task<<#= func.CSharpReturnType #>?> <#= func.CSharpMethodName #>Async(<#= func.CSharpParameters.Length > 0 ? func.CSharpParameters + ", " : "" #>CancellationToken cancellationToken = default)
+    {
+<# if (func.Parameters.Any()) { #>
+        var actionParameters = new Dictionary<string, object?> { <#= GetActionParameterDict(func) #> };
+        var result = await odataClient.InvokeActionAsync<<#= func.CSharpReturnType #>>("<#= func.Name #>", actionParameters, cancellationToken);
+<# } else { #>
+        var result = await odataClient.InvokeActionAsync<<#= func.CSharpReturnType #>>("<#= func.Name #>", null, cancellationToken);
+<# } #>
+        return result?.Data;
+    }
+<# } #>
+<# } #>
+<# } #>
+<# } #>
+}

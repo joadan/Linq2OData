@@ -16,10 +16,13 @@ public class TripPinClient
 {
     private Linq2OData.Core.ODataClient odataClient;
     public Linq2OData.Core.ODataClient ODataClient => odataClient;
+    private Microsoft_OData_SampleService_Models_TripPin_Actions microsoft_OData_SampleService_Models_TripPin;
+    public Microsoft_OData_SampleService_Models_TripPin_Actions Microsoft_OData_SampleService_Models_TripPin => microsoft_OData_SampleService_Models_TripPin;
 
     public TripPinClient(HttpClient httpClient) 
     {
          odataClient = new Linq2OData.Core.ODataClient(httpClient, Linq2OData.Core.ODataVersion.V4); 
+         microsoft_OData_SampleService_Models_TripPin = new Microsoft_OData_SampleService_Models_TripPin_Actions(odataClient);
     }
 
     public List<ODataService> Services => TripPinServices.Services();
@@ -50,15 +53,6 @@ public class TripPinClient
     public SingletonBuilder<Person> Me()
     {
         return new SingletonBuilder<Person>(odataClient, "Me");
-    }
-    public async Task ResetDataSourceAsync(CancellationToken cancellationToken = default)
-    {
-        await odataClient.InvokeActionAsync("ResetDataSource", null, cancellationToken);
-    }
-    public async Task<Airport?> GetNearestAirportAsync(double @lat, double @lon, CancellationToken cancellationToken = default)
-    {
-        var result = await odataClient.InvokeFunctionAsync<Airport>($"GetNearestAirport(lat={@lat},lon={@lon})", cancellationToken);
-        return result?.Data;
     }
 }
 
