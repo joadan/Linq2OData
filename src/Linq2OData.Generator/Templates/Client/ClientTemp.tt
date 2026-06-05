@@ -6,7 +6,7 @@
 
 using Linq2OData.Core;
 using Linq2OData.Core.Builders;
-<# foreach (var usingNs in GetFunctionUsingDirectives()) { #>
+<# foreach (var usingNs in GetSingletonUsingDirectives()) { #>
 using <#= usingNs #>;
 <# } #>
 namespace <#= request.Namespace #>;
@@ -17,10 +17,21 @@ public class <#= request.Name #>
 {
     private Linq2OData.Core.ODataClient odataClient;
     public Linq2OData.Core.ODataClient ODataClient => odataClient;
+<# foreach (var clientMetadata in request.Metadata) { #>
+<# if (clientMetadata.Metadata.Schemas.Any(s => s.Functions.Any())) { #>
+    private <#= clientMetadata.ActionsClassName #> <#= clientMetadata.ActionsFieldName #>;
+    public <#= clientMetadata.ActionsClassName #> <#= clientMetadata.ActionsPropertyName #> => <#= clientMetadata.ActionsFieldName #>;
+<# } #>
+<# } #>
 
     public <#= request.Name #>(HttpClient httpClient) 
     {
          odataClient = new Linq2OData.Core.ODataClient(httpClient, <#= GetODataVersionParameter() #>); 
+<# foreach (var clientMetadata in request.Metadata) { #>
+<# if (clientMetadata.Metadata.Schemas.Any(s => s.Functions.Any())) { #>
+         <#= clientMetadata.ActionsFieldName #> = new <#= clientMetadata.ActionsClassName #>(odataClient);
+<# } #>
+<# } #>
     }
 <# if (request.IncludeServiceMetadata) { #>
 
@@ -57,45 +68,6 @@ public class <#= request.Name #>
     {
         return new SingletonBuilder<<#= singleton.EntityType.ClassName #>>(odataClient, "<#= GetSingletonPath(clientMetadata, singleton) #>");
     }
-<# } #>
-<# foreach (var func in schema.Functions) { #>
-<# if (func.HttpMethod == "GET") { #>
-<# if (func.CSharpReturnType == "void") { #>
-    public async Task <#= func.CSharpMethodName #>Async(<#= func.CSharpParameters #>CancellationToken cancellationToken = default)
-    {
-        await odataClient.InvokeFunctionAsync<object>($"<#= func.FunctionUrlTemplate #>", cancellationToken);
-    }
-<# } else { #>
-    public async Task<<#= func.CSharpReturnType #>?> <#= func.CSharpMethodName #>Async(<#= func.CSharpParameters.Length > 0 ? func.CSharpParameters + ", " : "" #>CancellationToken cancellationToken = default)
-    {
-        var result = await odataClient.InvokeFunctionAsync<<#= func.CSharpReturnType #>>($"<#= func.FunctionUrlTemplate #>", cancellationToken);
-        return result?.Data;
-    }
-<# } #>
-<# } else { #>
-<# if (func.CSharpReturnType == "void") { #>
-    public async Task <#= func.CSharpMethodName #>Async(<#= func.CSharpParameters.Length > 0 ? func.CSharpParameters + ", " : "" #>CancellationToken cancellationToken = default)
-    {
-<# if (func.Parameters.Any()) { #>
-        var actionParameters = new Dictionary<string, object?> { <#= GetActionParameterDict(func) #> };
-        await odataClient.InvokeActionAsync("<#= func.Name #>", actionParameters, cancellationToken);
-<# } else { #>
-        await odataClient.InvokeActionAsync("<#= func.Name #>", null, cancellationToken);
-<# } #>
-    }
-<# } else { #>
-    public async Task<<#= func.CSharpReturnType #>?> <#= func.CSharpMethodName #>Async(<#= func.CSharpParameters.Length > 0 ? func.CSharpParameters + ", " : "" #>CancellationToken cancellationToken = default)
-    {
-<# if (func.Parameters.Any()) { #>
-        var actionParameters = new Dictionary<string, object?> { <#= GetActionParameterDict(func) #> };
-        var result = await odataClient.InvokeActionAsync<<#= func.CSharpReturnType #>>("<#= func.Name #>", actionParameters, cancellationToken);
-<# } else { #>
-        var result = await odataClient.InvokeActionAsync<<#= func.CSharpReturnType #>>("<#= func.Name #>", null, cancellationToken);
-<# } #>
-        return result?.Data;
-    }
-<# } #>
-<# } #>
 <# } #>
 <# } #>
 <# } #>

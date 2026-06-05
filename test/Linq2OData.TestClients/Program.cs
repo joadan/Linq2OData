@@ -17,15 +17,15 @@ namespace Linq2OData.TestClients
         {
             Console.WriteLine("Here we go!");
 
-            // await GenerateDemoClientV2Async();
+            //await GenerateDemoClientV2Async();
             //await GenerateDemoClientV4Async();
             //await GenerateTripPinClientAsync();
 
             //GenerateLargeClientAsync();
 
-            //     await TestTripPinAsync();
+                 await TestTripPinAsync();
             //await TestV4ClientAsync();
-            await TestV2ClientAsync();
+           // await TestV2ClientAsync();
         }
 
         private static async Task TestTripPinAsync()
@@ -40,6 +40,7 @@ namespace Linq2OData.TestClients
             try
             {
                 Console.WriteLine("Starting query...");
+                 await tripPinClient.Microsoft_OData_SampleService_Models_TripPin.ResetDataSourceAsync(new CancellationToken());
 
                 var result = await tripPinClient
                     .Query<TripPin.Microsoft.OData.SampleService.Models.TripPin.Person>()

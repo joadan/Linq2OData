@@ -7,7 +7,6 @@
 
 using Linq2OData.Core;
 using Linq2OData.Core.Builders;
-using DemoClientV2.ODataDemo;
 namespace DemoClientV2;
 
 public interface IDemoClientV2EntitySet : IODataEntitySet {}
@@ -16,10 +15,13 @@ public class ODataDemoClientV2
 {
     private Linq2OData.Core.ODataClient odataClient;
     public Linq2OData.Core.ODataClient ODataClient => odataClient;
+    private ODataDemo_Actions oDataDemo;
+    public ODataDemo_Actions ODataDemo => oDataDemo;
 
     public ODataDemoClientV2(HttpClient httpClient) 
     {
          odataClient = new Linq2OData.Core.ODataClient(httpClient, Linq2OData.Core.ODataVersion.V2); 
+         oDataDemo = new ODataDemo_Actions(odataClient);
     }
 
     public List<ODataService> Services => DemoClientV2Services.Services();
@@ -46,11 +48,6 @@ public class ODataDemoClientV2
     public CreateBuilder<T> Create<T>() where T : IDemoClientV2EntitySet, new()
     {
         return new CreateBuilder<T>(odataClient);
-    }
-    public async Task<List<Product>?> GetProductsByRatingAsync(int @rating, CancellationToken cancellationToken = default)
-    {
-        var result = await odataClient.InvokeFunctionAsync<List<Product>>($"GetProductsByRating(rating={@rating})", cancellationToken);
-        return result?.Data;
     }
 }
 

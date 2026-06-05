@@ -27,6 +27,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Update="Templates\Client\ActionsTemplate.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>ActionsTemplate.tt</DependentUpon>
+		</Compile>
 		<Compile Update="Templates\Client\ClientHelperTemplate.cs">
 		  <DesignTime>True</DesignTime>
 		  <AutoGen>True</AutoGen>
@@ -56,6 +61,10 @@
 
 
 	<ItemGroup>
+		<None Update="Templates\Client\ActionsTemplate.tt">
+		  <Generator>TextTemplatingFilePreprocessor</Generator>
+		  <LastGenOutput>ActionsTemplate.cs</LastGenOutput>
+		</None>
 		<None Update="Templates\Client\ClientHelperTemplate.tt">
 		  <Generator>TextTemplatingFilePreprocessor</Generator>
 		  <LastGenOutput>ClientHelperTemplate.cs</LastGenOutput>
