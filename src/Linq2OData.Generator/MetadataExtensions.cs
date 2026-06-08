@@ -59,7 +59,9 @@ internal static class MetadataExtensions
         internal string HelperName => $"{navigation.NamespaceName}_Helper";
         internal string ServiceName => $"{navigation.NamespaceName}_Service";
         internal string ActionsClassName => $"{navigation.NamespaceName}_Actions";
-        internal string ActionsPropertyName => navigation.NamespaceName;
+        internal string ActionsPropertyName => string.IsNullOrEmpty(navigation.NamespaceName)
+            ? navigation.NamespaceName
+            : char.ToUpperInvariant(navigation.NamespaceName[0]) + navigation.NamespaceName.Substring(1);
         internal string ActionsFieldName => $"{Helpers.ToCamelCaseVariable(navigation.NamespaceName)}";
 
         internal string MetadataAsJson => System.Text.Json.JsonSerializer.Serialize(navigation.Metadata);
