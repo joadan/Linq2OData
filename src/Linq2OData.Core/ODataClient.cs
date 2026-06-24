@@ -42,6 +42,8 @@ namespace Linq2OData.Core
                 jsonOptions.Converters.Add(new MicrosoftNullableDateTimeConverter());
                 jsonOptions.Converters.Add(new MicrosoftDateTimeOffsetConverter());
                 jsonOptions.Converters.Add(new DecimalStringJsonConverter());
+                jsonOptions.Converters.Add(new DoubleStringJsonConverter());
+                jsonOptions.Converters.Add(new NullableDoubleStringJsonConverter());
                 jsonOptions.Converters.Add(new Int64StringJsonConverter());
                 jsonOptions.Converters.Add(new NullableInt64StringJsonConverter());
                 // Handles the "results" wrapper for V2/V3 collection navigation properties
