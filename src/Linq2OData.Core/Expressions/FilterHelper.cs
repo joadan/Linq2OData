@@ -1,4 +1,6 @@
-﻿namespace Linq2OData.Core.Expressions;
+﻿using System.Xml;
+
+namespace Linq2OData.Core.Expressions;
 
 public static class FilterHelper
 {
@@ -61,6 +63,23 @@ public static class FilterHelper
     public static string ToODataFilter(DateOnly date, ODataVersion version)
     {
         return $"date'{date:yyyy-MM-dd}'";
+    }
+
+    public static string ToODataFilter(TimeSpan? timeSpan, ODataVersion version)
+    {
+        if (!timeSpan.HasValue) return "null";
+        return ToODataFilter(timeSpan.Value, version);
+    }
+
+    public static string ToODataFilter(TimeSpan timeSpan, ODataVersion version)
+    {
+        var iso = XmlConvert.ToString(timeSpan);
+        if (version == ODataVersion.V4)
+        {
+            return $"duration'{iso}'";
+        }
+        // OData v2/v3: Edm.Time literal
+        return $"time'{iso}'";
     }
 
 
