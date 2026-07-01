@@ -26,6 +26,8 @@ public class FilterExpressionTests
         public TimeOnly? CloseTime { get; set; }
         public DateOnly OpenDate { get; set; }
         public DateOnly? CloseDate { get; set; }
+        public TimeSpan Duration { get; set; }
+        public TimeSpan? OptionalDuration { get; set; }
         public TestCategory? Category { get; set; }
         public string _Key => $"ID={ID}";
     }
@@ -1639,6 +1641,99 @@ public class FilterExpressionTests
 
         // Assert
         Assert.Equal("(OpenTime ge time'08:30:00')", result);
+    }
+
+    #endregion
+
+    #region TimeSpan Tests
+
+    [Fact]
+    public void ODataFilterVisitor_TimeSpanConstant_V2_GeneratesTimePrefix()
+    {
+        // Arrange - Edm.Time in OData v2 uses time'...' literal
+        var visitor = new ODataFilterVisitor();
+        var duration = new TimeSpan(9, 18, 39);
+        Expression<Func<TestProduct, bool>> expression = p => p.Duration == duration;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("(Duration eq time'PT9H18M39S')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_TimeSpanConstant_V4_GeneratesDurationPrefix()
+    {
+        // Arrange - Edm.Duration in OData v4 uses duration'...' literal
+        var visitor = new ODataFilterVisitor();
+        var duration = new TimeSpan(9, 18, 39);
+        Expression<Func<TestProduct, bool>> expression = p => p.Duration == duration;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(Duration eq duration'PT9H18M39S')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_TimeSpanGreaterThan_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var duration = new TimeSpan(1, 0, 0);
+        Expression<Func<TestProduct, bool>> expression = p => p.Duration > duration;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("(Duration gt time'PT1H')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_TimeSpanLessThan_V4_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var duration = new TimeSpan(0, 30, 0);
+        Expression<Func<TestProduct, bool>> expression = p => p.Duration < duration;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V4);
+
+        // Assert
+        Assert.Equal("(Duration lt duration'PT30M')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_NullableTimeSpan_V2_GeneratesCorrectFilter()
+    {
+        // Arrange
+        var visitor = new ODataFilterVisitor();
+        var duration = new TimeSpan(2, 15, 0);
+        Expression<Func<TestProduct, bool>> expression = p => p.OptionalDuration == duration;
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("(OptionalDuration eq time'PT2H15M')", result);
+    }
+
+    [Fact]
+    public void ODataFilterVisitor_TimeSpanInlineConstant_V2_GeneratesCorrectFilter()
+    {
+        // Arrange - inline TimeSpan constant (the exact value from the problem report)
+        var visitor = new ODataFilterVisitor();
+        Expression<Func<TestProduct, bool>> expression = p => p.Duration == new TimeSpan(9, 18, 39);
+
+        // Act
+        var result = visitor.ToFilter(expression, ODataVersion.V2);
+
+        // Assert
+        Assert.Equal("(Duration eq time'PT9H18M39S')", result);
     }
 
     #endregion

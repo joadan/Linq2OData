@@ -598,6 +598,10 @@ namespace Linq2OData.Core.Expressions
                     {
                         sb.Append(FilterHelper.ToODataFilter(timeOnly, odataVersion));
                     }
+                    else if (value is TimeSpan timeSpan)
+                    {
+                        sb.Append(FilterHelper.ToODataFilter(timeSpan, odataVersion));
+                    }
                     else if (value is DateOnly dateOnly)
                     {
                         sb.Append(FilterHelper.ToODataFilter(dateOnly, odataVersion));

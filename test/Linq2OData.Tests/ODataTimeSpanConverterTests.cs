@@ -11,6 +11,7 @@ namespace Linq2OData.Tests
         [InlineData("PT2H", 2, 0, 0)] // ISO 8601 Duration: 2 hours
         [InlineData("PT15M", 0, 15, 0)] // ISO 8601 Duration: 15 minutes
         [InlineData("PT1H30M45S", 1, 30, 45)] // ISO 8601 Duration: 1 hour 30 minutes 45 seconds
+        [InlineData("PT09H18M39S", 9, 18, 39)] // OData v2 Edm.Time format from server (with leading zero in hours)
         [InlineData("P1DT2H", 26, 0, 0)] // ISO 8601 Duration: 1 day 2 hours = 26 hours
         [InlineData("1:30:00", 1, 30, 0)] // Standard TimeSpan format
         [InlineData("02:00:00", 2, 0, 0)] // Standard TimeSpan format
@@ -148,6 +149,48 @@ namespace Linq2OData.Tests
 
             // Assert
             Assert.Equal("null", json);
+        }
+
+        [Fact]
+        public void ODataV2_EdmTime_DeserializesFromODataResponse()
+        {
+            // Arrange - OData v2 wraps entity responses in {"d":{...}}
+            // Edm.Time arrives as ISO 8601 duration string, e.g. "PT09H18M39S"
+            var rawResponse = """{"d":{"results":[{"Duration":"PT09H18M39S"}]}}""";
+            var odataClient = new Core.ODataClient(new System.Net.Http.HttpClient(), Core.ODataVersion.V2);
+
+            // Act
+            var result = odataClient.ProcessQueryResponse<List<TestEdmTimeEntity>>(rawResponse);
+
+            // Assert
+            Assert.NotNull(result.Data);
+            Assert.Single(result.Data);
+            Assert.Equal(new TimeSpan(9, 18, 39), result.Data[0].Duration);
+        }
+
+        [Fact]
+        public void ODataV2_EdmTime_NullableProperty_DeserializesFromODataResponse()
+        {
+            // Arrange - nullable Edm.Time property in OData v2 response
+            var rawResponse = """{"d":{"results":[{"Duration":"PT09H18M39S","OptionalDuration":null}]}}""";
+            var odataClient = new Core.ODataClient(new System.Net.Http.HttpClient(), Core.ODataVersion.V2);
+
+            // Act
+            var result = odataClient.ProcessQueryResponse<List<TestEdmTimeEntity>>(rawResponse);
+
+            // Assert
+            Assert.NotNull(result.Data);
+            Assert.Single(result.Data);
+            Assert.Equal(new TimeSpan(9, 18, 39), result.Data[0].Duration);
+            Assert.Null(result.Data[0].OptionalDuration);
+        }
+
+        [Core.ODataEntitySet("TestEntities")]
+        private class TestEdmTimeEntity : Core.IODataEntitySet
+        {
+            public TimeSpan Duration { get; set; }
+            public TimeSpan? OptionalDuration { get; set; }
+            public string _Key => string.Empty;
         }
     }
 }
